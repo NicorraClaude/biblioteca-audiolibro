@@ -1,0 +1,63 @@
+// Esquema de la base — modelo "Book" según el spec de 3 capas legales.
+// Provider SQLite para desarrollo local (migrable a Postgres en Fase 2).
+// La URL se configura en prisma.config.ts (Prisma 7).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Book {
+  id       String @id @default(cuid())
+  slug     String @unique
+  title    String
+  author   String
+  language String // "es" | "en"
+
+  // --- Modelo legal de 3 capas ---
+  contentLayer  Int // 1 = dominio público/CC | 2 = copyright sin licencia (reseña) | 3 = copyright con licencia
+  contentType   String // "full_audiobook" | "summary" | "licensed_audiobook"
+  status        String @default("published") // "published" | "blocked" (Capa 3 sin licencia válida)
+  licenseStatus String // "public_domain" | "cc" | "copyrighted_summary_only" | "licensed"
+
+  // Metadatos generales
+  categories    String // JSON: string[]
+  description   String
+  coverImageUrl String?
+
+  // Procedencia / fuente
+  sourceName  String?
+  sourceUrl   String?
+  gutenbergId Int?    @unique // único → el ingester es idempotente (upsert por id)
+  copyright   Boolean @default(false)
+
+  // Ingesta masiva (Fase 2)
+  textDownloaded Boolean @default(false) // si ya bajamos el texto plano (para TTS)
+  textPath       String? // ruta local del pg{id}.txt
+  librivoxUrl    String? // si LibriVox ya tiene una grabación (audio costo $0)
+
+  // Capa 3 — registro de licencia (JSON: { agreementRef, territory, expiresAt, copyTerms } | null)
+  licenseRecord String?
+
+  // Capa 1 — descargas de e-book
+  ebookPdfUrl  String?
+  ebookEpubUrl String?
+
+  // Capa 2 — links de afiliados (JSON: { store, url }[])
+  affiliateLinks String?
+
+  // Versiones de audio (JSON: { voiceId, voiceName, youtubeVideoId, durationSeconds, status }[])
+  audioVersions String?
+
+  // Métricas / publicación
+  publishedAt   DateTime?
+  viewsCached   Int       @default(0)
+  downloadCount Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

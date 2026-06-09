@@ -1,0 +1,43 @@
+# Cron de crecimiento (Fase 5): todos los días ingiere más libros de dominio
+# público y publica el sitio actualizado. Corre en la nube (no necesita tu
+# compu prendida).
+#
+# Para ACTIVARLO hace falta (una vez):
+#   1) Subir este repo a GitHub.
+#   2) En GitHub → Settings → Secrets and variables → Actions, cargar:
+#        VERCEL_TOKEN       (token de Vercel: vercel.com/account/tokens)
+#        VERCEL_ORG_ID      (de .vercel/project.json tras "vercel link")
+#        VERCEL_PROJECT_ID  (idem)
+# Mientras tanto, el crecimiento se puede correr a mano: bash scripts/grow.sh
+name: Crecer catálogo
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # todos los días 09:00 UTC (~06:00 AR)
+  workflow_dispatch: {} # botón para correrlo a mano
+
+jobs:
+  grow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm ci
+      - name: Ingerir + snapshot (sin deploy)
+        env:
+          SKIP_DEPLOY: "1"
+        run: bash scripts/grow.sh 200 80
+      - name: Commit del snapshot si cambió
+        run: |
+          git config user.name "biblioteca-bot"
+          git config user.email "bot@biblioteca.local"
+          git add prisma/seed-data.json
+          git commit -m "Crecer catálogo (auto)" || echo "sin cambios"
+          git push || echo "nada para pushear"
+      - name: Deploy a Vercel
+        run: npx vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
