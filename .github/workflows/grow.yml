@@ -16,6 +16,9 @@ on:
     - cron: "0 9 * * *" # todos los días 09:00 UTC (~06:00 AR)
   workflow_dispatch: {} # botón para correrlo a mano
 
+permissions:
+  contents: write # para commitear el snapshot actualizado
+
 jobs:
   grow:
     runs-on: ubuntu-latest
