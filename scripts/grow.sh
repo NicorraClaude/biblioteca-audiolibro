@@ -16,6 +16,13 @@ TARGET_EN="${1:-200}"
 TARGET_ES="${2:-80}"
 
 echo "🌱 [$(date +%H:%M:%S)] Creciendo catálogo → EN:$TARGET_EN ES:$TARGET_ES"
+
+# En un entorno limpio (CI) no existe dev.db: la creamos y la sembramos desde el
+# snapshot versionado antes de ingerir (así crecemos sobre el catálogo actual).
+npx prisma generate
+npx prisma migrate deploy
+npx tsx prisma/seed.ts
+
 npx tsx scripts/ingest-gutenberg.ts "$TARGET_EN"
 INGEST_SOURCE=es npx tsx scripts/ingest-gutenberg.ts "$TARGET_ES"
 
