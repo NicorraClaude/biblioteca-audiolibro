@@ -1,0 +1,67 @@
+# Genera en la NUBE las sinopsis + resúmenes (ES/EN + audio Onyx/Nova) que falten,
+# para los libros que el cron creció y nunca pasaron por el pipeline de resúmenes.
+# Idempotente: saltea los que ya tienen. Corré varias veces si quedan muchos.
+#
+# Secrets: BLOB_READ_WRITE_TOKEN, OPENAI_API_KEY, VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
+name: Generar resúmenes faltantes
+
+on:
+  workflow_dispatch:
+    inputs:
+      limite:
+        description: "Máx. de libros por corrida"
+        default: "40"
+
+permissions:
+  contents: write
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Instalar deps
+        run: |
+          npm ci
+          python3 -m venv .venv-tts
+          .venv-tts/bin/pip install -q edge-tts
+      - name: Preparar base desde el snapshot
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
+      - name: Generar resúmenes faltantes
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REQ_LIMIT: ${{ github.event.inputs.limite || '40' }}
+        run: npx tsx scripts/fill-summaries.ts
+      - name: Snapshot del catálogo
+        run: npx tsx scripts/export-seed.ts
+      - name: ¿Cambió el catálogo?
+        id: diff
+        run: |
+          if git diff --quiet -- prisma/seed-data.json; then
+            echo "changed=0" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=1" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Commit del snapshot
+        if: steps.diff.outputs.changed == '1'
+        run: |
+          git config user.name "biblioteca-bot"
+          git config user.email "bot@biblioteca.local"
+          git add prisma/seed-data.json
+          git commit -m "Resúmenes generados (auto)" || echo "sin cambios"
+          git push || echo "nada para pushear"
+      - name: Deploy a Vercel
+        if: steps.diff.outputs.changed == '1'
+        run: npx vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
