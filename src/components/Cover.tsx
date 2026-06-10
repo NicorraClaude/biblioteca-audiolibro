@@ -1,8 +1,9 @@
 import type { Book } from "@/lib/types";
 import { coverColors } from "@/lib/presentation";
 
-// Tapa HÍBRIDA: si tenemos la tapa real (Open Library, sin marca), la mostramos;
-// si no, una tapa DISEÑADA tipográfica con la identidad de la marca.
+// Tapa SIEMPRE diseñada (tipográfica, identidad propia). No usamos imágenes de
+// fuentes externas (Gutenberg/Open Library): la biblioteca es una base ORIGINAL,
+// no un repositorio de otros sitios.
 export function Cover({
   book,
   variant = "card",
@@ -11,24 +12,6 @@ export function Cover({
   variant?: "card" | "detail";
 }) {
   const [from, to] = coverColors(book.slug);
-
-  // Tapa real
-  if (book.coverImageUrl) {
-    return (
-      <div
-        className="h-full w-full"
-        style={{ background: `linear-gradient(150deg, ${from}, ${to})` }}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={book.coverImageUrl}
-          alt={`Tapa de ${book.title}`}
-          loading="lazy"
-          className="h-full w-full object-cover"
-        />
-      </div>
-    );
-  }
 
   // Tapa diseñada
   const initial = book.title.replace(/[^\p{L}\p{N}]/gu, "").charAt(0).toUpperCase();

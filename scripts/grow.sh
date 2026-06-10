@@ -29,8 +29,7 @@ INGEST_SOURCE=es npx tsx scripts/ingest-gutenberg.ts "$TARGET_ES"
 echo "🧹 Quitando duplicados..."
 npx tsx scripts/dedupe-books.ts
 
-echo "🖼️  Tapas verificadas (Open Library, título+autor) ..."
-npx tsx scripts/verify-covers.ts
+# (Tapas: SIEMPRE diseñadas propias. No bajamos imágenes externas — base original.)
 
 echo "🎙️  Match LibriVox a los nuevos..."
 npx tsx scripts/match-librivox.ts

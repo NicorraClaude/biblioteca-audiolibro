@@ -6,6 +6,14 @@
 import { prisma } from "./db";
 import { normalize } from "../src/lib/text";
 
+// Clave de identidad INSENSIBLE al orden del autor: "Stoker, Bram" y "Bram Stoker"
+// dan la misma clave (un ingester guarda "Apellido, Nombre" y el otro "Nombre Apellido").
+// Incluye el idioma para no fusionar nunca una edición ES con una EN.
+function dedupeKey(title: string, author: string, language: string): string {
+  const authorWords = normalize(author.replace(/,/g, " ")).split(/\s+/).filter(Boolean).sort().join(" ");
+  return `${normalize(title)}|${authorWords}|${language}`;
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function score(b: any): number {
   let s = b.downloadCount ?? 0;
@@ -24,8 +32,7 @@ async function main() {
   const all = await prisma.book.findMany({ where: { contentLayer: 1 } });
   const groups = new Map<string, typeof all>();
   for (const b of all) {
-    // Título COMPLETO (no recortado) + autor → los tomos quedan separados.
-    const key = `${normalize(b.title)}|${normalize(b.author.split(",")[0])}`;
+    const key = dedupeKey(b.title, b.author, b.language);
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key)!.push(b);
   }

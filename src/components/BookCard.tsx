@@ -1,7 +1,6 @@
 import Link from "next/link";
 import type { Book } from "@/lib/types";
 import { Cover } from "@/components/Cover";
-import { LayerBadge } from "@/components/LayerBadge";
 import { LANGUAGE_FLAG, getPlayableTrack } from "@/lib/presentation";
 import { PlayButton } from "@/components/player/Player";
 
@@ -16,9 +15,6 @@ export function BookCard({ book }: { book: Book }) {
     >
       <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl shadow-[0_8px_24px_-12px_rgba(33,28,24,0.4)] ring-1 ring-black/5 transition duration-300 group-hover:-translate-y-1.5 group-hover:shadow-[0_20px_40px_-16px_rgba(33,28,24,0.5)]">
         <Cover book={book} />
-        <div className="absolute top-2.5 left-2.5">
-          <LayerBadge layer={book.contentLayer} />
-        </div>
         <div className="absolute top-2.5 right-2.5 text-sm drop-shadow" title="Idioma">
           {LANGUAGE_FLAG[book.language]}
         </div>

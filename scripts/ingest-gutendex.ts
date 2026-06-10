@@ -19,8 +19,6 @@ const TARGET = Number(process.argv[2] ?? process.env.INGEST_TARGET ?? 100);
 const DOWNLOAD_TEXT = process.env.INGEST_NO_TEXT !== "1";
 const TEXT_DIR = path.join(process.cwd(), "content", "texts");
 
-const gutenbergCover = (id: number) =>
-  `https://www.gutenberg.org/cache/epub/${id}/pg${id}.cover.medium.jpg`;
 const gutenbergPage = (id: number) => `https://www.gutenberg.org/ebooks/${id}`;
 
 const pendingAudio = () =>
@@ -129,7 +127,7 @@ async function main() {
       const title: string = (b.title ?? "Sin título").trim();
       const author: string = b.authors?.[0]?.name ?? "Anónimo";
       const formats: Record<string, string> = b.formats ?? {};
-      const cover = formats["image/jpeg"] ?? gutenbergCover(id);
+      const cover = null; // tapa diseñada propia (sin imágenes externas)
       const epub = formats["application/epub+zip"] ?? null;
       const categories = mapCategories(b.subjects ?? [], b.bookshelves ?? []);
       const description = buildDescription(b);

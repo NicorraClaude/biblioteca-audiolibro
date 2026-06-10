@@ -21,8 +21,6 @@ const SPANISH_IDS = [
   16110, 51763, 57497,
 ];
 
-const gutenbergCover = (id: number) =>
-  `https://www.gutenberg.org/cache/epub/${id}/pg${id}.cover.medium.jpg`;
 const gutenbergPage = (id: number) => `https://www.gutenberg.org/ebooks/${id}`;
 
 const pendingAudio = () =>
@@ -192,7 +190,7 @@ async function main() {
       licenseStatus: "public_domain",
       categories: JSON.stringify(categories),
       description: descriptionFor(p.author, p.language),
-      coverImageUrl: gutenbergCover(id),
+      coverImageUrl: null, // tapa diseñada propia (sin imágenes externas)
       sourceName: "Project Gutenberg",
       sourceUrl: gutenbergPage(id),
       copyright: false,
@@ -211,7 +209,7 @@ async function main() {
         author: p.author,
         language: p.language,
         categories: JSON.stringify(categories),
-        coverImageUrl: gutenbergCover(id),
+        coverImageUrl: null, // tapa diseñada propia (sin imágenes externas)
         ebookEpubUrl: p.epubUrl,
         downloadCount: p.downloads,
       },

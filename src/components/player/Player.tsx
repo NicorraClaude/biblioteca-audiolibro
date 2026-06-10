@@ -91,13 +91,12 @@ function PlayerBar() {
         {/* Tapa + info */}
         <div className="flex min-w-0 items-center gap-3 sm:w-64 sm:shrink-0">
           <div
-            className="h-14 w-14 shrink-0 overflow-hidden rounded-lg shadow-md ring-1 ring-black/5"
+            className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-lg shadow-md ring-1 ring-black/5"
             style={{ background: `linear-gradient(150deg, ${from}, ${to})` }}
           >
-            {track.cover && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={track.cover} alt="" className="h-full w-full object-cover" />
-            )}
+            <span className="font-display text-2xl font-black text-white/25 select-none" aria-hidden>
+              {track.title.replace(/[^\p{L}\p{N}]/gu, "").charAt(0).toUpperCase()}
+            </span>
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-ink">{track.title}</p>
