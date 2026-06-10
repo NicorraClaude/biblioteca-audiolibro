@@ -55,6 +55,19 @@ function Flourish({ color }: { color: string }) {
 
 export function Cover({ book, variant = "card" }: { book: Book; variant?: "card" | "detail" }) {
   const detail = variant === "detail";
+
+  // Portada REAL (Open Library, sin marca de fuentes). Si la tenemos, la mostramos.
+  if (book.coverImageUrl) {
+    const [from, to] = [PALETTES[hash(book.slug) % PALETTES.length].deep, "#000"];
+    return (
+      <div className="h-full w-full" style={{ background: `linear-gradient(150deg, ${from}, ${to})` }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={book.coverImageUrl} alt={`Tapa de ${book.title}`} loading="lazy" className="h-full w-full object-cover" />
+      </div>
+    );
+  }
+
+  // Si no hay portada real, una tapa DISEÑADA (fallback, siempre correcta).
   const h = hash(book.slug);
   const p = PALETTES[h % PALETTES.length];
   const tpl = Math.floor(h / 16) % 4;
