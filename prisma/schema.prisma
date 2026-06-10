@@ -53,6 +53,9 @@ model Book {
   // Versiones de audio (JSON: { voiceId, voiceName, youtubeVideoId, durationSeconds, status }[])
   audioVersions String?
 
+  // Resúmenes originales (JSON: { es, en }) — contenido transformador propio
+  summary String?
+
   // Métricas / publicación
   publishedAt   DateTime?
   viewsCached   Int       @default(0)

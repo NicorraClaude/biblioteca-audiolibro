@@ -49,3 +49,7 @@ dev.db-journal
 # Artefactos de build (textos y videos para upload)
 content/
 .venv-tts/
+.env*.local
+
+# Resumen temporal de la corrida de pedidos
+new-titles.txt

@@ -37,10 +37,26 @@ export function splitFrontMatterAndBody(text: string): {
   return { frontMatter: "", body: text.trim() };
 }
 
+// Limpia un párrafo para que el TTS lo lea bien:
+//  - une los saltos de línea internos (Gutenberg corta a ~70 chars) en espacios,
+//    así no parte ni pega palabras ni mete pausas raras,
+//  - saca marcas de cursiva (_), asteriscos y notas [Illustration]/[Footnote],
+//  - normaliza espacios.
+export function cleanParagraphForSpeech(p: string): string {
+  return p
+    .replace(/\[(?:illustration|footnote|sidenote)[^\]]*\]/gi, " ")
+    .replace(/[_*]+/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 // Corta el texto en fragmentos <= maxLen, respetando párrafos y oraciones.
 export function chunkText(text: string, maxLen = 3800): string[] {
-  const clean = text.replace(/\n{3,}/g, "\n\n").trim();
-  const paragraphs = clean.split(/\n\n+/);
+  const clean = text.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+  const paragraphs = clean
+    .split(/\n\n+/)
+    .map(cleanParagraphForSpeech)
+    .filter(Boolean);
   const chunks: string[] = [];
   let current = "";
 

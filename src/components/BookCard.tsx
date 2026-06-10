@@ -2,48 +2,43 @@ import Link from "next/link";
 import type { Book } from "@/lib/types";
 import { Cover } from "@/components/Cover";
 import { LayerBadge } from "@/components/LayerBadge";
-import { LANGUAGE_FLAG, hasPlayableAudio } from "@/lib/presentation";
+import { LANGUAGE_FLAG, getPlayableTrack } from "@/lib/presentation";
+import { PlayButton } from "@/components/player/Player";
 
-// Tarjeta de un libro en la grilla del catálogo.
+// Tarjeta de un libro — diseño app: tapa diseñada, hover con elevación,
+// info clara debajo.
 export function BookCard({ book }: { book: Book }) {
-  const blocked = book.status === "blocked";
+  const track = getPlayableTrack(book);
   return (
     <Link
       href={`/libro/${book.slug}`}
-      className="group flex flex-col overflow-hidden rounded-xl bg-white ring-1 ring-stone-200 transition hover:-translate-y-1 hover:shadow-lg hover:ring-stone-300"
+      className="group flex flex-col"
     >
-      <div className="relative aspect-[2/3] w-full overflow-hidden bg-stone-100">
+      <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl shadow-[0_8px_24px_-12px_rgba(33,28,24,0.4)] ring-1 ring-black/5 transition duration-300 group-hover:-translate-y-1.5 group-hover:shadow-[0_20px_40px_-16px_rgba(33,28,24,0.5)]">
         <Cover book={book} />
-        <div className="absolute top-2 left-2">
-          <LayerBadge layer={book.contentLayer} blocked={blocked} />
+        <div className="absolute top-2.5 left-2.5">
+          <LayerBadge layer={book.contentLayer} />
         </div>
-        <div className="absolute top-2 right-2 text-base" title="Idioma">
+        <div className="absolute top-2.5 right-2.5 text-sm drop-shadow" title="Idioma">
           {LANGUAGE_FLAG[book.language]}
         </div>
-        {hasPlayableAudio(book) && (
-          <div
-            className="absolute right-2 bottom-2 rounded-full bg-black/70 px-2 py-0.5 text-xs font-medium text-white"
-            title="Con audio para escuchar"
+        {track && (
+          <PlayButton
+            track={track}
+            ariaLabel={`Reproducir ${book.title}`}
+            className="absolute right-2.5 bottom-2.5 grid h-9 w-9 place-items-center rounded-full bg-white text-accent shadow-lg transition hover:scale-110 group-hover:scale-110"
           >
-            🎧 Audio
-          </div>
+            <svg viewBox="0 0 24 24" className="h-4 w-4 translate-x-px" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </PlayButton>
         )}
       </div>
-      <div className="flex flex-1 flex-col p-3">
-        <h3 className="line-clamp-2 text-sm leading-snug font-semibold text-stone-900">
+      <div className="px-0.5 pt-2.5">
+        <h3 className="font-display text-[15px] leading-snug font-semibold text-ink line-clamp-1">
           {book.title}
         </h3>
-        <p className="mt-1 text-xs text-stone-500">{book.author}</p>
-        <div className="mt-2 flex flex-wrap gap-1">
-          {book.categories.slice(0, 2).map((c) => (
-            <span
-              key={c}
-              className="rounded bg-stone-100 px-1.5 py-0.5 text-[10px] text-stone-600"
-            >
-              {c}
-            </span>
-          ))}
-        </div>
+        <p className="mt-0.5 text-xs text-ink-soft line-clamp-1">{book.author}</p>
       </div>
     </Link>
   );

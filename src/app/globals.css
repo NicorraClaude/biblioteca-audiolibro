@@ -1,15 +1,51 @@
 @import "tailwindcss";
 
-:root {
-  --background: #fafaf9; /* stone-50 */
-  --foreground: #1c1917; /* stone-900 */
+@theme {
+  /* Paleta "papel & tinta" con acento coral — cálida, premium, 2026 */
+  --color-paper: #faf6ef; /* fondo cálido */
+  --color-surface: #ffffff; /* tarjetas */
+  --color-ink: #211c18; /* texto principal */
+  --color-ink-soft: #6f6259; /* texto secundario */
+  --color-line: #ece3d6; /* bordes suaves */
+  --color-accent: #ec5a36; /* coral — acción principal */
+  --color-accent-dark: #cf4621; /* hover */
+  --color-accent-soft: #fdeee9; /* fondos suaves del acento */
+  --color-mint: #0f9d8f; /* secundario (capa 1 / éxito) */
+
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+:root {
+  --background: var(--color-paper);
+  --foreground: var(--color-ink);
 }
 
 html {
   -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-feature-settings: "ss01", "cv01";
+  background-image:
+    radial-gradient(60rem 40rem at 80% -10%, #fbe9e2 0%, transparent 60%),
+    radial-gradient(50rem 40rem at -10% 0%, #f3efe6 0%, transparent 55%);
+  background-attachment: fixed;
+}
+
+/* Transiciones de navegación suaves (sensación de app) */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.25s;
+  }
+}
+
+/* Scrollbar discreta */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
 }

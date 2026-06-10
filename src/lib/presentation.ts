@@ -47,27 +47,56 @@ export function initials(book: Book): string {
     .join("");
 }
 
-// Color de fondo estable para la portada-placeholder, derivado del slug.
-const GRADIENTS = [
-  "from-rose-400 to-orange-300",
-  "from-violet-400 to-indigo-300",
-  "from-emerald-400 to-teal-300",
-  "from-amber-400 to-yellow-300",
-  "from-sky-400 to-cyan-300",
-  "from-fuchsia-400 to-pink-300",
+// Gradientes profundos y premium para las tapas diseñadas (texto blanco encima).
+const COVER_GRADIENTS = [
+  ["#2b2d42", "#545b78"], // pizarra
+  ["#7b341e", "#c05621"], // terracota
+  ["#1a4731", "#2f855a"], // bosque
+  ["#322659", "#6b46c1"], // ciruela
+  ["#1a365d", "#2b6cb0"], // océano
+  ["#702459", "#b83280"], // baya
+  ["#5f370e", "#b7791f"], // bronce
+  ["#234e52", "#319795"], // teal
+  ["#3c1518", "#8c2f39"], // vino
+  ["#1d3557", "#457b9d"], // acero
 ];
-export function gradientFor(slug: string): string {
+
+function hash(slug: string): number {
   let h = 0;
   for (let i = 0; i < slug.length; i++) h = (h * 31 + slug.charCodeAt(i)) >>> 0;
-  return GRADIENTS[h % GRADIENTS.length];
+  return h;
 }
 
-// ¿El libro tiene audio reproducible YA? (grabación LibriVox, mp3 propio, o
-// video de YouTube público). Los narrados pendientes no cuentan.
+// Devuelve los dos colores del degradado de la tapa, estables por slug.
+export function coverColors(slug: string): [string, string] {
+  return COVER_GRADIENTS[hash(slug) % COVER_GRADIENTS.length] as [string, string];
+}
+
+// ¿El libro tiene audio PROPIO reproducible YA? (YouTube público de nuestro
+// canal o mp3 IA). No contamos LibriVox: el audio lo servimos nosotros.
 export function hasPlayableAudio(book: Book): boolean {
-  return book.audioVersions.some(
-    (v) =>
-      (v.status === "ready" && (v.archiveId || v.audioUrl)) ||
-      (v.youtubeVideoId && v.youtubePublic),
-  );
+  return !!getPlayableTrack(book);
+}
+
+export type PlayableTrack = {
+  title: string;
+  author: string;
+  slug: string;
+  kind: "youtube" | "audio";
+  src: string;
+  cover?: string | null;
+};
+
+// Devuelve cómo reproducir el audio PROPIO de un libro (YouTube público o mp3),
+// o null si todavía no tiene. Prioriza YouTube (monetizable).
+export function getPlayableTrack(book: Book): PlayableTrack | null {
+  const yt = book.audioVersions.find((v) => v.youtubeVideoId && v.youtubePublic);
+  if (yt?.youtubeVideoId) {
+    return { title: book.title, author: book.author, slug: book.slug, kind: "youtube", src: yt.youtubeVideoId, cover: book.coverImageUrl };
+  }
+  const mp3 = book.audioVersions.find((v) => v.audioUrl && v.status === "ready");
+  if (mp3?.audioUrl) {
+    return { title: book.title, author: book.author, slug: book.slug, kind: "audio", src: mp3.audioUrl, cover: book.coverImageUrl };
+  }
+  return null;
 }

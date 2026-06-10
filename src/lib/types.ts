@@ -20,6 +20,20 @@ export type AudioVersion = {
   status: "ready" | "pending" | "processing";
 };
 
+export type SummaryEntry = {
+  text: string;
+  audioUrl?: string | null; // legado (= voz nova)
+  // Audio por voz (♂ onyx / ♀ nova).
+  audio?: { onyx?: string; nova?: string };
+  // Para resúmenes largos servidos desde YouTube (monetizable).
+  youtubeVideoId?: string | null;
+  youtubePublic?: boolean;
+};
+// Por idioma: "sinopsis" (~2-3 min, sin spoilers, genera interés) y
+// "resumen" (~20-30 min, recuento completo sin opiniones; solo dominio público).
+export type LangSummary = { sinopsis?: SummaryEntry; resumen?: SummaryEntry };
+export type SummaryByLang = { es?: LangSummary; en?: LangSummary };
+
 export type LicenseRecord = {
   agreementRef: string;
   territory: string;
@@ -55,6 +69,7 @@ export type Book = {
   ebookEpubUrl: string | null;
   affiliateLinks: AffiliateLink[];
   audioVersions: AudioVersion[];
+  summary: SummaryByLang | null;
   publishedAt: Date | null;
   viewsCached: number;
   downloadCount: number;

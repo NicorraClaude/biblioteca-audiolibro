@@ -3,21 +3,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublicSlugs, getBookBySlug, isPublishable } from "@/lib/books";
 import { Cover } from "@/components/Cover";
-import { LayerBadge } from "@/components/LayerBadge";
 import { AudioSection } from "@/components/AudioSection";
+import { BookContent } from "@/components/BookContent";
+import { EnviarKindle } from "@/components/EnviarKindle";
+import { ChatLibro } from "@/components/ChatLibro";
+import { ResumenMedida } from "@/components/ResumenMedida";
+import { Reviews } from "@/components/Reviews";
 import { LANGUAGE_LABEL, LAYER_INFO } from "@/lib/presentation";
 
-// Solo existen las páginas de los libros públicos. Cualquier otro slug (backlog
-// privado o inexistente) devuelve 404 limpio, sin tocar la base en runtime.
-export const dynamicParams = false;
-
-// Genera una página estática por cada libro público (SSG).
 export async function generateStaticParams() {
   const slugs = await getPublicSlugs();
   return slugs.map((slug) => ({ slug }));
 }
 
-// SEO: metadata por libro.
 export async function generateMetadata({
   params,
 }: {
@@ -29,16 +27,8 @@ export async function generateMetadata({
   return {
     title: `${book.title} — ${book.author}`,
     description: book.description.slice(0, 160),
-    openGraph: {
-      title: `${book.title} — ${book.author}`,
-      description: book.description.slice(0, 160),
-      images: book.coverImageUrl ? [book.coverImageUrl] : undefined,
-    },
   };
 }
-
-const librivoxSearch = (title: string) =>
-  `https://librivox.org/search?q=${encodeURIComponent(title)}&search_form=get_results`;
 
 export default async function BookPage({
   params,
@@ -47,12 +37,17 @@ export default async function BookPage({
 }) {
   const { slug } = await params;
   const book = await getBookBySlug(slug);
-  // No publicamos lo que hoy no se puede entregar (backlog privado): 404.
   if (!book || !isPublishable(book)) notFound();
 
   const info = LAYER_INFO[book.contentLayer];
-
-  // Datos estructurados para buscadores (SEO).
+  const aiCtx = {
+    title: book.title,
+    author: book.author,
+    slug: book.slug,
+    description: book.description,
+    sinopsis: book.summary?.es?.sinopsis?.text ?? book.summary?.en?.sinopsis?.text,
+    resumen: book.summary?.es?.resumen?.text ?? book.summary?.en?.resumen?.text,
+  };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": book.contentLayer === 1 ? "Audiobook" : "Book",
@@ -60,7 +55,6 @@ export default async function BookPage({
     author: { "@type": "Person", name: book.author },
     inLanguage: book.language,
     description: book.description,
-    ...(book.coverImageUrl ? { image: book.coverImageUrl } : {}),
   };
 
   return (
@@ -73,106 +67,84 @@ export default async function BookPage({
 
       <Link
         href="/"
-        className="mb-4 inline-flex items-center gap-1 text-sm font-medium text-stone-500 hover:text-stone-800"
+        className="mb-5 inline-flex items-center gap-1.5 text-sm font-medium text-ink-soft transition hover:text-ink"
       >
-        ← Volver al catálogo
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+        Volver
       </Link>
 
-      <div className="grid gap-8 md:grid-cols-[260px_1fr]">
-        {/* Columna izquierda: portada */}
-        <div>
-          <div className="relative aspect-[2/3] w-full overflow-hidden rounded-xl bg-stone-100 shadow-sm ring-1 ring-stone-200">
-            <Cover book={book} priority sizes="260px" />
+      <div className="grid gap-8 md:grid-cols-[300px_1fr] lg:gap-12">
+        {/* Tapa */}
+        <div className="mx-auto w-44 sm:w-56 md:mx-0 md:w-full">
+          <div className="aspect-[2/3] w-full overflow-hidden rounded-3xl shadow-[0_24px_60px_-20px_rgba(33,28,24,0.55)] ring-1 ring-black/5">
+            <Cover book={book} variant="detail" />
           </div>
         </div>
 
-        {/* Columna derecha: info + acción */}
+        {/* Info + acción */}
         <div>
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <LayerBadge layer={book.contentLayer} />
-            <span className="text-sm text-stone-500">
-              {LANGUAGE_LABEL[book.language]}
+          <div className="mb-3 flex flex-wrap items-center gap-2 text-xs font-semibold tracking-wide">
+            <span className="rounded-full bg-accent-soft px-2.5 py-1 text-accent-dark uppercase">
+              {info.short}
             </span>
+            <span className="text-ink-soft">{LANGUAGE_LABEL[book.language]}</span>
           </div>
 
-          <h1 className="text-2xl font-black tracking-tight text-stone-900 sm:text-3xl">
+          <h1 className="font-display text-3xl leading-tight font-semibold text-balance text-ink sm:text-5xl">
             {book.title}
           </h1>
-          <p className="mt-1 text-lg text-stone-600">{book.author}</p>
+          <p className="mt-2 text-lg text-ink-soft">{book.author}</p>
 
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="mt-4 flex flex-wrap gap-2">
             {book.categories.map((c) => (
-              <span
-                key={c}
-                className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs text-stone-600"
-              >
+              <span key={c} className="rounded-full bg-surface px-3 py-1 text-xs text-ink-soft ring-1 ring-line">
                 {c}
               </span>
             ))}
           </div>
 
-          <p className="mt-5 leading-relaxed text-stone-700">
-            {book.description}
-          </p>
+          <p className="mt-6 max-w-2xl leading-relaxed text-ink/80">{book.description}</p>
 
-          {/* Nota legal de la capa */}
-          <p className="mt-3 rounded-lg bg-stone-100 px-3 py-2 text-xs text-stone-500">
-            {info.description}
-          </p>
-
-          {/* --- Acción según la capa --- */}
-          <div className="mt-6 space-y-4">
-            {/* CAPA 1 — audiolibro completo + descarga */}
+          <div className="mt-7 space-y-4">
             {book.contentLayer === 1 && (
               <>
-                <AudioSection
-                  versions={book.audioVersions}
-                  librivoxUrl={book.librivoxUrl ?? librivoxSearch(book.title)}
-                />
-                <div className="flex flex-wrap gap-3">
-                  {book.ebookEpubUrl && (
+                <BookContent book={book} />
+                <ChatLibro id={book.gutenbergId ?? book.id} ctx={aiCtx} />
+                <ResumenMedida id={book.gutenbergId ?? book.id} ctx={aiCtx} />
+                {book.gutenbergId && (
+                  <div className="flex flex-wrap gap-3">
                     <a
-                      href={book.ebookEpubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+                      href={`/descargar/${book.gutenbergId}?n=${book.slug}`}
+                      className="inline-flex items-center gap-2 rounded-full bg-mint px-5 py-3 font-semibold text-white shadow-lg shadow-mint/25 transition hover:brightness-95 active:scale-95"
                     >
-                      ⬇ Descargar e-book (EPUB)
+                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      Descargar e-book
                     </a>
-                  )}
-                  {book.sourceUrl && (
-                    <a
-                      href={book.sourceUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-lg border border-stone-300 bg-white px-4 py-2.5 font-semibold text-stone-700 transition hover:bg-stone-50"
-                    >
-                      Más formatos en {book.sourceName} ↗
-                    </a>
-                  )}
-                </div>
+                    <EnviarKindle downloadUrl={`/descargar/${book.gutenbergId}?n=${book.slug}`} />
+                  </div>
+                )}
               </>
             )}
 
-            {/* CAPA 2 — reseña + afiliados */}
             {book.contentLayer === 2 && (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-                <h2 className="font-semibold text-amber-900">
-                  Dónde conseguirlo
-                </h2>
-                <p className="mt-1 text-sm text-amber-800">
-                  Este libro tiene derechos vigentes. Te dejamos los lugares para
-                  conseguirlo (links de afiliado: comprando ahí, apoyás la
-                  biblioteca sin costo extra).
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+                <h2 className="font-display text-lg font-semibold text-amber-900">Dónde conseguirlo</h2>
+                <p className="mt-1 text-sm text-amber-800/90">
+                  Libro con derechos vigentes. Comprándolo desde acá, apoyás la
+                  biblioteca sin costo extra.
                 </p>
-                <div className="mt-3 flex flex-wrap gap-3">
+                <div className="mt-4 flex flex-wrap gap-3">
                   {book.affiliateLinks.map((a) => (
                     <a
                       key={a.store}
                       href={a.url}
                       target="_blank"
                       rel="noopener noreferrer sponsored"
-                      className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2.5 font-semibold text-white shadow-sm transition hover:bg-amber-700"
+                      className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-amber-700 active:scale-95"
                     >
                       Ver en {a.store} ↗
                     </a>
@@ -181,16 +153,13 @@ export default async function BookPage({
               </div>
             )}
 
-            {/* CAPA 3 — licenciada con acuerdo válido (player licenciado, futuro).
-                Las de Capa 3 SIN licencia válida nunca llegan acá: dan 404. */}
-            {book.contentLayer === 3 && (
-              <AudioSection
-                versions={book.audioVersions}
-                librivoxUrl={null}
-              />
-            )}
+            {book.contentLayer === 3 && <AudioSection book={book} />}
           </div>
         </div>
+      </div>
+
+      <div className="mt-10">
+        <Reviews id={book.gutenbergId ?? book.id} />
       </div>
     </article>
   );

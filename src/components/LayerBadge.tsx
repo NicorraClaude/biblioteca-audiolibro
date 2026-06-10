@@ -1,27 +1,19 @@
 import type { ContentLayer } from "@/lib/types";
-import { LAYER_INFO } from "@/lib/presentation";
 
-// Badge que indica la capa legal del contenido.
-export function LayerBadge({
-  layer,
-  blocked = false,
-}: {
-  layer: ContentLayer;
-  blocked?: boolean;
-}) {
-  const info = LAYER_INFO[layer];
-  if (blocked) {
-    return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-stone-200 px-2.5 py-0.5 text-xs font-medium text-stone-600 ring-1 ring-stone-300 ring-inset">
-        🔒 Bloqueado
-      </span>
-    );
-  }
+// Etiqueta de capa legal — pill discreta y legible sobre la tapa.
+const STYLES: Record<ContentLayer, { label: string; cls: string }> = {
+  1: { label: "Gratis completo", cls: "bg-white/90 text-emerald-700" },
+  2: { label: "Reseña", cls: "bg-white/90 text-amber-700" },
+  3: { label: "Edición", cls: "bg-white/90 text-sky-700" },
+};
+
+export function LayerBadge({ layer }: { layer: ContentLayer }) {
+  const s = STYLES[layer];
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${info.badgeClass}`}
+      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide shadow-sm backdrop-blur ${s.cls}`}
     >
-      {info.short}
+      {s.label}
     </span>
   );
 }

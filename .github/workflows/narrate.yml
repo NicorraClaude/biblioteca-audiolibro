@@ -1,0 +1,57 @@
+# Narración en la NUBE (no necesita tu compu): narra audiolibros completos gratis
+# (edge-tts) y los sube a YouTube. Pensado para encenderse cuando Google apruebe
+# la auditoría (mientras tanto suben "ocultos").
+#
+# Secrets necesarios (Settings → Secrets → Actions):
+#   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
+# (Para subir público automático: agregar YT_PRIVACY=public cuando esté la auditoría.)
+name: Narrar audiolibros (nube)
+
+on:
+  workflow_dispatch:
+    inputs:
+      cantidad:
+        description: "Cuántos audiolibros narrar+subir"
+        default: "6"
+      privacidad:
+        description: "unlisted | public (public solo tras auditoría)"
+        default: "unlisted"
+  # schedule: [{ cron: "0 7 * * *" }]  # descomentar tras la auditoría para que corra solo
+
+permissions:
+  contents: write
+
+jobs:
+  narrar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Instalar deps
+        run: |
+          npm ci
+          python3 -m venv .venv-tts
+          .venv-tts/bin/pip install -q edge-tts
+      - name: Preparar base desde el snapshot
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
+      - name: Narrar + subir
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          YT_PRIVACY: ${{ github.event.inputs.privacidad }}
+        run: bash scripts/narrate-batch.sh ${{ github.event.inputs.cantidad }}
+      - name: Guardar snapshot con los nuevos videoIds
+        run: |
+          git config user.name "biblioteca-bot"
+          git config user.email "bot@biblioteca.local"
+          git add prisma/seed-data.json
+          git commit -m "Audiolibros narrados (auto)" || echo "sin cambios"
+          git push || echo "nada para pushear"

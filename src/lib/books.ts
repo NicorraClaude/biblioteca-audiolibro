@@ -9,6 +9,8 @@ import type {
   ContentLayer,
   Language,
   LicenseRecord,
+  SummaryByLang,
+  SummaryEntry,
 } from "@/lib/types";
 
 // Parsea un campo JSON guardado como texto, con fallback seguro.
@@ -19,6 +21,43 @@ function parseJSON<T>(value: string | null | undefined, fallback: T): T {
   } catch {
     return fallback;
   }
+}
+
+// Normaliza el resumen: acepta el formato viejo plano {es:{text,audioUrl}} y lo
+// convierte al nuevo de dos niveles {es:{short:{...}}}.
+// Asegura que cada entrada tenga audio.{onyx,nova}; migra el audioUrl viejo a nova.
+function normEntry(e: SummaryEntry | undefined): SummaryEntry | undefined {
+  if (!e) return undefined;
+  const audio = { ...(e.audio ?? {}) };
+  if (e.audioUrl && !audio.nova) audio.nova = e.audioUrl;
+  return { ...e, audio };
+}
+
+function normalizeSummary(
+  raw: Record<string, unknown> | null,
+): SummaryByLang | null {
+  if (!raw) return null;
+  const out: SummaryByLang = {};
+  for (const lang of ["es", "en"] as const) {
+    const v = raw[lang] as
+      | {
+          text?: string;
+          audioUrl?: string;
+          short?: SummaryEntry;
+          long?: SummaryEntry;
+          sinopsis?: SummaryEntry;
+          resumen?: SummaryEntry;
+        }
+      | undefined;
+    if (!v) continue;
+    const legacy: SummaryEntry | undefined =
+      v.text && v.audioUrl ? { text: v.text, audioUrl: v.audioUrl } : undefined;
+    out[lang] = {
+      sinopsis: normEntry(v.sinopsis ?? v.short ?? legacy),
+      resumen: normEntry(v.resumen ?? v.long),
+    };
+  }
+  return Object.keys(out).length ? out : null;
 }
 
 // Convierte el registro crudo de la base al tipo de dominio "Book".
@@ -47,6 +86,9 @@ function hydrate(row: any): Book {
     ebookEpubUrl: row.ebookEpubUrl,
     affiliateLinks: parseJSON<AffiliateLink[]>(row.affiliateLinks, []),
     audioVersions: parseJSON<AudioVersion[]>(row.audioVersions, []),
+    summary: normalizeSummary(
+      parseJSON<Record<string, unknown> | null>(row.summary, null),
+    ),
     publishedAt: row.publishedAt,
     viewsCached: row.viewsCached,
     downloadCount: row.downloadCount,

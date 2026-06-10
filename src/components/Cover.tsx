@@ -1,42 +1,71 @@
-import Image from "next/image";
 import type { Book } from "@/lib/types";
-import { gradientFor, initials } from "@/lib/presentation";
+import { coverColors } from "@/lib/presentation";
 
-// Portada del libro: usa la imagen real si existe; si no, un placeholder
-// elegante con degradado e iniciales (nunca guardamos portadas con copyright).
+// Tapa HÍBRIDA: si tenemos la tapa real (Open Library, sin marca), la mostramos;
+// si no, una tapa DISEÑADA tipográfica con la identidad de la marca.
 export function Cover({
   book,
-  priority = false,
-  sizes = "(max-width: 768px) 45vw, 200px",
+  variant = "card",
 }: {
   book: Book;
-  priority?: boolean;
-  sizes?: string;
+  variant?: "card" | "detail";
 }) {
+  const [from, to] = coverColors(book.slug);
+
+  // Tapa real
   if (book.coverImageUrl) {
     return (
-      <Image
-        src={book.coverImageUrl}
-        alt={`Portada de ${book.title}`}
-        fill
-        sizes={sizes}
-        priority={priority}
-        className="object-cover"
-      />
+      <div
+        className="h-full w-full"
+        style={{ background: `linear-gradient(150deg, ${from}, ${to})` }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={book.coverImageUrl}
+          alt={`Tapa de ${book.title}`}
+          loading="lazy"
+          className="h-full w-full object-cover"
+        />
+      </div>
     );
   }
+
+  // Tapa diseñada
+  const initial = book.title.replace(/[^\p{L}\p{N}]/gu, "").charAt(0).toUpperCase();
+  const detail = variant === "detail";
   return (
     <div
-      className={`flex h-full w-full flex-col items-center justify-center bg-gradient-to-br ${gradientFor(
-        book.slug,
-      )} p-3 text-center`}
+      className="relative flex h-full w-full flex-col justify-between overflow-hidden"
+      style={{ background: `linear-gradient(150deg, ${from}, ${to})` }}
     >
-      <span className="text-3xl font-black text-white/90 drop-shadow-sm">
-        {initials(book)}
+      <span
+        className="pointer-events-none absolute -right-3 -bottom-8 font-display font-black leading-none text-white/10 select-none"
+        style={{ fontSize: detail ? "16rem" : "9rem" }}
+        aria-hidden
+      >
+        {initial}
       </span>
-      <span className="mt-2 line-clamp-3 text-xs font-medium text-white/90">
-        {book.title}
-      </span>
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_80%_at_0%_0%,rgba(255,255,255,0.18),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-y-0 left-2 w-px bg-white/20" />
+      <div className={`relative z-10 flex flex-1 flex-col ${detail ? "p-6" : "p-4"}`}>
+        <span
+          className={`font-medium tracking-[0.18em] text-white/60 uppercase ${detail ? "text-xs" : "text-[9px]"}`}
+        >
+          {book.contentLayer === 1 ? "Audiolibro" : book.contentLayer === 2 ? "Reseña" : "Edición"}
+        </span>
+        <div className="mt-auto">
+          <h3
+            className={`font-display font-semibold text-balance text-white drop-shadow-sm ${
+              detail ? "text-3xl leading-tight" : "line-clamp-4 text-lg leading-[1.15]"
+            }`}
+          >
+            {book.title}
+          </h3>
+          <p className={`mt-2 text-white/70 ${detail ? "text-sm" : "line-clamp-1 text-xs"}`}>
+            {book.author}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
