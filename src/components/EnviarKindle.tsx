@@ -35,12 +35,19 @@ export function EnviarKindle({ downloadUrl }: { downloadUrl: string }) {
                 </a>
               </li>
               <li>
-                2. Reenvialo desde tu mail a tu dirección{" "}
-                <span className="font-semibold text-ink">@kindle.com</span> y te llega al Kindle.
+                <a
+                  href="https://www.amazon.com/sendtokindle"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-accent hover:text-accent-dark"
+                >
+                  2. Subilo en Amazon Send to Kindle ↗
+                </a>
               </li>
             </ol>
             <p className="mt-3 text-xs text-ink-soft/80">
-              Tu dirección @kindle.com está en la app Kindle, en Ajustes → Tu cuenta.
+              Llega a tu Kindle en segundos. También podés reenviarlo a tu correo
+              @kindle.com.
             </p>
           </div>
         </>

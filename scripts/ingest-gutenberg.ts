@@ -54,10 +54,14 @@ function formatAuthor(raw: string | null): string {
   return raw.trim();
 }
 
-// Limpia el título: corta subtítulos tras ";" o salto de línea.
+// Limpia el título: corta subtítulos tras ";" o salto de línea, PERO conserva
+// el número de tomo/volumen como "- Tomo N" (así los tomos no se confunden con
+// duplicados y quedan como libros independientes bien nombrados).
 function cleanTitle(raw: string | null): string {
   if (!raw) return "Sin título";
-  return raw.split(/[;\n]/)[0].replace(/\s+/g, " ").trim();
+  const base = raw.split(/[;\n]/)[0].replace(/\s+/g, " ").trim();
+  const vol = raw.match(/\b(?:t\.?|tomo|vol\.?|volumen|volume|part|parte)\s*(\d{1,3})\b/i);
+  return vol ? `${base} - Tomo ${vol[1]}` : base;
 }
 
 function descriptionFor(author: string, lang: "es" | "en"): string {

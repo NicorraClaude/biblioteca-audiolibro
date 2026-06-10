@@ -132,11 +132,24 @@ export default async function BookPage({
 
             {book.contentLayer === 2 && (
               <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
-                <h2 className="font-display text-lg font-semibold text-amber-900">Sobre este título</h2>
+                <h2 className="font-display text-lg font-semibold text-amber-900">Dónde conseguirlo</h2>
                 <p className="mt-1 text-sm text-amber-800/90">
-                  Es un libro con derechos vigentes, así que acá te ofrecemos una
-                  reseña original. La obra completa se consigue en librerías.
+                  Libro con derechos vigentes. Comprándolo desde acá, apoyás la
+                  biblioteca sin costo extra.
                 </p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {book.affiliateLinks.map((a) => (
+                    <a
+                      key={a.store}
+                      href={a.url}
+                      target="_blank"
+                      rel="noopener noreferrer sponsored"
+                      className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-amber-700 active:scale-95"
+                    >
+                      Ver en {a.store} ↗
+                    </a>
+                  ))}
+                </div>
               </div>
             )}
 

@@ -110,13 +110,15 @@ function formatAuthor(raw: string | null): string {
 }
 function cleanTitle(raw: string | null): string {
   if (!raw) return "Sin título";
-  return raw
+  const base = raw
     .replace(/\s*:\s*\$[a-z]\s*/gi, " — ") // subcampo MARC " : $b " → guion
     .replace(/\$[a-z]\s*/gi, "") // restos "$a/$b/$c"
     .split(/[;\n]/)[0]
     .replace(/\s*—\s*\[([^\]]+)\]\s*$/, " ($1)") // "— [Peter and Wendy]" → "(Peter and Wendy)"
     .replace(/\s+/g, " ")
     .trim();
+  const vol = raw.match(/\b(?:t\.?|tomo|vol\.?|volumen|volume|part|parte)\s*(\d{1,3})\b/i);
+  return vol ? `${base} - Tomo ${vol[1]}` : base;
 }
 
 async function gutenbergDirectSearch(query: string): Promise<SearchResult> {
