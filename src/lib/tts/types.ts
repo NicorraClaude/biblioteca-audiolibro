@@ -7,6 +7,7 @@ export type TTSVoiceId = "onyx" | "nova";
 export type TTSOptions = {
   voice: TTSVoiceId;
   speed?: number; // 1.0 = normal; subimos un poco para que no suene lento
+  pitch?: string; // tono por género en edge-tts, ej "+12Hz" / "-12Hz"
   instructions?: string; // tono/estilo de narración (gpt-4o-mini-tts)
 };
 

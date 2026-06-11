@@ -1,0 +1,62 @@
+# Aplica el TONO de voz por GÉNERO al audio de las sinopsis (velocidad + pitch),
+# regenerando en ES/EN × onyx/nova. Idempotente (marca audioGenre) → corré
+# varias veces hasta que no queden pendientes.
+#
+# Secrets: BLOB_READ_WRITE_TOKEN, VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
+name: Aplicar voces por género
+
+on:
+  workflow_dispatch:
+    inputs:
+      limite:
+        description: "Máx. de libros por corrida"
+        default: "60"
+
+permissions:
+  contents: write
+
+jobs:
+  voces:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - name: Instalar deps
+        run: |
+          npm ci
+          python3 -m venv .venv-tts
+          .venv-tts/bin/pip install -q edge-tts
+      - name: Preparar base desde el snapshot
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
+      - name: Aplicar tono por género
+        env:
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN }}
+          REQ_LIMIT: ${{ github.event.inputs.limite || '60' }}
+        run: npx tsx scripts/apply-genre-voices.ts
+      - name: Snapshot del catálogo
+        run: npx tsx scripts/export-seed.ts
+      - name: ¿Cambió el catálogo?
+        id: diff
+        run: |
+          if git diff --quiet -- prisma/seed-data.json; then echo "changed=0" >> "$GITHUB_OUTPUT"; else echo "changed=1" >> "$GITHUB_OUTPUT"; fi
+      - name: Commit del snapshot
+        if: steps.diff.outputs.changed == '1'
+        run: |
+          git config user.name "biblioteca-bot"
+          git config user.email "bot@biblioteca.local"
+          git add prisma/seed-data.json
+          git commit -m "Audio de sinopsis con tono por género (auto)" || echo "sin cambios"
+          git push || echo "nada para pushear"
+      - name: Deploy a Vercel
+        if: steps.diff.outputs.changed == '1'
+        run: npx vercel deploy --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

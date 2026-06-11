@@ -50,6 +50,7 @@ export class EdgeTTSProvider implements TTSProvider {
             "--voice", voice,
             "--file", txt,
             "--rate", this.rate(opts.speed),
+            "--pitch", opts.pitch ?? "+0Hz",
             "--write-media", out,
           ],
           { stdio: ["ignore", "ignore", "pipe"] },
