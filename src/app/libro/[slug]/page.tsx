@@ -12,6 +12,11 @@ import { Reviews } from "@/components/Reviews";
 import { LANGUAGE_LABEL, LAYER_INFO } from "@/lib/presentation";
 import { withAffiliateTag } from "@/lib/affiliates";
 
+// Solo se generan las fichas públicas (dominio público). Cualquier otro slug
+// —incluidos los libros con copyright ocultos— da 404 limpio, sin intentar
+// renderizar en runtime (el sitio es estático, no hay base de datos en el server).
+export const dynamicParams = false;
+
 export async function generateStaticParams() {
   const slugs = await getPublicSlugs();
   return slugs.map((slug) => ({ slug }));
