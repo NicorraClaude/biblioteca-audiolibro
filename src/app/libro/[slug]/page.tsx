@@ -10,6 +10,7 @@ import { ChatLibro } from "@/components/ChatLibro";
 import { ResumenMedida } from "@/components/ResumenMedida";
 import { Reviews } from "@/components/Reviews";
 import { LANGUAGE_LABEL, LAYER_INFO } from "@/lib/presentation";
+import { withAffiliateTag } from "@/lib/affiliates";
 
 export async function generateStaticParams() {
   const slugs = await getPublicSlugs();
@@ -141,7 +142,7 @@ export default async function BookPage({
                   {book.affiliateLinks.map((a) => (
                     <a
                       key={a.store}
-                      href={a.url}
+                      href={withAffiliateTag(a.store, a.url)}
                       target="_blank"
                       rel="noopener noreferrer sponsored"
                       className="inline-flex items-center gap-2 rounded-full bg-amber-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-amber-700 active:scale-95"

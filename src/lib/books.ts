@@ -95,18 +95,13 @@ function hydrate(row: any): Book {
   };
 }
 
-// Regla de integridad de Capa 3: un título licenciado sin licenseRecord
-// válido (inexistente o vencido) NO se considera publicable.
+// Qué se muestra públicamente. POR AHORA: solo DOMINIO PÚBLICO (Capa 1).
+// Los libros con copyright —Capa 2 (reseña+afiliados) y Capa 3 (licenciados)—
+// NO se muestran en la web hasta tener todo listo (pedido de Nico, jun-2026).
+// Para reactivarlos: permitir Capa 2, y Capa 3 con licenseRecord válido vigente.
 export function isPublishable(book: Book): boolean {
   if (book.status === "blocked") return false;
-  if (book.contentLayer === 3) {
-    const lic = book.licenseRecord;
-    if (!lic) return false;
-    const expires = new Date(lic.expiresAt);
-    if (Number.isNaN(expires.getTime()) || expires.getTime() < Date.now()) {
-      return false;
-    }
-  }
+  if (book.contentLayer !== 1) return false; // ocultos los copyright por ahora
   return true;
 }
 

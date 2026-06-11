@@ -56,13 +56,23 @@ function Flourish({ color }: { color: string }) {
 export function Cover({ book, variant = "card" }: { book: Book; variant?: "card" | "detail" }) {
   const detail = variant === "detail";
 
-  // Portada REAL (Open Library, sin marca de fuentes). Si la tenemos, la mostramos.
+  // Portada REAL (Open Library, sin marca de fuentes). Se muestra COMPLETA
+  // (object-contain) centrada sobre un passe-partout oscuro, para que ninguna
+  // quede cortada y todas conserven el mismo encuadre 2:3, como en una vitrina.
   if (book.coverImageUrl) {
-    const [from, to] = [PALETTES[hash(book.slug) % PALETTES.length].deep, "#000"];
+    const pal = PALETTES[hash(book.slug) % PALETTES.length];
     return (
-      <div className="h-full w-full" style={{ background: `linear-gradient(150deg, ${from}, ${to})` }}>
+      <div
+        className="flex h-full w-full items-center justify-center overflow-hidden"
+        style={{ background: `radial-gradient(120% 100% at 50% 0%, ${pal.deep}, #0c0a08)` }}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={book.coverImageUrl} alt={`Tapa de ${book.title}`} loading="lazy" className="h-full w-full object-cover" />
+        <img
+          src={book.coverImageUrl}
+          alt={`Tapa de ${book.title}`}
+          loading="lazy"
+          className="max-h-full max-w-full object-contain shadow-lg"
+        />
       </div>
     );
   }
