@@ -98,5 +98,12 @@ export function getPlayableTrack(book: Book): PlayableTrack | null {
   if (mp3?.audioUrl) {
     return { title: book.title, author: book.author, slug: book.slug, kind: "audio", src: mp3.audioUrl, cover: book.coverImageUrl };
   }
+  // Fallback: la SINOPSIS en audio (toda la biblioteca la tiene). Así cada libro
+  // es reproducible desde la tarjeta y la biblioteca "suena" desde el día uno.
+  const sin = book.summary?.es?.sinopsis ?? book.summary?.en?.sinopsis;
+  const sinAudio = sin?.audio?.onyx ?? sin?.audio?.nova ?? sin?.audioUrl ?? null;
+  if (sinAudio) {
+    return { title: `Sinopsis · ${book.title}`, author: book.author, slug: book.slug, kind: "audio", src: sinAudio, cover: book.coverImageUrl };
+  }
   return null;
 }
