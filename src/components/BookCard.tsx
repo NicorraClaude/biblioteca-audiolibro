@@ -15,8 +15,11 @@ export function BookCard({ book }: { book: Book }) {
     >
       <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl shadow-[0_8px_24px_-12px_rgba(33,28,24,0.4)] ring-1 ring-black/5 transition duration-300 group-hover:-translate-y-1.5 group-hover:shadow-[0_20px_40px_-16px_rgba(33,28,24,0.5)]">
         <Cover book={book} />
-        <div className="absolute top-2.5 right-2.5 text-sm drop-shadow" title="Idioma">
-          {LANGUAGE_FLAG[book.language]}
+        {/* Idiomas disponibles: ES + EN (sinopsis/resumen en ambos idiomas). */}
+        <div className="absolute top-2 right-2 flex gap-1 rounded-full bg-black/35 px-1.5 py-0.5 text-xs backdrop-blur" title="Idiomas disponibles">
+          {(["es", "en"] as const).map((lg) => (
+            <span key={lg} aria-label={lg === "es" ? "Español" : "Inglés"}>{LANGUAGE_FLAG[lg]}</span>
+          ))}
         </div>
         {track && (
           <PlayButton

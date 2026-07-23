@@ -9,7 +9,7 @@ import { EnviarKindle } from "@/components/EnviarKindle";
 import { ChatLibro } from "@/components/ChatLibro";
 import { ResumenMedida } from "@/components/ResumenMedida";
 import { Reviews } from "@/components/Reviews";
-import { LANGUAGE_LABEL, LAYER_INFO } from "@/lib/presentation";
+import { LANGUAGE_FLAG, LAYER_INFO } from "@/lib/presentation";
 import { withAffiliateTag } from "@/lib/affiliates";
 
 // Solo se generan las fichas públicas (dominio público). Cualquier otro slug
@@ -136,7 +136,11 @@ export default async function BookPage({
             <span className="rounded-full bg-accent-soft px-2.5 py-1 text-accent-dark uppercase">
               {info.short}
             </span>
-            <span className="text-ink-soft">{LANGUAGE_LABEL[book.language]}</span>
+            <span className="inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-1 text-ink-soft ring-1 ring-line">
+              <span title="Español">{LANGUAGE_FLAG.es}</span>
+              <span title="Inglés">{LANGUAGE_FLAG.en}</span>
+              <span className="ml-1 uppercase">Disponible en 2 idiomas</span>
+            </span>
           </div>
 
           <h1 className="font-display text-3xl leading-tight font-semibold text-balance text-ink sm:text-5xl">
