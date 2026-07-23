@@ -1,7 +1,10 @@
 import { ImageResponse } from "next/og";
-import { getBookBySlug, isPublishable } from "@/lib/books";
 import { coverColors } from "@/lib/presentation";
 import { notFound } from "next/navigation";
+// Lee del snapshot JSON directo, sin Prisma: la OG imagen se genera en runtime
+// y en Vercel la Function no tiene dev.db → así funciona en producción.
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const seed: Array<{ slug: string; title: string; author: string; coverImageUrl: string | null; contentLayer: number }> = require("../../../../prisma/seed-data.json");
 
 export const alt = "Biblioteca Abierta";
 export const size = { width: 1200, height: 630 };
@@ -11,8 +14,8 @@ export const contentType = "image/png";
 // Compuesta: tapa del libro a la izquierda + info y branding a la derecha.
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const book = await getBookBySlug(slug);
-  if (!book || !isPublishable(book)) notFound();
+  const book = seed.find((b) => b.slug === slug);
+  if (!book || book.contentLayer !== 1) notFound();
 
   const [from, to] = coverColors(book.slug);
 
