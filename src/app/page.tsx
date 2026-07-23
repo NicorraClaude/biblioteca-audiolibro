@@ -1,12 +1,20 @@
 import { getPublicBooks } from "@/lib/books";
 import { Catalog } from "@/components/Catalog";
 import { SolicitarTitulo } from "@/components/SolicitarTitulo";
+import { BookRow } from "@/components/BookRow";
+import { COLECCIONES, pickForColeccion } from "@/lib/colecciones";
 import { hasPlayableAudio } from "@/lib/presentation";
 
 export default async function HomePage() {
   const books = await getPublicBooks();
   const total = books.length;
   const conAudio = books.filter(hasPlayableAudio).length;
+  // Novedades: los últimos 16 publicados (los ingesta el cron / los pedidos).
+  const novedades = [...books]
+    .sort((a, b) => (b.publishedAt?.getTime() ?? 0) - (a.publishedAt?.getTime() ?? 0))
+    .slice(0, 16);
+  const colecciones = COLECCIONES.map((c) => ({ c, list: pickForColeccion(books, c) }))
+    .filter((x) => x.list.length >= 4);
 
   return (
     <div>
@@ -43,7 +51,16 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section id="catalogo" className="scroll-mt-24">
+      {/* Novedades: lo último que entró al catálogo */}
+      <BookRow title="Novedades" subtitle="Lo último que sumamos a la biblioteca" emoji="✨" books={novedades} />
+
+      {/* Colecciones curadas */}
+      {colecciones.map(({ c, list }) => (
+        <BookRow key={c.slug} title={c.title} subtitle={c.subtitle} emoji={c.emoji} books={list} />
+      ))}
+
+      <section id="catalogo" className="mt-12 scroll-mt-24">
+        <h2 className="mb-4 font-display text-xl font-semibold text-ink sm:text-2xl">Toda la biblioteca</h2>
         <Catalog books={books} />
       </section>
 

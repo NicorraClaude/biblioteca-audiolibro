@@ -30,9 +30,21 @@ export async function generateMetadata({
   const { slug } = await params;
   const book = await getBookBySlug(slug);
   if (!book) return { title: "Libro no encontrado" };
+  const desc = (book.summary?.[book.language]?.sinopsis?.text ?? book.description).replace(/\s+/g, " ").slice(0, 200);
+  const url = `https://biblioteca-audiolibros.vercel.app/libro/${book.slug}`;
   return {
     title: `${book.title} — ${book.author}`,
-    description: book.description.slice(0, 160),
+    description: desc,
+    alternates: { canonical: url },
+    openGraph: {
+      title: `${book.title} — ${book.author}`,
+      description: desc,
+      url,
+      siteName: "Biblioteca Abierta",
+      type: "book",
+      locale: book.language === "es" ? "es_AR" : "en_US",
+    },
+    twitter: { card: "summary_large_image", title: `${book.title} — ${book.author}`, description: desc },
   };
 }
 
@@ -54,14 +66,43 @@ export default async function BookPage({
     sinopsis: book.summary?.es?.sinopsis?.text ?? book.summary?.en?.sinopsis?.text,
     resumen: book.summary?.es?.resumen?.text ?? book.summary?.en?.resumen?.text,
   };
-  const jsonLd = {
+  // JSON-LD rico: Audiobook con abstract=sinopsis + AudioObject cuando ya
+  // tenemos audio, para que Google entienda que es un audiolibro reproducible.
+  const sin = book.summary?.[book.language]?.sinopsis ?? book.summary?.es?.sinopsis ?? book.summary?.en?.sinopsis;
+  const sinAudio = sin?.audio?.onyx ?? sin?.audio?.nova ?? sin?.audioUrl;
+  const audioVersion = book.audioVersions.find((v) => (v.youtubeVideoId && v.youtubePublic) || (v.audioUrl && v.status === "ready"));
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const jsonLd: Record<string, any> = {
     "@context": "https://schema.org",
     "@type": book.contentLayer === 1 ? "Audiobook" : "Book",
     name: book.title,
     author: { "@type": "Person", name: book.author },
     inLanguage: book.language,
     description: book.description,
+    abstract: sin?.text ?? undefined,
+    image: book.coverImageUrl ?? `https://biblioteca-audiolibros.vercel.app/libro/${book.slug}/opengraph-image`,
+    url: `https://biblioteca-audiolibros.vercel.app/libro/${book.slug}`,
+    isAccessibleForFree: true,
+    isFamilyFriendly: book.categories.includes("Infantil") ? true : undefined,
+    genre: book.categories,
+    publisher: { "@type": "Organization", name: "Biblioteca Abierta" },
   };
+  if (audioVersion?.audioUrl) {
+    jsonLd.associatedMedia = {
+      "@type": "AudioObject",
+      contentUrl: audioVersion.audioUrl,
+      encodingFormat: "audio/mpeg",
+      duration: audioVersion.durationSeconds ? `PT${audioVersion.durationSeconds}S` : undefined,
+    };
+  } else if (audioVersion?.youtubeVideoId && audioVersion.youtubePublic) {
+    jsonLd.associatedMedia = {
+      "@type": "VideoObject",
+      contentUrl: `https://www.youtube.com/watch?v=${audioVersion.youtubeVideoId}`,
+      embedUrl: `https://www.youtube.com/embed/${audioVersion.youtubeVideoId}`,
+    };
+  } else if (sinAudio) {
+    jsonLd.associatedMedia = { "@type": "AudioObject", contentUrl: sinAudio, encodingFormat: "audio/mpeg", name: "Sinopsis" };
+  }
 
   return (
     <article>

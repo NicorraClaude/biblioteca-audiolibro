@@ -8,6 +8,27 @@ import { hasPlayableAudio } from "@/lib/presentation";
 
 type SortKey = "az" | "za";
 
+// Emoji por categoría (para dar identidad a los chips y hacer más navegable).
+const CATEGORY_EMOJI: Record<string, string> = {
+  Historia: "🏛️",
+  Romance: "💌",
+  Fantasía: "🐉",
+  Clásicos: "📖",
+  Aventura: "🗺️",
+  Misterio: "🕵️",
+  Filosofía: "🧠",
+  Cuentos: "📜",
+  Infantil: "🧸",
+  Ensayo: "✍️",
+  Poesía: "🌿",
+  Terror: "🕯️",
+  Teatro: "🎭",
+  "Ciencia ficción": "🚀",
+  Fábulas: "🐿️",
+  "Desarrollo personal": "🌱",
+  "Realismo mágico": "✨",
+};
+
 export function Catalog({ books }: { books: Book[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("todas");
@@ -15,10 +36,11 @@ export function Catalog({ books }: { books: Book[] }) {
   const [sort, setSort] = useState<SortKey>("az");
   const [onlyAudio, setOnlyAudio] = useState(false);
 
+  // Categorías con conteo, ordenadas por cantidad (las más pobladas primero).
   const categories = useMemo(() => {
-    const set = new Set<string>();
-    books.forEach((b) => b.categories.forEach((c) => set.add(c)));
-    return Array.from(set).sort((a, b) => a.localeCompare(b, "es"));
+    const count = new Map<string, number>();
+    books.forEach((b) => b.categories.forEach((c) => count.set(c, (count.get(c) ?? 0) + 1)));
+    return Array.from(count.entries()).sort((a, b) => b[1] - a[1]);
   }, [books]);
 
   const audioCount = useMemo(() => books.filter(hasPlayableAudio).length, [books]);
@@ -78,14 +100,16 @@ export function Catalog({ books }: { books: Book[] }) {
         </button>
       </div>
 
-      {/* Categorías (chips scrollables) */}
+      {/* Categorías (chips scrollables) con emoji y conteo */}
       <div className="mb-7 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none]">
         <Chip active={category === "todas"} onClick={() => setCategory("todas")}>
           Todas
         </Chip>
-        {categories.map((c) => (
+        {categories.map(([c, n]) => (
           <Chip key={c} active={category === c} onClick={() => setCategory(c)}>
+            <span className="mr-1">{CATEGORY_EMOJI[c] ?? "📚"}</span>
             {c}
+            <span className="ml-1.5 text-xs opacity-60">{n}</span>
           </Chip>
         ))}
       </div>
