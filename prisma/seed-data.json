@@ -909,7 +909,7 @@
   "licenseStatus": "public_domain",
   "categories": "[\"Terror\",\"Misterio\",\"Cuentos\"]",
   "description": "Public-domain work by Arthur Machen. Free audiobook and e-book to listen and download.",
-  "coverImageUrl": "https://covers.openlibrary.org/b/id/921610-L.jpg",
+  "coverImageUrl": null,
   "sourceName": "Project Gutenberg",
   "sourceUrl": "https://www.gutenberg.org/ebooks/389",
   "gutenbergId": 389,
@@ -13917,7 +13917,7 @@
   "summary": null,
   "publishedAt": "2026-06-18T12:18:43.049Z",
   "viewsCached": 0,
-  "downloadCount": 25785
+  "downloadCount": 48889
  },
  {
   "slug": "romancero-selecto-del-cid",
@@ -14626,7 +14626,7 @@
   "licenseStatus": "public_domain",
   "categories": "[\"Historia\"]",
   "description": "Obra de dominio público de Victor Hugo. Audiolibro y e-book gratis para escuchar y descargar, sin costo ni restricciones.",
-  "coverImageUrl": "https://covers.openlibrary.org/b/id/1966665-L.jpg",
+  "coverImageUrl": null,
   "sourceName": "Project Gutenberg",
   "sourceUrl": "https://www.gutenberg.org/ebooks/67819",
   "gutenbergId": 67819,
