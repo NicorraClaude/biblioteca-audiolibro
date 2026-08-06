@@ -95,14 +95,29 @@ function hydrate(row: any): Book {
   };
 }
 
-// Qué se muestra públicamente. POR AHORA: solo DOMINIO PÚBLICO (Capa 1).
-// Los libros con copyright —Capa 2 (reseña+afiliados) y Capa 3 (licenciados)—
-// NO se muestran en la web hasta tener todo listo (pedido de Nico, jun-2026).
-// Para reactivarlos: permitir Capa 2, y Capa 3 con licenseRecord válido vigente.
+// Qué se muestra públicamente:
+// - Capa 1 (dominio público): siempre se muestra.
+// - Capa 2 (con copyright): SOLO si tiene ficha rica curada (reseña + resumen
+//   original) → contenido transformativo legal, con botón de compra por afiliado.
+//   Los del backlog viejo (sin reseña) siguen ocultos.
+// - Capa 3 (licenciados): sólo con licenseRecord válido vigente.
 export function isPublishable(book: Book): boolean {
   if (book.status === "blocked") return false;
-  if (book.contentLayer !== 1) return false; // ocultos los copyright por ahora
-  return true;
+  if (book.contentLayer === 1) return true;
+  if (book.contentLayer === 2) {
+    // "Ficha rica" = tiene reseña/resumen original nuestro. Si es solo backlog
+    // (sin reseña), queda oculto como estaba.
+    const hasResumen = !!(book.summary?.es?.resumen?.text || book.summary?.en?.resumen?.text);
+    return hasResumen;
+  }
+  if (book.contentLayer === 3) {
+    const lic = book.licenseRecord;
+    if (!lic) return false;
+    const expires = new Date(lic.expiresAt);
+    if (Number.isNaN(expires.getTime()) || expires.getTime() < Date.now()) return false;
+    return true;
+  }
+  return false;
 }
 
 // Catálogo PÚBLICO: solo títulos que hoy podemos entregar de verdad.

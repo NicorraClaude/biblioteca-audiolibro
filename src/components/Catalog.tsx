@@ -27,6 +27,13 @@ const CATEGORY_EMOJI: Record<string, string> = {
   Fábulas: "🐿️",
   "Desarrollo personal": "🌱",
   "Realismo mágico": "✨",
+  "Negocios y emprendimientos": "💼",
+  Startups: "🚀",
+  Liderazgo: "🎯",
+  "Finanzas personales": "💰",
+  Productividad: "⚡",
+  Ventas: "🤝",
+  Biografía: "👤",
 };
 
 export function Catalog({ books }: { books: Book[] }) {

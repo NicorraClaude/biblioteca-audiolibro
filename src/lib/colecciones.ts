@@ -14,6 +14,14 @@ export type Coleccion = {
 
 export const COLECCIONES: Coleccion[] = [
   {
+    slug: "negocios-y-emprendimientos",
+    title: "Negocios y emprendimientos",
+    subtitle: "De los clásicos que fundaron la mentalidad de éxito a los best-sellers de hoy",
+    emoji: "💼",
+    match: (b) => b.categories.some((c) => ["Negocios y emprendimientos", "Startups", "Liderazgo", "Finanzas personales", "Productividad"].includes(c)),
+    limit: 16,
+  },
+  {
     slug: "clasicos-para-empezar",
     title: "Clásicos para empezar",
     subtitle: "Diez puertas de entrada a la gran literatura",
