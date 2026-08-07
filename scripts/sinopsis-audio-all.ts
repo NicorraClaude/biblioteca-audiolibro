@@ -4,7 +4,7 @@
 // Necesita BLOB_READ_WRITE_TOKEN en .env.
 // Uso:  npx tsx scripts/sinopsis-audio-all.ts
 import "dotenv/config";
-import { put } from "@vercel/blob";
+import { r2Put, isR2Configured } from "../src/lib/r2";
 import { prisma, sleep } from "./db";
 import { EdgeTTSProvider } from "../src/lib/tts/edge";
 import { chunkText } from "../src/lib/tts/text";
@@ -20,8 +20,7 @@ async function narrate(text: string, lang: Language): Promise<Buffer> {
 }
 
 async function main() {
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (!token) throw new Error("Falta BLOB_READ_WRITE_TOKEN.");
+  if (!isR2Configured()) throw new Error("R2 no configurado (faltan vars R2_*).");
 
   const books = await prisma.book.findMany({ where: { contentLayer: 1 }, orderBy: { downloadCount: "desc" } });
   let done = 0;
@@ -39,12 +38,7 @@ async function main() {
       if (!s?.text || s.audioUrl) continue; // sin texto, o ya tiene audio
       try {
         const audio = await narrate(s.text, lang);
-        const { url } = await put(`sinopsis/${b.slug}-${lang}.mp3`, audio, {
-          access: "public",
-          contentType: "audio/mpeg",
-          token,
-          allowOverwrite: true,
-        });
+        const url = await r2Put(`sinopsis/${b.slug}-${lang}.mp3`, audio, "audio/mpeg");
         summary[lang].sinopsis.audioUrl = url;
         changed = true;
         uploaded++;

@@ -8,7 +8,7 @@
 //        REQ_LIMIT=3 npx tsx scripts/process-requests.ts  # tope de pedidos por corrida
 import "dotenv/config";
 import { writeFile } from "node:fs/promises";
-import { list, put } from "@vercel/blob";
+import { r2Put, r2GetText, isR2Configured } from "../src/lib/r2";
 import { prisma, sleep, fetchRetry } from "./db";
 import { slugify } from "../src/lib/text";
 import { mapCategories } from "../src/lib/categories";
@@ -16,7 +16,6 @@ import { EdgeTTSProvider } from "../src/lib/tts/edge";
 import { chunkText } from "../src/lib/tts/text";
 import type { Language } from "../src/lib/types";
 
-const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const LIMIT = Number(process.env.REQ_LIMIT ?? 50);
 const QUEUE = "solicitudes.json";
 
@@ -30,18 +29,14 @@ type Req = {
   doneAt?: string;
 };
 
-// ---------- Cola en Blob ----------
+// ---------- Cola en R2 ----------
 async function loadQueue(): Promise<Req[]> {
-  const { blobs } = await list({ prefix: QUEUE, limit: 1, token: TOKEN });
-  const hit = blobs.find((b) => b.pathname === QUEUE);
-  if (!hit) return [];
-  const res = await fetch(hit.url, { cache: "no-store" });
-  return res.ok ? ((await res.json()) as Req[]) : [];
+  const raw = await r2GetText(QUEUE);
+  if (!raw) return [];
+  try { return JSON.parse(raw) as Req[]; } catch { return []; }
 }
 async function saveQueue(queue: Req[]): Promise<void> {
-  await put(QUEUE, JSON.stringify(queue), {
-    access: "public", contentType: "application/json", token: TOKEN, allowOverwrite: true,
-  });
+  await r2Put(QUEUE, JSON.stringify(queue), "application/json");
 }
 
 // ---------- Búsqueda en Gutenberg (Gutendex + fallback directo a gutenberg.org) ----------
@@ -287,9 +282,7 @@ async function buildEverything(slug: string): Promise<void> {
       if (s.audio[voice]) continue;
       try {
         const audio = await narrate(s.text, lang, voice);
-        const { url } = await put(`sinopsis/${slug}-${lang}-${voice}.mp3`, audio, {
-          access: "public", contentType: "audio/mpeg", token: TOKEN, allowOverwrite: true,
-        });
+        const url = await r2Put(`sinopsis/${slug}-${lang}-${voice}.mp3`, audio, "audio/mpeg");
         s.audio[voice] = url;
         console.log(`   ✓ audio sinopsis ${lang}/${voice}`);
         await sleep(100);
@@ -333,7 +326,7 @@ async function notify(req: Req): Promise<void> {
 
 // ---------- Main ----------
 async function main() {
-  if (!TOKEN) throw new Error("Falta BLOB_READ_WRITE_TOKEN.");
+  if (!isR2Configured()) throw new Error("R2 no configurado (faltan vars R2_*).");
   const queue = await loadQueue();
   const pending = queue.filter((r) => r.status === "pendiente").slice(0, LIMIT);
   console.log(`\n📥 Cola de pedidos: ${queue.length} total · ${pending.length} a procesar.\n`);

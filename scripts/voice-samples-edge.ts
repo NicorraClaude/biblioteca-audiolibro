@@ -5,9 +5,8 @@ import { spawn } from "node:child_process";
 import { mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { put } from "@vercel/blob";
+import { r2Put } from "../src/lib/r2";
 
-const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const PY = path.join(process.cwd(), ".venv-tts", "bin", "python");
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const seed: any[] = require("../prisma/seed-data.json");
@@ -48,13 +47,12 @@ async function edge(text: string, voice: string, rate: string, pitch: string): P
 }
 
 async function main() {
-  if (!TOKEN) throw new Error("Falta BLOB_READ_WRITE_TOKEN.");
   for (const s of SAMPLES) {
     const text = sinopsis(s.slug);
     if (!text) { console.log(`✗ ${s.slug}: sin sinopsis`); continue; }
     console.log(`🎙️  ${s.genre} (${s.voice}, ${s.rate}, pitch ${s.pitch})...`);
     const buf = await edge(text, s.voice, s.rate, s.pitch);
-    const { url } = await put(`muestras/${s.genre}-edge-${s.slug}.mp3`, buf, { access: "public", contentType: "audio/mpeg", token: TOKEN, allowOverwrite: true });
+    const url = await r2Put(`muestras/${s.genre}-edge-${s.slug}.mp3`, buf, "audio/mpeg");
     console.log(`   ✓ ${s.genre} (GRATIS): ${url}`);
   }
 }

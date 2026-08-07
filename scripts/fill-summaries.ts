@@ -4,13 +4,12 @@
 //
 // Uso:  REQ_LIMIT=10 npx tsx scripts/fill-summaries.ts
 import "dotenv/config";
-import { put } from "@vercel/blob";
+import { r2Put, isR2Configured } from "../src/lib/r2";
 import { prisma, sleep } from "./db";
 import { EdgeTTSProvider } from "../src/lib/tts/edge";
 import { chunkText } from "../src/lib/tts/text";
 import type { Language } from "../src/lib/types";
 
-const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const LIMIT = Number(process.env.REQ_LIMIT ?? 40);
 
 const SYS_SINOPSIS =
@@ -85,9 +84,7 @@ async function buildEverything(slug: string, title: string, author: string): Pro
       if (s.audio[voice]) continue;
       try {
         const audio = await narrate(s.text, lang, voice);
-        const { url } = await put(`sinopsis/${slug}-${lang}-${voice}.mp3`, audio, {
-          access: "public", contentType: "audio/mpeg", token: TOKEN, allowOverwrite: true,
-        });
+        const url = await r2Put(`sinopsis/${slug}-${lang}-${voice}.mp3`, audio, "audio/mpeg");
         s.audio[voice] = url;
         await sleep(100);
       } catch (e) {
@@ -111,7 +108,7 @@ function lacksSummary(raw: string | null): boolean {
 }
 
 async function main() {
-  if (!TOKEN) throw new Error("Falta BLOB_READ_WRITE_TOKEN.");
+  if (!isR2Configured()) throw new Error("R2 no configurado (faltan vars R2_*).");
   if (!process.env.OPENAI_API_KEY) throw new Error("Falta OPENAI_API_KEY.");
   const all = await prisma.book.findMany({ where: { contentLayer: 1 }, orderBy: { downloadCount: "desc" } });
   const pend = all.filter((b) => lacksSummary(b.summary)).slice(0, LIMIT);

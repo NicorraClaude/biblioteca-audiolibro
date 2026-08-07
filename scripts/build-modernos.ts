@@ -11,7 +11,7 @@
 //
 // Uso:  REQ_LIMIT=5 npx tsx scripts/build-modernos.ts
 import "dotenv/config";
-import { put } from "@vercel/blob";
+import { r2Put, isR2Configured } from "../src/lib/r2";
 import { prisma, sleep } from "./db";
 import { EdgeTTSProvider } from "../src/lib/tts/edge";
 import { chunkText } from "../src/lib/tts/text";
@@ -19,7 +19,6 @@ import { styleFor } from "../src/lib/voice-style";
 import type { Language } from "../src/lib/types";
 import { MODERNOS_NEGOCIOS, type Moderno } from "./data/negocios-modernos";
 
-const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const LIMIT = Number(process.env.REQ_LIMIT ?? 5);
 const MODE = (process.env.MODE ?? "all") as "review" | "summary" | "audio" | "all";
 const VOICES = ["onyx", "nova"] as const;
@@ -134,7 +133,7 @@ function complete(s: any): boolean {
 
 // ---------- Main ----------
 async function main() {
-  if (!TOKEN) throw new Error("Falta BLOB_READ_WRITE_TOKEN.");
+  if (!isR2Configured()) throw new Error("R2 no configurado (faltan vars R2_*).");
   if (!process.env.OPENAI_API_KEY) throw new Error("Falta OPENAI_API_KEY.");
   console.log(`\n💼 Negocios modernos · MODE=${MODE} · LIMIT=${LIMIT}\n`);
 
@@ -182,9 +181,7 @@ async function main() {
             const t0 = Date.now();
             try {
               const audio = await narrate(r.text, lang, voice, st.speed, st.pitch);
-              const { url } = await put(`resumen/${m.slug}-${lang}-${voice}.mp3`, audio, {
-                access: "public", contentType: "audio/mpeg", token: TOKEN, allowOverwrite: true,
-              });
+              const url = await r2Put(`resumen/${m.slug}-${lang}-${voice}.mp3`, audio, "audio/mpeg");
               r.audio[voice] = url;
               changed = true;
               const secs = Math.round((Date.now() - t0) / 1000);

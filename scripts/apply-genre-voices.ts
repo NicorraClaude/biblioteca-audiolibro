@@ -5,14 +5,13 @@
 //
 // Uso:  REQ_LIMIT=30 npx tsx scripts/apply-genre-voices.ts
 import "dotenv/config";
-import { put } from "@vercel/blob";
+import { r2Put, isR2Configured } from "../src/lib/r2";
 import { prisma, sleep } from "./db";
 import { EdgeTTSProvider } from "../src/lib/tts/edge";
 import { chunkText } from "../src/lib/tts/text";
 import { styleFor } from "../src/lib/voice-style";
 import type { Language } from "../src/lib/types";
 
-const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const LIMIT = Number(process.env.REQ_LIMIT ?? 30);
 const MODE = (process.env.MODE ?? "both") as "sinopsis" | "resumen" | "both";
 const KIND: ("sinopsis" | "resumen")[] = MODE === "both" ? ["sinopsis", "resumen"] : [MODE];
@@ -39,7 +38,7 @@ function lacksAny(s: any): boolean {
 }
 
 async function main() {
-  if (!TOKEN) throw new Error("Falta BLOB_READ_WRITE_TOKEN.");
+  if (!isR2Configured()) throw new Error("R2 no configurado (faltan vars R2_*).");
   const all = await prisma.book.findMany({ where: { contentLayer: 1 }, orderBy: { downloadCount: "desc" } });
 
   const pend = all
@@ -76,9 +75,7 @@ async function main() {
           const t0 = Date.now();
           try {
             const audio = await narrate(e.text, lang, voice, st.speed, st.pitch);
-            const { url } = await put(`${kind}/${b.slug}-${lang}-${voice}.mp3`, audio, {
-              access: "public", contentType: "audio/mpeg", token: TOKEN, allowOverwrite: true,
-            });
+            const url = await r2Put(`${kind}/${b.slug}-${lang}-${voice}.mp3`, audio, "audio/mpeg");
             e.audio[voice] = url;
             changed = true;
             uploaded++;

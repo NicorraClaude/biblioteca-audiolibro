@@ -1,9 +1,8 @@
 // Genera MUESTRAS de voz actuada por género (OpenAI gpt-4o-mini-tts con
 // instrucciones de tono) y las sube a Blob. Para evaluar si los tonos quedan bien.
 import "dotenv/config";
-import { put } from "@vercel/blob";
+import { r2Put } from "../src/lib/r2";
 
-const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const seed: any[] = require("../prisma/seed-data.json");
@@ -53,16 +52,13 @@ async function tts(input: string, voice: string, instructions: string): Promise<
 }
 
 async function main() {
-  if (!TOKEN) throw new Error("Falta BLOB_READ_WRITE_TOKEN.");
   if (!process.env.OPENAI_API_KEY) throw new Error("Falta OPENAI_API_KEY.");
   for (const s of SAMPLES) {
     const text = sinopsis(s.slug);
     if (!text) { console.log(`✗ ${s.slug}: sin sinopsis`); continue; }
     console.log(`🎙️  ${s.genre} (${s.slug}, voz ${s.voice})...`);
     const buf = await tts(text, s.voice, s.instructions);
-    const { url } = await put(`muestras/${s.genre}-${s.slug}.mp3`, buf, {
-      access: "public", contentType: "audio/mpeg", token: TOKEN, allowOverwrite: true,
-    });
+    const url = await r2Put(`muestras/${s.genre}-${s.slug}.mp3`, buf, "audio/mpeg");
     console.log(`   ✓ ${s.genre}: ${url}`);
   }
 }

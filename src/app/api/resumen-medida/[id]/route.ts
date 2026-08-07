@@ -69,25 +69,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   return Response.json({ text, audioUrl });
 }
 
-// Helpers de Blob para binarios (audio).
-import { list, put } from "@vercel/blob";
-const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
+// Helpers R2 para binarios (audio).
+import { r2Put, r2Exists, r2PublicUrl, isR2Configured } from "@/lib/r2";
 
 async function blobUrl(pathname: string): Promise<string | null> {
-  if (!TOKEN) return null;
+  if (!isR2Configured()) return null;
   try {
-    const { blobs } = await list({ prefix: pathname, limit: 1, token: TOKEN });
-    return blobs.find((b) => b.pathname === pathname)?.url ?? null;
+    return (await r2Exists(pathname)) ? r2PublicUrl(pathname) : null;
   } catch {
     return null;
   }
 }
 
 async function setCachedBinary(pathname: string, buf: Buffer): Promise<string | null> {
-  if (!TOKEN) return null;
+  if (!isR2Configured()) return null;
   try {
-    const { url } = await put(pathname, buf, { access: "public", contentType: "audio/mpeg", token: TOKEN, allowOverwrite: true });
-    return url;
+    return await r2Put(pathname, buf, "audio/mpeg");
   } catch {
     return null;
   }

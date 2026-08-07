@@ -17,24 +17,21 @@ const REDIRECT = `http://localhost:${PORT}`;
 
 async function saveRefreshToken(token: string) {
   const envPath = path.join(process.cwd(), ".env");
+  const { writeFile } = await import("node:fs/promises");
   let current = "";
   try {
     current = await readFile(envPath, "utf8");
-  } catch {
-    /* no existe aún */
+  } catch { /* no existe aún */ }
+  if (/^GOOGLE_REFRESH_TOKEN=/m.test(current)) {
+    // reemplazo la línea existente
+    const updated = current.replace(/^GOOGLE_REFRESH_TOKEN=.*$/m, `GOOGLE_REFRESH_TOKEN="${token}"`);
+    await writeFile(envPath, updated, "utf8");
+    console.log("\n✅ REEMPLACÉ GOOGLE_REFRESH_TOKEN en .env con el nuevo. Listo.");
+  } else {
+    await appendFile(envPath, `\n# YouTube (Fase 4) — permiso de subida\nGOOGLE_REFRESH_TOKEN="${token}"\n`);
+    console.log("\n✅ Guardé GOOGLE_REFRESH_TOKEN en .env.");
   }
-  if (current.includes("GOOGLE_REFRESH_TOKEN")) {
-    console.log(
-      "\n⚠️  Ya había un GOOGLE_REFRESH_TOKEN en .env. Pegá este nuevo a mano si querés reemplazarlo:\n" +
-        token,
-    );
-    return;
-  }
-  await appendFile(
-    envPath,
-    `\n# YouTube (Fase 4) — permiso de subida\nGOOGLE_REFRESH_TOKEN="${token}"\n`,
-  );
-  console.log("\n✅ Guardé GOOGLE_REFRESH_TOKEN en .env. Ya podés subir videos.");
+  console.log("Token (guardalo también, para GitHub Secrets):\n" + token);
 }
 
 async function main() {
