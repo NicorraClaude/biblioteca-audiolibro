@@ -6,6 +6,7 @@
 # normal → de acá en más el pipeline se cambia sin que Nico toque nada.
 #
 # Orden de prioridades (el primero que tenga trabajo, lo hace):
+#   0. Pedidos de título de los usuarios (lo que pidió gente real, va primero)
 #   1. Fichas modernas de negocios (las 38 curadas)      → build-modernos.ts
 #   2. Sinopsis + resumen + AUDIO del catálogo de capa 1  → fill-summaries.ts
 #   3. Subida a YouTube de lo que tenga audio y no video  → upload-resumenes-youtube.ts
@@ -14,11 +15,12 @@
 # cuota de YouTube (6/día) no puede dejar el catálogo mudo.
 set -uo pipefail
 
+PEDIDOS="${PEDIDOS:-10}"
 MODERNOS="${MODERNOS:-5}"
 BIBLIOTECA="${BIBLIOTECA:-3}"
 YOUTUBE="${YOUTUBE:-6}"
 
-echo "▶ Motor: modernos=$MODERNOS · biblioteca=$BIBLIOTECA · youtube=$YOUTUBE"
+echo "▶ Motor: pedidos=$PEDIDOS · modernos=$MODERNOS · biblioteca=$BIBLIOTECA · youtube=$YOUTUBE"
 
 # Cada etapa es independiente: que una falle no debe tirar abajo las otras ni
 # impedir que el catálogo se snapshotee y deploye con lo que sí salió bien.
@@ -32,6 +34,14 @@ run_step() {
     echo "✗ $nombre falló (código $?) — sigo con lo demás"
   fi
 }
+
+# Va PRIMERO: es lo único que pidió una persona de verdad y está esperando.
+# (Su cron propio, process-requests.yml, venía fallando cada 2h desde la migración
+#  a R2 porque el YAML solo le pasaba BLOB_READ_WRITE_TOKEN. Acá los secrets están
+#  bien, así que los pedidos se atienden igual aunque aquel siga roto.)
+if [ "$PEDIDOS" != "0" ]; then
+  REQ_LIMIT="$PEDIDOS" run_step "Pedidos de títulos" npx tsx scripts/process-requests.ts
+fi
 
 if [ "$MODERNOS" != "0" ]; then
   REQ_LIMIT="$MODERNOS" run_step "Fichas modernas" npx tsx scripts/build-modernos.ts
