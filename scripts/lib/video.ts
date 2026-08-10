@@ -49,10 +49,12 @@ export async function makeVideo(opts: {
     coverOk = await downloadCover(`${SITE}/libro/${opts.slug}/opengraph-image`, tmpCover);
   }
 
-  // Filtro: escalar la tapa para que entre en 1280x720 y centrarla con relleno negro.
+  // Escala la imagen para que entre en 1280x720 y la centra. El relleno va del mismo
+  // marrón oscuro que el fondo del sitio (no negro puro): la imagen OG es más ancha
+  // que 16:9, y con negro se veían dos franjas marcadas arriba y abajo.
   const vf =
     "scale=1280:720:force_original_aspect_ratio=decrease," +
-    "pad=1280:720:(ow-iw)/2:(oh-ih)/2:color=black,setsar=1,format=yuv420p";
+    "pad=1280:720:(ow-iw)/2:(oh-ih)/2:color=0x181310,setsar=1,format=yuv420p";
 
   const args = coverOk
     ? [
