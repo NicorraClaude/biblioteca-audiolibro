@@ -1,0 +1,112 @@
+# MOTOR DIARIO — corre solo, sin que nadie apriete nada.
+#
+# Todos los días: genera fichas nuevas (reseña + análisis + audio → R2) y sube
+# hasta 6 resúmenes a YouTube. El 6 no es arbitrario: la cuota de la YouTube Data
+# API son 10.000 unidades/día y cada subida cuesta 1.600, así que 6 es el techo.
+# Si se pide más, las de sobra fallan con quotaExceeded y se reintentan mañana.
+#
+# Corre a las 08:30 UTC (05:30 en Argentina) porque la cuota de YouTube se
+# renueva a medianoche del Pacífico — así arranca el día con el tanque lleno.
+#
+# Secrets: los mismos que nicho-negocios.yml (R2_*, OPENAI_API_KEY, GOOGLE_*, VERCEL_*).
+name: Motor diario
+
+on:
+  schedule:
+    - cron: "30 8 * * *"
+  workflow_dispatch:
+    inputs:
+      generar:
+        description: "Fichas modernas a generar"
+        default: "5"
+      subir:
+        description: "Videos a subir (máx. 6 por cuota de YouTube)"
+        default: "6"
+
+# Si una corrida se pasa de la hora, que no se pisen dos.
+concurrency:
+  group: motor-diario
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  motor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+
+      - name: Instalar deps
+        run: |
+          npm ci
+          python3 -m venv .venv-tts
+          .venv-tts/bin/pip install -q edge-tts
+
+      - name: Preparar base desde el snapshot
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
+
+      - name: Generar fichas (reseña + análisis + audio → R2)
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REQ_LIMIT: ${{ github.event.inputs.generar || '5' }}
+        run: npx tsx scripts/build-modernos.ts
+
+      # No corta la corrida si YouTube rechaza: el snapshot y el deploy igual valen.
+      - name: Subir a YouTube (hasta 6)
+        continue-on-error: true
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          REQ_LIMIT: ${{ github.event.inputs.subir || '6' }}
+        run: npx tsx scripts/upload-resumenes-youtube.ts
+
+      - name: Snapshot del catálogo
+        run: npx tsx scripts/export-seed.ts
+
+      - name: ¿Cambió el catálogo?
+        id: diff
+        run: |
+          if git diff --quiet -- prisma/seed-data.json; then echo "changed=0" >> "$GITHUB_OUTPUT"; else echo "changed=1" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Commit del snapshot
+        if: steps.diff.outputs.changed == '1'
+        run: |
+          git config user.name "biblioteca-bot"
+          git config user.email "bot@biblioteca.local"
+          git add prisma/seed-data.json
+          git commit -m "Motor diario (auto)" || echo "sin cambios"
+          git pull --rebase --autostash || true
+          git push || echo "nada para pushear"
+
+      - name: Deploy a Vercel
+        if: steps.diff.outputs.changed == '1'
+        run: npx vercel deploy --prod --yes --force --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Resumen de la corrida
+        if: always()
+        run: |
+          echo "### Motor diario" >> "$GITHUB_STEP_SUMMARY"
+          echo "Catálogo cambió: ${{ steps.diff.outputs.changed }}" >> "$GITHUB_STEP_SUMMARY"
