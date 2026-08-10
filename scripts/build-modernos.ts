@@ -119,15 +119,16 @@ async function upsertModerno(m: Moderno) {
 }
 
 // ---------- ¿Está completa la ficha? ----------
+// OJO: solo se genera el idioma ORIGINAL del título (ver el loop de main), así
+// que la completitud se evalúa contra ESE idioma. Si se exigieran es+en, ninguna
+// ficha contaría como completa y cada corrida gastaría el cupo re-visitando las
+// que ya están listas, sin generar nada.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function complete(s: any): boolean {
-  const langs: Language[] = ["es", "en"];
-  for (const l of langs) {
-    // reseña como "sinopsis" (mismo campo)
-    if (!s?.[l]?.sinopsis?.text) return false;
-    if (!s?.[l]?.resumen?.text) return false;
-    for (const v of VOICES) if (!s?.[l]?.resumen?.audio?.[v]) return false;
-  }
+function complete(s: any, lang: Language): boolean {
+  // reseña como "sinopsis" (mismo campo)
+  if (!s?.[lang]?.sinopsis?.text) return false;
+  if (!s?.[lang]?.resumen?.text) return false;
+  for (const v of VOICES) if (!s?.[lang]?.resumen?.audio?.[v]) return false;
   return true;
 }
 
@@ -138,6 +139,7 @@ async function main() {
   console.log(`\n💼 Negocios modernos · MODE=${MODE} · LIMIT=${LIMIT}\n`);
 
   let done = 0;
+  let skipped = 0;
   for (const m of MODERNOS_NEGOCIOS) {
     if (done >= LIMIT) break;
     // 1) upsert (siempre, es idempotente y rápido)
@@ -146,7 +148,7 @@ async function main() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let summary: any; try { summary = JSON.parse(b.summary ?? "{}"); } catch { summary = {}; }
 
-    if (complete(summary) && MODE === "all") continue;
+    if (complete(summary, m.language) && MODE === "all") { skipped++; continue; }
 
     console.log(`\n→ ${m.slug} (${m.language})`);
     const st = styleFor(m.categories);
@@ -196,13 +198,18 @@ async function main() {
       }
     }
 
+    // El cupo se gasta solo con trabajo REAL: si no cambió nada, no cuenta.
     if (changed) {
       await prisma.book.update({ where: { id: b.id }, data: { summary: JSON.stringify(summary) } });
+      done++;
+      console.log(`   (${done}/${LIMIT} ficha lista)`);
+    } else {
+      skipped++;
+      console.log(`   (sin cambios, no gasta cupo)`);
     }
-    done++;
-    console.log(`   (${done}/${LIMIT} ficha lista)`);
   }
-  console.log(`\n✅ Tanda lista: ${done} fichas modernas procesadas.\n`);
+  const faltan = MODERNOS_NEGOCIOS.length - skipped - done;
+  console.log(`\n✅ Tanda lista: ${done} fichas generadas · ${skipped} ya estaban · ~${Math.max(0, faltan)} pendientes.\n`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); }).finally(() => prisma.$disconnect());
