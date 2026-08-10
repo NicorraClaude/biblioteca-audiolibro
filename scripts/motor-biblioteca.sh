@@ -27,7 +27,11 @@ MOTOR_MIN="${MOTOR_MIN:-290}"
 # corto: en la ventana del job entran ~12 libros, no 3. Cuando corre solo, el
 # límite lo pone el reloj y no un número fijo; cuando lo disparás a mano, se
 # respeta lo que hayas puesto en el formulario.
-if [ "${GITHUB_EVENT_NAME:-}" = "schedule" ]; then
+# OJO: el 0 es sagrado. Un workflow que pide CERO libros de catálogo (pedidos.yml)
+# lo pide en serio. Sin esta guarda, la regla del reloj lo pisaba y el cron de
+# pedidos se ponía a generar catálogo hasta chocar con su timeout de 2 horas,
+# perdiendo todo lo generado porque nunca llegaba al paso de guardar.
+if [ "${GITHUB_EVENT_NAME:-}" = "schedule" ] && [ "$BIBLIOTECA" != "0" ]; then
   BIBLIOTECA="auto"
 fi
 
