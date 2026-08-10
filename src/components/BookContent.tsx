@@ -13,13 +13,18 @@ type Trans = { code: string; name: string };
 export function BookContent({ book }: { book: Book }) {
   const hasSinopsis = !!(book.summary?.es?.sinopsis || book.summary?.en?.sinopsis);
   const hasResumen = !!(book.summary?.es?.resumen || book.summary?.en?.resumen);
+  // Solo Capa 1 (dominio público) puede mostrar el texto completo de la obra.
+  // En Capa 2 la ficha es 100% obra nuestra: reseña + análisis original.
+  const hasLibro = book.contentLayer === 1;
   const tabs: Tab[] = [
-    "libro",
+    ...(hasLibro ? (["libro"] as Tab[]) : []),
     ...(hasSinopsis ? (["sinopsis"] as Tab[]) : []),
     ...(hasResumen ? (["resumen"] as Tab[]) : []),
   ];
 
-  const [tab, setTab] = useState<Tab>("libro");
+  const [tab, setTab] = useState<Tab>(tabs[0] ?? "libro");
+  // Ficha sin nada que mostrar todavía (ej. moderno recién creado, sin reseña).
+  const nothingToShow = tabs.length === 0;
   const [lang, setLang] = useState<Language>("es");
   const [voice, setVoice] = useState<"onyx" | "nova">("onyx");
 
@@ -102,8 +107,13 @@ export function BookContent({ book }: { book: Book }) {
     else if (e?.audio?.[voice] ?? e?.audioUrl) track = { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "audio", src: (e.audio?.[voice] ?? e.audioUrl)!, cover: book.coverImageUrl };
   }
 
-  const tabLabel: Record<Tab, string> = { libro: "Libro", sinopsis: "Sinopsis", resumen: "Resumen" };
+  // En Capa 2 la "sinopsis" es nuestra reseña editorial y el "resumen" el análisis largo.
+  const tabLabel: Record<Tab, string> = hasLibro
+    ? { libro: "Libro", sinopsis: "Sinopsis", resumen: "Resumen" }
+    : { libro: "Libro", sinopsis: "Reseña", resumen: "Análisis" };
   const isOriginal = libroLang === orig;
+
+  if (nothingToShow) return null;
 
   return (
     <div className="rounded-2xl border border-line bg-surface shadow-sm">

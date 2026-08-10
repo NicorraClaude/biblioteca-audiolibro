@@ -136,11 +136,31 @@ export default async function BookPage({
             <span className="rounded-full bg-accent-soft px-2.5 py-1 text-accent-dark uppercase">
               {info.short}
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-1 text-ink-soft ring-1 ring-line">
-              <span title="Español">{LANGUAGE_FLAG.es}</span>
-              <span title="Inglés">{LANGUAGE_FLAG.en}</span>
-              <span className="ml-1 uppercase">Disponible en 2 idiomas</span>
-            </span>
+            {/* Idiomas REALES de la ficha. Capa 1 se traduce on-demand a cualquier
+                idioma; Capa 2 muestra solo los que efectivamente generamos. */}
+            {(() => {
+              const langs = (["es", "en"] as const).filter(
+                (l) => book.summary?.[l]?.sinopsis || book.summary?.[l]?.resumen,
+              );
+              const shown = book.contentLayer === 1 ? (["es", "en"] as const) : langs;
+              if (shown.length === 0) return null;
+              return (
+                <span className="inline-flex items-center gap-1 rounded-full bg-surface px-2.5 py-1 text-ink-soft ring-1 ring-line">
+                  {shown.map((l) => (
+                    <span key={l} title={l === "es" ? "Español" : "Inglés"}>
+                      {LANGUAGE_FLAG[l]}
+                    </span>
+                  ))}
+                  <span className="ml-1 uppercase">
+                    {shown.length > 1
+                      ? `Disponible en ${shown.length} idiomas`
+                      : shown[0] === "es"
+                        ? "En español"
+                        : "En inglés"}
+                  </span>
+                </span>
+              );
+            })()}
           </div>
 
           <h1 className="font-display text-3xl leading-tight font-semibold text-balance text-ink sm:text-5xl">
@@ -182,7 +202,10 @@ export default async function BookPage({
             )}
 
             {book.contentLayer === 2 && (
-              <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
+              <>
+                {/* Obra propia: reseña editorial + análisis original (texto y audio). */}
+                <BookContent book={book} />
+                <div className="rounded-2xl border border-amber-200 bg-amber-50/60 p-5">
                 <h2 className="font-display text-lg font-semibold text-amber-900">Dónde conseguirlo</h2>
                 <p className="mt-1 text-sm text-amber-800/90">
                   Libro con derechos vigentes. Comprándolo desde acá, apoyás la
@@ -201,7 +224,8 @@ export default async function BookPage({
                     </a>
                   ))}
                 </div>
-              </div>
+                </div>
+              </>
             )}
 
             {book.contentLayer === 3 && <AudioSection book={book} />}
