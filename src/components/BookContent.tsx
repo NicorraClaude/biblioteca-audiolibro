@@ -90,7 +90,11 @@ export function BookContent({ book }: { book: Book }) {
   else text = book.summary?.[activeLang]?.[tab]?.text ?? null;
 
   // --- Track de audio ---
+  // ytId = el video de este contenido, si existe y es público. No se usa para
+  // reproducir (eso lo hace el mp3, que sí suena en segundo plano) sino para
+  // ofrecer el link al canal: así el video igual suma views y suscriptores.
   let track: PlayableTrack | null = null;
+  let ytId: string | null = null;
   if (tab === "libro") {
     const v = book.audioVersions.find((x) => x.voiceId === voice && ((x.youtubeVideoId && x.youtubePublic) || (x.audioUrl && x.status === "ready")));
     // Preferimos el mp3 propio sobre el embed de YouTube: el <audio> sigue sonando
@@ -99,6 +103,7 @@ export function BookContent({ book }: { book: Book }) {
       track = v.audioUrl && v.status === "ready"
         ? { title: book.title, author: book.author, slug: book.slug, kind: "audio", src: v.audioUrl, cover: book.coverImageUrl }
         : { title: book.title, author: book.author, slug: book.slug, kind: "youtube", src: v.youtubeVideoId!, cover: book.coverImageUrl };
+    if (v?.youtubeVideoId && v.youtubePublic) ytId = v.youtubeVideoId;
   } else if (tab === "sinopsis") {
     const e = book.summary?.[activeLang]?.sinopsis;
     const src = e?.audio?.[voice] ?? e?.audio?.nova ?? e?.audioUrl;
@@ -109,6 +114,7 @@ export function BookContent({ book }: { book: Book }) {
     const src = e?.audio?.[voice] ?? e?.audioUrl;
     if (src) track = { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "audio", src, cover: book.coverImageUrl };
     else if (e?.youtubeVideoId && e.youtubePublic) track = { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "youtube", src: e.youtubeVideoId, cover: book.coverImageUrl };
+    if (e?.youtubeVideoId && e.youtubePublic) ytId = e.youtubeVideoId;
   }
 
   // En Capa 2 la "sinopsis" es nuestra reseña editorial y el "resumen" el análisis largo.
@@ -188,10 +194,29 @@ export function BookContent({ book }: { book: Book }) {
           </div>
         )}
         {track ? (
-          <PlayButton track={track} className="ml-auto inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-dark active:scale-95">
-            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-            Escuchar
-          </PlayButton>
+          <div className="ml-auto flex items-center gap-2">
+            <PlayButton track={track} className="inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-dark active:scale-95">
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
+              Escuchar
+            </PlayButton>
+            {/* El reproductor usa el mp3 (único que suena con el teléfono bloqueado),
+                pero el video sigue accesible: le da views y suscriptores al canal. */}
+            {ytId && (
+              <a
+                href={`https://www.youtube.com/watch?v=${ytId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Ver este audio como video en nuestro canal"
+                className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3.5 py-2.5 text-sm font-semibold text-ink-soft ring-1 ring-line transition hover:text-ink active:scale-95"
+              >
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="#FF0000" aria-hidden>
+                  <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2C0 8.1 0 12 0 12s0 3.9.5 5.8a3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1c.5-1.9.5-5.8.5-5.8s0-3.9-.5-5.8Z" />
+                  <path d="M9.6 15.6 15.8 12 9.6 8.4v7.2Z" fill="#fff" />
+                </svg>
+                YouTube
+              </a>
+            )}
+          </div>
         ) : (
           <span className="ml-auto rounded-full bg-paper px-3 py-1.5 text-xs font-medium text-ink-soft">🎧 Audio en preparación</span>
         )}
