@@ -1,12 +1,16 @@
-# AUDIO MASIVO — completa texto + audio de TODO el catálogo, en paralelo.
-# Detalle del diseño en scripts/motor-shard.sh y scripts/apply-patches.ts.
+# AUDIO MASIVO ‚Äî completa texto + audio de TODO el cat√°logo, en paralelo.
+# Detalle del dise√±o en scripts/motor-shard.sh y scripts/apply-patches.ts.
 #
-# 10 sesiones a la vez, cada una con su pedazo (reparto por resto: cubre todo sin
-# repetir). Las sesiones NO commitean —se pisarían el snapshot y el summary es
-# irrecuperable—: cada una sube su parche y un job final los junta en un commit.
+# La CANTIDAD de sesiones sale de scripts/shards.mjs, no de ac√°: as√≠ se puede subir
+# o bajar la paralelizaci√≥n con un push normal, sin volver a editar este archivo a
+# mano por la web.
 #
-# Arranca a medianoche de Argentina para terminar antes del Motor biblioteca (5:30).
-# Secrets: R2_*, OPENAI_API_KEY, VERCEL_*.
+# Cada sesi√≥n toma su pedazo (reparto por resto: cubre todo sin repetir) y NO
+# commitea ‚Äîse pisar√≠an el snapshot y el summary es irrecuperable‚Äî: sube su parche y
+# el job final los junta. El guardado lo hace apply-patches.ts, que reintenta y
+# falla en rojo si no puede.
+#
+# Arranca a medianoche de Argentina. Secrets: R2_*, OPENAI_API_KEY, VERCEL_*.
 name: Audio masivo
 
 on:
@@ -15,7 +19,7 @@ on:
   workflow_dispatch:
     inputs:
       sesiones_min:
-        description: "Minutos de trabajo por sesión (el job muere a los 350)"
+        description: "Minutos de trabajo por sesi√≥n (el job muere a los 350)"
         default: "290"
 
 concurrency:
@@ -26,14 +30,25 @@ permissions:
   contents: write
 
 jobs:
+  preparar:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.calc.outputs.shards }}
+      total: ${{ steps.calc.outputs.total }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: calc
+        run: node scripts/shards.mjs >> "$GITHUB_OUTPUT"
+
   generar:
+    needs: preparar
     runs-on: ubuntu-latest
     timeout-minutes: 350
     strategy:
-      # Que una sesión falle no debe cancelar a las otras nueve.
+      # Que una sesi√≥n falle no debe cancelar a las dem√°s.
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        shard: ${{ fromJSON(needs.preparar.outputs.shards) }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -53,7 +68,7 @@ jobs:
           npx prisma migrate deploy
           npx tsx prisma/seed.ts
 
-      - name: Generar (sesión ${{ matrix.shard }})
+      - name: Generar (sesi√≥n ${{ matrix.shard }})
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -62,12 +77,12 @@ jobs:
           R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           SHARD: ${{ matrix.shard }}
-          SHARDS: "10"
+          SHARDS: ${{ needs.preparar.outputs.total }}
           PATCH_OUT: "parche-${{ matrix.shard }}.json"
           MOTOR_MIN: ${{ github.event.inputs.sesiones_min || '290' }}
         run: bash scripts/motor-shard.sh
 
-      - name: Guardar el parche de esta sesión
+      - name: Guardar el parche de esta sesi√≥n
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -78,11 +93,14 @@ jobs:
 
   consolidar:
     needs: generar
-    # Corre aunque alguna sesión se haya caído: lo que sí se generó se guarda igual.
+    # Corre aunque alguna sesi√≥n se haya ca√≠do: lo generado se guarda igual.
     if: always()
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with: { node-version: 24 }
       - run: npm ci
@@ -93,33 +111,15 @@ jobs:
           pattern: parche-*
           path: parches
 
-      - name: Aplicar los parches al catálogo
+      - name: Aplicar, commitear y pushear
         run: npx tsx scripts/apply-patches.ts parches
 
-      - name: ¿Cambió el catálogo?
-        id: diff
-        run: |
-          if git diff --quiet -- prisma/seed-data.json; then echo "changed=0" >> "$GITHUB_OUTPUT"; else echo "changed=1" >> "$GITHUB_OUTPUT"; fi
-
-      - name: Commit del snapshot
-        if: steps.diff.outputs.changed == '1'
-        run: |
-          git config user.name "biblioteca-bot"
-          git config user.email "bot@biblioteca.local"
-          git add prisma/seed-data.json
-          git commit -m "Audio masivo (auto)" || echo "sin cambios"
-          git pull --rebase --autostash || true
-          git push || echo "nada para pushear"
-
       - name: Deploy a Vercel
-        if: steps.diff.outputs.changed == '1'
         run: npx vercel deploy --prod --yes --force --token="${{ secrets.VERCEL_TOKEN }}"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Cuánto falta
+      - name: Cu√°nto falta
         if: always()
-        run: |
-          echo "### Audio masivo" >> "$GITHUB_STEP_SUMMARY"
-          npx tsx scripts/faltan.ts >> "$GITHUB_STEP_SUMMARY"
+        run: npx tsx scripts/faltan.ts >> "$GITHUB_STEP_SUMMARY"
