@@ -1,0 +1,98 @@
+# MOTOR DE LA BIBLIOTECA — reemplaza a "Motor diario".
+#
+# Toda la lógica vive en scripts/motor-biblioteca.sh, NO acá. Así el pipeline se
+# puede cambiar con un push normal, sin volver a editar un workflow a mano por la
+# web (pushear .github/workflows/ exige el scope "workflow" que el token no tiene).
+#
+# Prioridad automática: primero termina las fichas modernas de negocios; cuando
+# no quedan, sigue solo con el catálogo de dominio público. No hay que tocar nada
+# cuando se acaban los 38 modernos: la transición pasa sola.
+#
+# Secrets: R2_*, OPENAI_API_KEY, GOOGLE_*, VERCEL_*.
+name: Motor biblioteca
+
+on:
+  schedule:
+    - cron: "30 8 * * *"
+  workflow_dispatch:
+    inputs:
+      modernos:
+        description: "Fichas modernas de negocios por corrida"
+        default: "5"
+      biblioteca:
+        description: "Libros del catálogo (texto + audio) por corrida"
+        default: "3"
+      youtube:
+        description: "Videos a subir (máx. 6 por cuota de YouTube)"
+        default: "6"
+
+concurrency:
+  group: motor-biblioteca
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  motor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+
+      - name: Instalar deps
+        run: |
+          npm ci
+          python3 -m venv .venv-tts
+          .venv-tts/bin/pip install -q edge-tts
+
+      - name: Preparar base desde el snapshot
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
+
+      - name: Producir (modernos → catálogo → YouTube)
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          MODERNOS: ${{ github.event.inputs.modernos || '5' }}
+          BIBLIOTECA: ${{ github.event.inputs.biblioteca || '3' }}
+          YOUTUBE: ${{ github.event.inputs.youtube || '6' }}
+        run: bash scripts/motor-biblioteca.sh
+
+      - name: Snapshot del catálogo
+        run: npx tsx scripts/export-seed.ts
+
+      - name: ¿Cambió el catálogo?
+        id: diff
+        run: |
+          if git diff --quiet -- prisma/seed-data.json; then echo "changed=0" >> "$GITHUB_OUTPUT"; else echo "changed=1" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Commit del snapshot
+        if: steps.diff.outputs.changed == '1'
+        run: |
+          git config user.name "biblioteca-bot"
+          git config user.email "bot@biblioteca.local"
+          git add prisma/seed-data.json
+          git commit -m "Motor biblioteca (auto)" || echo "sin cambios"
+          git pull --rebase --autostash || true
+          git push || echo "nada para pushear"
+
+      - name: Deploy a Vercel
+        if: steps.diff.outputs.changed == '1'
+        run: npx vercel deploy --prod --yes --force --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
