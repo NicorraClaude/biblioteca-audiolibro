@@ -94,14 +94,45 @@ async function buildEverything(slug: string, title: string, author: string): Pro
     if (!summary[lang].resumen?.text) {
       summary[lang].resumen = { ...(summary[lang].resumen ?? {}), text: await genResumen(title, author, lang) };
     }
+    // El resumen largo también lleva audio propio en R2. Antes solo se narraba la
+    // sinopsis, así que el resumen quedaba mudo salvo que hubiera video de YouTube
+    // — y la cuota de YouTube (6/día) dejaba el catálogo en silencio.
+    const r = summary[lang].resumen;
+    if (r?.text) {
+      r.audio = r.audio ?? {};
+      for (const voice of ["onyx", "nova"] as const) {
+        if (r.audio[voice]) continue;
+        try {
+          const audio = await narrate(r.text, lang, voice);
+          const url = await r2Put(`resumen/${slug}-${lang}-${voice}.mp3`, audio, "audio/mpeg");
+          r.audio[voice] = url;
+          console.log(`   ✓ audio resumen ${lang}/${voice} (${(audio.length / 1024 / 1024).toFixed(1)} MB)`);
+          await sleep(100);
+        } catch (e) {
+          console.error(`   ✗ audio resumen ${lang}/${voice}: ${(e as Error).message}`);
+        }
+      }
+    }
     await prisma.book.update({ where: { slug }, data: { summary: JSON.stringify(summary) } });
   }
 }
 
+// Un libro está PENDIENTE si le falta texto O si le falta el audio de ese texto.
+// (Antes solo miraba el texto: los libros con resumen escrito pero sin narrar
+// nunca volvían a entrar, y quedaban mudos para siempre.)
 function lacksSummary(raw: string | null): boolean {
   try {
     const s = JSON.parse(raw ?? "{}");
-    return !(s.es?.sinopsis?.text || s.en?.sinopsis?.text || s.es?.resumen?.text || s.en?.resumen?.text);
+    const hayTexto = s.es?.sinopsis?.text || s.en?.sinopsis?.text || s.es?.resumen?.text || s.en?.resumen?.text;
+    if (!hayTexto) return true;
+    for (const lang of ["es", "en"] as const) {
+      for (const tier of ["sinopsis", "resumen"] as const) {
+        const e = s[lang]?.[tier];
+        if (!e?.text) continue;
+        for (const v of ["onyx", "nova"] as const) if (!e.audio?.[v]) return true;
+      }
+    }
+    return false;
   } catch {
     return true;
   }
