@@ -1,0 +1,111 @@
+# Motor del NICHO NEGOCIOS (corre en la NUBE, no necesita la compu de Nico):
+#   1. Ingesta los clásicos curados de dominio público.
+#   2. Genera las fichas MODERNAS: reseña original + resumen analítico ~40 min
+#      + audio (edge-tts, gratis) → Cloudflare R2 + link de Amazon afiliado.
+#   3. Sube a YouTube (PÚBLICO — auditoría aprobada) los resúmenes que tengan
+#      audio y todavía no tengan videoId.
+#   4. Snapshotea el catálogo, commitea y deploya a Vercel.
+#
+# Es IDEMPOTENTE y por tandas: volvé a dispararlo hasta completar los 38 modernos.
+#
+# Secrets necesarios (Settings → Secrets and variables → Actions):
+#   R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET, R2_PUBLIC_URL
+#   OPENAI_API_KEY
+#   GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REFRESH_TOKEN
+#   VERCEL_TOKEN, VERCEL_ORG_ID, VERCEL_PROJECT_ID
+#   NEXT_PUBLIC_AMAZON_TAG  (opcional: sin él los links de compra funcionan pero no cobran comisión)
+name: Nicho Negocios
+
+on:
+  workflow_dispatch:
+    inputs:
+      limite:
+        description: "Máx. fichas MODERNAS a generar por corrida"
+        default: "5"
+      subir_youtube:
+        description: "Cuántos resúmenes subir a YouTube (0 = ninguno)"
+        default: "5"
+      solo_clasicos:
+        description: "Solo ingesta de clásicos (skip modernos)"
+        default: "false"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+
+      - name: Instalar deps
+        run: |
+          npm ci
+          python3 -m venv .venv-tts
+          .venv-tts/bin/pip install -q edge-tts
+
+      - name: Preparar base desde el snapshot
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
+
+      - name: Ingestar clásicos curados
+        run: npx tsx scripts/ingest-clasicos-negocios.ts
+
+      - name: Generar fichas modernas (reseña + resumen + audio → R2)
+        if: ${{ github.event.inputs.solo_clasicos != 'true' }}
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          REQ_LIMIT: ${{ github.event.inputs.limite || '5' }}
+        run: npx tsx scripts/build-modernos.ts
+
+      - name: Subir resúmenes a YouTube (público)
+        if: ${{ github.event.inputs.subir_youtube != '0' }}
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          NEXT_PUBLIC_AMAZON_TAG: ${{ secrets.NEXT_PUBLIC_AMAZON_TAG }}
+          REQ_LIMIT: ${{ github.event.inputs.subir_youtube || '5' }}
+        run: npx tsx scripts/upload-resumenes-youtube.ts
+
+      - name: Snapshot del catálogo
+        run: npx tsx scripts/export-seed.ts
+
+      - name: ¿Cambió el catálogo?
+        id: diff
+        run: |
+          if git diff --quiet -- prisma/seed-data.json; then echo "changed=0" >> "$GITHUB_OUTPUT"; else echo "changed=1" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Commit del snapshot
+        if: steps.diff.outputs.changed == '1'
+        run: |
+          git config user.name "biblioteca-bot"
+          git config user.email "bot@biblioteca.local"
+          git add prisma/seed-data.json
+          git commit -m "Nicho Negocios (auto)" || echo "sin cambios"
+          git pull --rebase --autostash || true
+          git push || echo "nada para pushear"
+
+      - name: Deploy a Vercel
+        if: steps.diff.outputs.changed == '1'
+        run: npx vercel deploy --prod --yes --force --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
