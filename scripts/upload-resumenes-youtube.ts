@@ -19,7 +19,6 @@ import type { Language } from "../src/lib/types";
 
 const LIMIT = Number(process.env.REQ_LIMIT ?? 3);
 const SITE = "https://biblioteca-audiolibros.vercel.app";
-const AMAZON_TAG = process.env.NEXT_PUBLIC_AMAZON_TAG ?? "";
 
 const s3 = new S3Client({
   region: "auto",
@@ -66,16 +65,12 @@ function buildMetadata(book: any, lang: Language) {
   let cats: string[] = []; try { cats = JSON.parse(book.categories ?? "[]"); } catch { /* */ }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let affs: {store:string,url:string}[] = []; try { affs = JSON.parse(book.affiliateLinks ?? "[]"); } catch { /* */ }
-  // Aplicar tag de afiliado a Amazon si tenemos.
-  const amazon = affs.find((a) => /amazon/i.test(a.store));
-  let amazonUrl = amazon?.url;
-  if (amazonUrl && AMAZON_TAG) {
-    try {
-      const u = new URL(amazonUrl);
-      u.searchParams.set("tag", AMAZON_TAG);
-      amazonUrl = u.toString();
-    } catch { /* */ }
-  }
+  // La descripción NO lleva link directo a la tienda: manda a la ficha, y la ficha
+  // arma el link de afiliado al renderizar (withAffiliateTag). Así el día que el tag
+  // de Associates esté cargado, TODOS los videos ya subidos empiezan a cobrar sin
+  // tener que editar una sola descripción — editarlas por API exige el scope
+  // `youtube` completo, que mandaría la app a verificación de Google otra vez.
+  const hasStore = affs.length > 0;
   const disclaimer = isEs
     ? "Este es un análisis original de las ideas centrales de la obra, con nuestras palabras. NO reproduce el texto del libro. Para la experiencia completa, comprá la edición original."
     : "This is an original analysis of the book's central ideas, in our own words. It does NOT reproduce the book's text. For the full experience, get the original edition.";
@@ -84,8 +79,14 @@ function buildMetadata(book: any, lang: Language) {
     ``,
     `Análisis extenso (~40 min) de las ideas centrales de este best-seller, narrado con IA.`,
     ``,
-    `📖 Escuchá y leé el análisis completo, y descubrí más libros en: ${SITE}/libro/${book.slug}`,
-    ...(amazonUrl ? [``, `🛒 Comprá el libro original en Amazon: ${amazonUrl}`, `(Compra por este link ayuda a mantener la biblioteca sin costo para vos.)`] : []),
+    `📖 Análisis completo en texto y audio, y más libros: ${SITE}/libro/${book.slug}`,
+    ...(hasStore
+      ? [
+          ``,
+          `🛒 En esa misma página está el link para conseguir el libro original.`,
+          `(Comprándolo desde ahí apoyás la biblioteca, sin costo extra para vos.)`,
+        ]
+      : []),
     ``,
     disclaimer,
     ``,
