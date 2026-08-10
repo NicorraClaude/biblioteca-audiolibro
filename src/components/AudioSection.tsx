@@ -8,10 +8,11 @@ import { PlayButton } from "@/components/player/Player";
 // Sección "Escuchar" de la ficha — usa el reproductor flotante (sigue sonando
 // al navegar). Solo audio PROPIO (YouTube de nuestro canal o mp3 IA).
 function trackFor(book: Book, v: AudioVersion): PlayableTrack | null {
-  if (v.youtubeVideoId && v.youtubePublic)
-    return { title: book.title, author: book.author, slug: book.slug, kind: "youtube", src: v.youtubeVideoId, cover: book.coverImageUrl };
+  // mp3 primero: sigue sonando en segundo plano; el embed de YouTube no.
   if (v.audioUrl && v.status === "ready")
     return { title: book.title, author: book.author, slug: book.slug, kind: "audio", src: v.audioUrl, cover: book.coverImageUrl };
+  if (v.youtubeVideoId && v.youtubePublic)
+    return { title: book.title, author: book.author, slug: book.slug, kind: "youtube", src: v.youtubeVideoId, cover: book.coverImageUrl };
   return null;
 }
 

@@ -93,18 +93,22 @@ export function BookContent({ book }: { book: Book }) {
   let track: PlayableTrack | null = null;
   if (tab === "libro") {
     const v = book.audioVersions.find((x) => x.voiceId === voice && ((x.youtubeVideoId && x.youtubePublic) || (x.audioUrl && x.status === "ready")));
+    // Preferimos el mp3 propio sobre el embed de YouTube: el <audio> sigue sonando
+    // con el teléfono bloqueado (Media Session), el iframe de YouTube no.
     if (v)
-      track = v.youtubeVideoId && v.youtubePublic
-        ? { title: book.title, author: book.author, slug: book.slug, kind: "youtube", src: v.youtubeVideoId, cover: book.coverImageUrl }
-        : { title: book.title, author: book.author, slug: book.slug, kind: "audio", src: v.audioUrl!, cover: book.coverImageUrl };
+      track = v.audioUrl && v.status === "ready"
+        ? { title: book.title, author: book.author, slug: book.slug, kind: "audio", src: v.audioUrl, cover: book.coverImageUrl }
+        : { title: book.title, author: book.author, slug: book.slug, kind: "youtube", src: v.youtubeVideoId!, cover: book.coverImageUrl };
   } else if (tab === "sinopsis") {
     const e = book.summary?.[activeLang]?.sinopsis;
     const src = e?.audio?.[voice] ?? e?.audio?.nova ?? e?.audioUrl;
     if (src) track = { title: `Sinopsis · ${book.title}`, author: book.author, slug: book.slug, kind: "audio", src, cover: book.coverImageUrl };
   } else {
     const e = book.summary?.[activeLang]?.resumen;
-    if (e?.youtubeVideoId && e.youtubePublic) track = { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "youtube", src: e.youtubeVideoId, cover: book.coverImageUrl };
-    else if (e?.audio?.[voice] ?? e?.audioUrl) track = { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "audio", src: (e.audio?.[voice] ?? e.audioUrl)!, cover: book.coverImageUrl };
+    // Igual que arriba: el mp3 gana porque permite escuchar en segundo plano.
+    const src = e?.audio?.[voice] ?? e?.audioUrl;
+    if (src) track = { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "audio", src, cover: book.coverImageUrl };
+    else if (e?.youtubeVideoId && e.youtubePublic) track = { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "youtube", src: e.youtubeVideoId, cover: book.coverImageUrl };
   }
 
   // En Capa 2 la "sinopsis" es nuestra reseña editorial y el "resumen" el análisis largo.

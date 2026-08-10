@@ -59,6 +59,59 @@ function PlayerBar() {
     if (audioRef.current) audioRef.current.volume = vol;
   }, [vol, track?.src]);
 
+  // --- Reproducción en segundo plano ---
+  // Sin Media Session el sistema no sabe que esto es "un reproductor" y el audio
+  // se corta al bloquear el teléfono o cambiar de app. Registrando metadata +
+  // handlers, iOS y Android lo tratan como música: sigue sonando con la pantalla
+  // apagada y aparecen los controles en la pantalla de bloqueo.
+  // (El iframe de YouTube NO puede hacer esto: YouTube bloquea la reproducción en
+  // segundo plano fuera de Premium. Por eso el reproductor prefiere el mp3 propio.)
+  useEffect(() => {
+    const ms = typeof navigator !== "undefined" ? navigator.mediaSession : undefined;
+    if (!ms || !track || track.kind !== "audio") return;
+
+    ms.metadata = new MediaMetadata({
+      title: track.title,
+      artist: track.author,
+      album: "Biblioteca Abierta",
+      ...(track.cover ? { artwork: [{ src: track.cover, sizes: "512x512", type: "image/jpeg" }] } : {}),
+    });
+
+    const el = () => audioRef.current;
+    const seekBy = (d: number) => {
+      const a = el();
+      if (a) a.currentTime = Math.max(0, Math.min(a.duration || 0, a.currentTime + d));
+    };
+    const handlers: [MediaSessionAction, MediaSessionActionHandler][] = [
+      ["play", () => el()?.play()],
+      ["pause", () => el()?.pause()],
+      ["seekbackward", () => seekBy(-15)],
+      ["seekforward", () => seekBy(30)],
+      ["seekto", (d) => { const a = el(); if (a && d.seekTime != null) a.currentTime = d.seekTime; }],
+    ];
+    for (const [action, fn] of handlers) {
+      try { ms.setActionHandler(action, fn); } catch { /* acción no soportada */ }
+    }
+    return () => {
+      for (const [action] of handlers) {
+        try { ms.setActionHandler(action, null); } catch { /* */ }
+      }
+    };
+  }, [track]);
+
+  // El sistema operativo necesita saber si está sonando y por dónde va, o los
+  // controles del lock screen quedan congelados.
+  useEffect(() => {
+    const ms = typeof navigator !== "undefined" ? navigator.mediaSession : undefined;
+    if (!ms || track?.kind !== "audio") return;
+    ms.playbackState = playing ? "playing" : "paused";
+    if (dur > 0 && Number.isFinite(dur)) {
+      try {
+        ms.setPositionState({ duration: dur, position: Math.min(cur, dur), playbackRate: rate });
+      } catch { /* algunos navegadores no lo soportan */ }
+    }
+  }, [playing, cur, dur, rate, track?.kind]);
+
   if (!track) return null;
   const [from, to] = coverColors(track.slug);
   const isAudio = track.kind === "audio";

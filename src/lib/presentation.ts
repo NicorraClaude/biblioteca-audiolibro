@@ -87,16 +87,17 @@ export type PlayableTrack = {
   cover?: string | null;
 };
 
-// Devuelve cómo reproducir el audio PROPIO de un libro (YouTube público o mp3),
-// o null si todavía no tiene. Prioriza YouTube (monetizable).
+// Devuelve cómo reproducir el audio PROPIO de un libro (mp3 o YouTube público),
+// o null si todavía no tiene. Prioriza el mp3: es el único que sigue sonando con
+// el teléfono bloqueado (YouTube bloquea el segundo plano fuera de Premium).
 export function getPlayableTrack(book: Book): PlayableTrack | null {
-  const yt = book.audioVersions.find((v) => v.youtubeVideoId && v.youtubePublic);
-  if (yt?.youtubeVideoId) {
-    return { title: book.title, author: book.author, slug: book.slug, kind: "youtube", src: yt.youtubeVideoId, cover: book.coverImageUrl };
-  }
   const mp3 = book.audioVersions.find((v) => v.audioUrl && v.status === "ready");
   if (mp3?.audioUrl) {
     return { title: book.title, author: book.author, slug: book.slug, kind: "audio", src: mp3.audioUrl, cover: book.coverImageUrl };
+  }
+  const yt = book.audioVersions.find((v) => v.youtubeVideoId && v.youtubePublic);
+  if (yt?.youtubeVideoId) {
+    return { title: book.title, author: book.author, slug: book.slug, kind: "youtube", src: yt.youtubeVideoId, cover: book.coverImageUrl };
   }
   // Fallback: la SINOPSIS en audio (toda la biblioteca la tiene). Así cada libro
   // es reproducible desde la tarjeta y la biblioteca "suena" desde el día uno.
