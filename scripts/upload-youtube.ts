@@ -38,7 +38,7 @@ async function main() {
   const videoPath = path.join(process.cwd(), "content", "videos", `${SLUG}-${VOICE}.mp4`);
 
   console.log(`🎬 Armando video para "${book.title}" (${VOICE})...`);
-  await makeVideo({ coverUrl: book.coverImageUrl, audioPath, outPath: videoPath });
+  await makeVideo({ coverUrl: book.coverImageUrl, slug: book.slug, audioPath, outPath: videoPath });
 
   const categories: string[] = JSON.parse(book.categories ?? "[]");
   const meta = buildVideoMetadata({

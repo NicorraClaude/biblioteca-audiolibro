@@ -15,7 +15,12 @@ export const contentType = "image/png";
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const book = seed.find((b) => b.slug === slug);
-  if (!book || book.contentLayer !== 1) notFound();
+  // Antes solo la generaba para Capa 1. Ahora también para los modernos (Capa 2):
+  // es la imagen que se ve al compartir en WhatsApp Y el fondo de los videos de
+  // YouTube (esos libros no tienen archivo de tapa, así que sin esto el video sale
+  // 40 minutos de pantalla negra).
+  if (!book) notFound();
+  const esResumen = book.contentLayer !== 1;
 
   const [from, to] = coverColors(book.slug);
 
@@ -61,8 +66,14 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ background: "#ec5a36", color: "#fff", padding: "10px 22px", borderRadius: 999, fontSize: 22, fontWeight: 700 }}>Escuchar gratis</div>
-              <div style={{ color: "#a89b7a", fontSize: 22 }}>· Audio + texto · ES / EN</div>
+              <div style={{ background: "#ec5a36", color: "#fff", padding: "10px 22px", borderRadius: 999, fontSize: 22, fontWeight: 700 }}>
+                {esResumen ? "Análisis gratis" : "Escuchar gratis"}
+              </div>
+              {/* No prometer lo que no hay: los modernos son análisis original en
+                  español, no el libro completo bilingüe. */}
+              <div style={{ color: "#a89b7a", fontSize: 22 }}>
+                {esResumen ? "· Resumen en audio · ~40 min" : "· Audio + texto · ES / EN"}
+              </div>
             </div>
           </div>
         </div>

@@ -122,7 +122,7 @@ async function main() {
       console.log("  · descargando audio de R2...");
       await downloadFromR2(key, audioPath);
       console.log("  · armando mp4 (tapa + audio)...");
-      await makeVideo({ coverUrl: book.coverImageUrl, audioPath, outPath: videoPath });
+      await makeVideo({ coverUrl: book.coverImageUrl, slug: book.slug, audioPath, outPath: videoPath });
       const meta = buildMetadata(book, pick.lang);
       console.log(`  · subiendo a YouTube ("${meta.title.slice(0, 50)}")...`);
       const videoId = await uploadVideo({

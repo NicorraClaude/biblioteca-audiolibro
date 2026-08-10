@@ -92,7 +92,7 @@ async function main() {
     } else {
       try {
         console.log(`   🎬 Armando video...`);
-        await makeVideo({ coverUrl: book.coverImageUrl, audioPath, outPath: videoPath });
+        await makeVideo({ coverUrl: book.coverImageUrl, slug: book.slug, audioPath, outPath: videoPath });
         const categories: string[] = JSON.parse(book.categories ?? "[]");
         const meta = buildVideoMetadata({
           title: book.title, author: book.author, language, voiceName: VOICE === "onyx" ? "voz masculina" : "voz femenina",

@@ -26,10 +26,14 @@ async function downloadCover(coverUrl: string, dest: string): Promise<boolean> {
   return true;
 }
 
+const SITE = process.env.SITE_URL ?? "https://biblioteca-audiolibros.vercel.app";
+
 export async function makeVideo(opts: {
   coverUrl: string | null;
   audioPath: string;
   outPath: string;
+  /** Slug del libro: si no hay archivo de tapa, se usa la imagen diseñada del sitio. */
+  slug?: string;
 }): Promise<string> {
   const dir = path.dirname(opts.outPath);
   await mkdir(dir, { recursive: true });
@@ -37,6 +41,13 @@ export async function makeVideo(opts: {
 
   let coverOk = false;
   if (opts.coverUrl) coverOk = await downloadCover(opts.coverUrl, tmpCover);
+  // Muchos libros (todos los modernos) no tienen archivo de tapa: su portada se
+  // dibuja en la web, no existe como imagen. Sin esto el video salía 40 minutos de
+  // pantalla negra. La imagen OG del sitio ya está diseñada y trae título, autor y
+  // marca, así que sirve de fondo sin inventar nada nuevo.
+  if (!coverOk && opts.slug) {
+    coverOk = await downloadCover(`${SITE}/libro/${opts.slug}/opengraph-image`, tmpCover);
+  }
 
   // Filtro: escalar la tapa para que entre en 1280x720 y centrarla con relleno negro.
   const vf =

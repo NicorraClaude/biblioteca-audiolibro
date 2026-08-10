@@ -54,7 +54,7 @@ async function main() {
       }
       await writeFile(audioPath, Buffer.concat(bufs));
       console.log(`\n   🎬 Video...`);
-      await makeVideo({ coverUrl: book.coverImageUrl, audioPath, outPath: videoPath });
+      await makeVideo({ coverUrl: book.coverImageUrl, slug: book.slug, audioPath, outPath: videoPath });
 
       const meta = buildVideoMetadata({
         title: `${book.title} — Resumen completo (${lang === "es" ? "Español" : "English"})`,
