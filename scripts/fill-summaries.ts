@@ -8,9 +8,20 @@ import { r2Put, isR2Configured } from "../src/lib/r2";
 import { prisma, sleep } from "./db";
 import { EdgeTTSProvider } from "../src/lib/tts/edge";
 import { chunkText } from "../src/lib/tts/text";
+import { readFile, writeFile } from "node:fs/promises";
 import type { Language } from "../src/lib/types";
 
 const LIMIT = Number(process.env.REQ_LIMIT ?? 40);
+
+// --- Reparto en sesiones paralelas ---
+// Varios jobs corren a la vez, cada uno con SU pedazo del catálogo: el job N toma
+// los libros cuya posición en la lista de pendientes da resto N. Sin esto, todos
+// los jobs empezarían por el mismo libro y harían el mismo trabajo N veces.
+const SHARD = Number(process.env.SHARD ?? 0);
+const SHARDS = Number(process.env.SHARDS ?? 1);
+// Cada job escribe SU parche (no puede commitear: se pisarían entre sí). Un job
+// final los junta y hace un único commit.
+const PATCH_OUT = process.env.PATCH_OUT ?? "";
 
 const SYS_SINOPSIS =
   "Escribís la SINOPSIS de un libro para presentarlo y generar ganas de leerlo/escucharlo. " +
@@ -142,20 +153,45 @@ async function main() {
   if (!isR2Configured()) throw new Error("R2 no configurado (faltan vars R2_*).");
   if (!process.env.OPENAI_API_KEY) throw new Error("Falta OPENAI_API_KEY.");
   const all = await prisma.book.findMany({ where: { contentLayer: 1 }, orderBy: { downloadCount: "desc" } });
-  const pend = all.filter((b) => lacksSummary(b.summary)).slice(0, LIMIT);
-  console.log(`\n📝 Libros sin sinopsis/resumen: ${all.filter((b) => lacksSummary(b.summary)).length} · a generar ahora: ${pend.length}\n`);
+  // El orden (downloadCount desc) es estable entre jobs porque todos parten del
+  // mismo snapshot: por eso el reparto por resto no deja libros afuera ni repetidos.
+  const pendientes = all.filter((b) => lacksSummary(b.summary));
+  const mios = SHARDS > 1 ? pendientes.filter((_, i) => i % SHARDS === SHARD) : pendientes;
+  const pend = mios.slice(0, LIMIT);
+  const reparto = SHARDS > 1 ? ` · sesión ${SHARD + 1}/${SHARDS} (me tocan ${mios.length})` : "";
+  console.log(`\n📝 Libros sin sinopsis/resumen: ${pendientes.length}${reparto} · a generar ahora: ${pend.length}\n`);
 
   let hechos = 0;
+  const listos: string[] = [];
   for (const b of pend) {
     console.log(`→ ${b.slug} ("${b.title.slice(0, 40)}")`);
     try {
       await buildEverything(b.slug, b.title, b.author);
       hechos++;
+      listos.push(b.slug);
       console.log(`   ✓ listo (${hechos}/${pend.length})`);
     } catch (e) {
       console.error(`   ✗ ${(e as Error).message}`);
     }
   }
+
+  // Parche de esta sesión: solo lo que ELLA generó. El job consolidador los junta.
+  // Se ACUMULA sobre el archivo existente porque la sesión llama a este script una
+  // vez por libro (para poder cortar por reloj entre libro y libro): si sobrescribiera,
+  // el parche final tendría un solo libro y se perdería todo lo anterior.
+  if (PATCH_OUT) {
+    const rows = listos.length
+      ? await prisma.book.findMany({ where: { slug: { in: listos } }, select: { slug: true, summary: true } })
+      : [];
+    const previos: { slug: string; summary: string | null }[] = await readFile(PATCH_OUT, "utf8")
+      .then((t) => JSON.parse(t))
+      .catch(() => []);
+    const acc = new Map(previos.map((p) => [p.slug, p]));
+    for (const r of rows) acc.set(r.slug, r);
+    await writeFile(PATCH_OUT, JSON.stringify([...acc.values()], null, 2), "utf8");
+    console.log(`📦 Parche: ${PATCH_OUT} (${acc.size} libros acumulados)`);
+  }
+
   console.log(`\n✅ Generados ${hechos} resúmenes esta corrida.\n`);
 }
 
