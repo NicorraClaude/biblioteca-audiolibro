@@ -1,0 +1,125 @@
+# AUDIO MASIVO — completa texto + audio de TODO el catálogo, en paralelo.
+# Detalle del diseño en scripts/motor-shard.sh y scripts/apply-patches.ts.
+#
+# 10 sesiones a la vez, cada una con su pedazo (reparto por resto: cubre todo sin
+# repetir). Las sesiones NO commitean —se pisarían el snapshot y el summary es
+# irrecuperable—: cada una sube su parche y un job final los junta en un commit.
+#
+# Arranca a medianoche de Argentina para terminar antes del Motor biblioteca (5:30).
+# Secrets: R2_*, OPENAI_API_KEY, VERCEL_*.
+name: Audio masivo
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      sesiones_min:
+        description: "Minutos de trabajo por sesión (el job muere a los 350)"
+        default: "290"
+
+concurrency:
+  group: audio-masivo
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  generar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      # Que una sesión falle no debe cancelar a las otras nueve.
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+
+      - name: Instalar deps
+        run: |
+          npm ci
+          python3 -m venv .venv-tts
+          .venv-tts/bin/pip install -q edge-tts
+
+      - name: Preparar base desde el snapshot
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
+
+      - name: Generar (sesión ${{ matrix.shard }})
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SHARD: ${{ matrix.shard }}
+          SHARDS: "10"
+          PATCH_OUT: "parche-${{ matrix.shard }}.json"
+          MOTOR_MIN: ${{ github.event.inputs.sesiones_min || '290' }}
+        run: bash scripts/motor-shard.sh
+
+      - name: Guardar el parche de esta sesión
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: parche-${{ matrix.shard }}
+          path: parche-${{ matrix.shard }}.json
+          retention-days: 3
+          if-no-files-found: warn
+
+  consolidar:
+    needs: generar
+    # Corre aunque alguna sesión se haya caído: lo que sí se generó se guarda igual.
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: npm ci
+
+      - name: Traer los parches de todas las sesiones
+        uses: actions/download-artifact@v4
+        with:
+          pattern: parche-*
+          path: parches
+
+      - name: Aplicar los parches al catálogo
+        run: npx tsx scripts/apply-patches.ts parches
+
+      - name: ¿Cambió el catálogo?
+        id: diff
+        run: |
+          if git diff --quiet -- prisma/seed-data.json; then echo "changed=0" >> "$GITHUB_OUTPUT"; else echo "changed=1" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Commit del snapshot
+        if: steps.diff.outputs.changed == '1'
+        run: |
+          git config user.name "biblioteca-bot"
+          git config user.email "bot@biblioteca.local"
+          git add prisma/seed-data.json
+          git commit -m "Audio masivo (auto)" || echo "sin cambios"
+          git pull --rebase --autostash || true
+          git push || echo "nada para pushear"
+
+      - name: Deploy a Vercel
+        if: steps.diff.outputs.changed == '1'
+        run: npx vercel deploy --prod --yes --force --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Cuánto falta
+        if: always()
+        run: |
+          echo "### Audio masivo" >> "$GITHUB_STEP_SUMMARY"
+          npx tsx scripts/faltan.ts >> "$GITHUB_STEP_SUMMARY"
