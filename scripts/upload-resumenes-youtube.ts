@@ -19,6 +19,10 @@ import type { Language } from "../src/lib/types";
 
 const LIMIT = Number(process.env.REQ_LIMIT ?? 3);
 const SITE = "https://biblioteca-audiolibros.vercel.app";
+// Para subidas puntuales que tienen que saltear la cola: re-subir un video que salió
+// mal, o empujar un título concreto. Sin esto hay que esperar el turno por orden de
+// capa, y con 60+ libros en cola eso son semanas.
+const SOLO_SLUGS = (process.env.SOLO_SLUGS ?? "").split(",").map((s) => s.trim()).filter(Boolean);
 
 const s3 = new S3Client({
   region: "auto",
@@ -105,9 +109,15 @@ async function main() {
     where: { AND: [{ status: "published" }, { OR: [{ contentLayer: 1 }, { contentLayer: 2 }] }] },
     orderBy: [{ contentLayer: "asc" }, { downloadCount: "desc" }],
   });
-  const pend = all.filter((b) => !!pickAudioToUpload(b)).slice(0, LIMIT);
-  const total = all.filter((b) => !!pickAudioToUpload(b)).length;
-  console.log(`\n📺 A subir a YouTube: ${pend.length} (de ${total} pendientes)\n`);
+  const listos = all.filter((b) => !!pickAudioToUpload(b));
+  const elegibles = SOLO_SLUGS.length ? listos.filter((b) => SOLO_SLUGS.includes(b.slug)) : listos;
+  const pend = elegibles.slice(0, LIMIT);
+  const filtro = SOLO_SLUGS.length ? ` · filtrando ${SOLO_SLUGS.length} slug(s)` : "";
+  console.log(`\n📺 A subir a YouTube: ${pend.length} (de ${listos.length} pendientes${filtro})\n`);
+  if (SOLO_SLUGS.length) {
+    const faltantes = SOLO_SLUGS.filter((s) => !elegibles.some((b) => b.slug === s));
+    if (faltantes.length) console.log(`   ⚠️  sin audio pendiente (los salteo): ${faltantes.join(", ")}\n`);
+  }
 
   let done = 0;
   for (const book of pend) {
