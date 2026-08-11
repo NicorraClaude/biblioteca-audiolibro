@@ -115,5 +115,12 @@ if [ "$BIBLIOTECA" != "0" ]; then
   echo "✓ Catálogo: $hechos libro(s) esta corrida."
 fi
 
+# El guardado va ACÁ y no en el YAML: los pasos inline del workflow hacían
+# `git pull --rebase || true` y dejaban el archivo con marcas de conflicto, que
+# después `vercel deploy` subía tal cual (sube el directorio, no el commit).
+# Haciéndolo bien acá, el paso del YAML no encuentra nada que commitear y el
+# directorio queda limpio para el deploy.
+bash scripts/guardar-catalogo.sh "Motor biblioteca (auto)"
+
 echo ""
 echo "▶ Motor terminado."
