@@ -12,7 +12,7 @@
 //   npx tsx scripts/narrate-and-upload.ts <slug> [voz]
 //   SKIP_YOUTUBE=1 npx tsx scripts/narrate-and-upload.ts <slug>   # solo narrar → R2
 //   YT_PRIVACY=public npx tsx scripts/narrate-and-upload.ts the-great-gatsby nova
-import { mkdtemp, writeFile, rm } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { prisma, fetchRetry, sleep } from "./db";
@@ -119,6 +119,19 @@ async function main() {
       status: "ready",
     });
     await prisma.book.update({ where: { slug: SLUG }, data: { audioVersions: JSON.stringify(versions) } });
+
+    // Parche para las sesiones paralelas: cada una acumula lo suyo y un job final
+    // los junta en un solo commit. Las sesiones NO pueden commitear (se pisarían).
+    if (process.env.PATCH_OUT) {
+      const f = process.env.PATCH_OUT;
+      const previos: { slug: string; audioVersions?: string }[] = await readFile(f, "utf8")
+        .then((t) => JSON.parse(t))
+        .catch(() => []);
+      const acc = new Map(previos.map((p) => [p.slug, p]));
+      acc.set(SLUG, { slug: SLUG, audioVersions: JSON.stringify(versions) });
+      await writeFile(f, JSON.stringify([...acc.values()], null, 2), "utf8");
+      console.log(`   📦 Parche: ${acc.size} libro(s) acumulados`);
+    }
 
     console.log(
       `\n✅ Audiolibro completo escuchable en la ficha.` +

@@ -18,8 +18,10 @@ import { readdir, readFile, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 
-type Patch = { slug: string; summary: string | null };
-type Book = { slug: string; summary?: string | null; [k: string]: unknown };
+// Un parche puede traer el resumen (Audio masivo) o el audiolibro completo
+// (motor de audiolibros), o los dos. Cada campo se evalúa por separado.
+type Patch = { slug: string; summary?: string | null; audioVersions?: string | null };
+type Book = { slug: string; summary?: string | null; audioVersions?: string | null; [k: string]: unknown };
 
 const SEED = "prisma/seed-data.json";
 const INTENTOS = 4;
@@ -74,6 +76,18 @@ async function leerParches(dir: string): Promise<Patch[]> {
   return todos;
 }
 
+// Cuántas grabaciones REALES tiene un audioVersions (las "pending" no cuentan).
+function riquezaAudio(raw: string | null | undefined): number {
+  if (!raw) return 0;
+  try {
+    const vs = JSON.parse(raw);
+    if (!Array.isArray(vs)) return 0;
+    return vs.filter((v) => v?.audioUrl || v?.youtubeVideoId).length;
+  } catch {
+    return 0;
+  }
+}
+
 // Aplica los parches sobre el snapshot actual del disco. Devuelve cuántos entraron.
 async function aplicar(parches: Patch[]): Promise<number> {
   const libros: Book[] = JSON.parse(await readFile(SEED, "utf8"));
@@ -83,7 +97,18 @@ async function aplicar(parches: Patch[]): Promise<number> {
   for (const p of parches) {
     const b = porSlug.get(p.slug);
     if (!b) { desconocidos++; continue; }
-    if (riqueza(p.summary) > riqueza(b.summary)) { b.summary = p.summary; aplicados++; }
+    let toco = false;
+    // Cada campo se compara contra el suyo: un parche que solo trae el audiolibro
+    // no debe pisar un resumen que el otro motor generó mientras tanto.
+    if (p.summary !== undefined && riqueza(p.summary) > riqueza(b.summary)) {
+      b.summary = p.summary;
+      toco = true;
+    }
+    if (p.audioVersions !== undefined && riquezaAudio(p.audioVersions) > riquezaAudio(b.audioVersions)) {
+      b.audioVersions = p.audioVersions;
+      toco = true;
+    }
+    if (toco) aplicados++;
     else ignorados++;
   }
 
