@@ -41,6 +41,12 @@ async function chat(system: string, user: string, maxTokens: number): Promise<st
 }
 
 // ---------- Generadores de contenido ----------
+// "Buffett y Naval" en vez de "Buffett, Naval".
+function listar(xs: string[]): string {
+  if (xs.length <= 1) return xs[0] ?? "";
+  return `${xs.slice(0, -1).join(", ")} y ${xs[xs.length - 1]}`;
+}
+
 async function genReview(m: Moderno): Promise<string> {
   const idioma = m.language === "es" ? "español" : "inglés";
   const sys =
@@ -48,8 +54,18 @@ async function genReview(m: Moderno): Promise<string> {
     "La reseña presenta la obra, situá al autor, contexto histórico, ideas centrales, para quién es, " +
     "por qué importa hoy. Es contenido nuestro, NO reproduce el texto del libro. Prosa fluida, sin " +
     "títulos ni bullets. 400-600 palabras. Cierra invitando a leerlo/comprarlo.";
+  // La recomendación se pasa como DATO VERIFICADO y con instrucción de no adornarla:
+  // el modelo tiende a inventar anécdotas ("Buffett lo leyó a los 19 en un tren"),
+  // y una cita falsa atribuida a una persona real es un problema serio.
+  const reco = m.recomendadoPor?.length
+    ? `DATO VERIFICADO que debés mencionar UNA vez, con naturalidad y sin adornar: ` +
+      `${listar(m.recomendadoPor)} ${m.recomendadoPor.length > 1 ? "recomiendan" : "recomienda"} este libro. ` +
+      `NO inventes anécdotas, citas textuales, fechas ni circunstancias sobre esa recomendación: ` +
+      `solo el hecho de que lo recomiendan. `
+    : "";
   const user =
-    `Reseñá "${m.title}" (${m.year}) de ${m.author} en ${idioma}. Ideas centrales que debés mencionar y explicar: ${m.keyIdeas.join("; ")}. ` +
+    `Reseñá "${m.title}" (${m.year}) de ${m.author} en ${idioma}. ${reco}` +
+    `Ideas centrales que debés mencionar y explicar: ${m.keyIdeas.join("; ")}. ` +
     `Tono cálido pero riguroso, para lectores adultos interesados en negocios/desarrollo personal.`;
   return chat(sys, user, 1400);
 }
@@ -95,11 +111,21 @@ async function narrate(text: string, lang: Language, voice: "onyx" | "nova", spe
 
 // ---------- Upsert del libro moderno como Capa 2 ----------
 async function upsertModerno(m: Moderno) {
+  // Sin ASIN se manda a la búsqueda: muchas ediciones en español no tienen un código
+  // estable, y un /dp/ inventado da 404 — peor que una búsqueda que sí encuentra.
+  const amazonUrl = m.amazonAsin
+    ? `https://www.amazon.com/dp/${m.amazonAsin}`
+    : `https://www.amazon.com/s?k=${m.amazonSearch ?? encodeURIComponent(`${m.title} ${m.author}`)}`;
   const affiliateLinks = JSON.stringify([
-    { store: "Amazon", url: `https://www.amazon.com/dp/${m.amazonAsin}` },
+    { store: "Amazon", url: amazonUrl },
     ...(m.bajalibrosSearch ? [{ store: "Bajalibros", url: `https://www.bajalibros.com/AR/search?q=${m.bajalibrosSearch}` }] : []),
   ]);
-  const description = `${m.title} — ${m.author} (${m.year}). Análisis original con las ideas centrales de la obra. Contenido curado por Biblioteca Abierta.`;
+  // El "lo recomienda X" va al principio: es lo que engancha en el catálogo y en
+  // los resultados de búsqueda, más que el título solo.
+  const recos = m.recomendadoPor?.length
+    ? `${m.recomendadoPor.length > 1 ? "Recomendado por" : "Recomendado por"} ${listar(m.recomendadoPor)}. `
+    : "";
+  const description = `${recos}${m.title} — ${m.author} (${m.year}). Análisis original con las ideas centrales de la obra. Contenido curado por Biblioteca Abierta.`;
   return prisma.book.upsert({
     where: { slug: m.slug },
     create: {

@@ -16,9 +16,244 @@ export type Moderno = {
   amazonSearch?: string; // fallback si el ASIN falla, hace una búsqueda
   bajalibrosSearch?: string;
   keyIdeas: string[]; // ideas centrales para guiar la generación de la reseña/resumen
+  // Quién lo recomienda. Es el gancho comercial de estos títulos: "el libro que
+  // Buffett regala" se busca mucho más que el título solo.
+  // REGLA: solo nombres con atribución RASTREABLE (carta a accionistas, blog propio,
+  // lista oficial, entrevista). Las listas de "libros que lee X" están llenas de
+  // atribuciones inventadas y acá no se inventa nada.
+  recomendadoPor?: string[];
 };
 
 export const MODERNOS_NEGOCIOS: Moderno[] = [
+  // ── RECOMENDADOS POR LOS GRANDES ────────────────────────────────────────────
+  // Van PRIMEROS a propósito: el generador procesa esta lista en orden, así que
+  // estos se producen antes que el resto. Son los de mayor demanda de búsqueda y
+  // los que mejor definen la categoría.
+  //
+  // Cada atribución se verificó contra una fuente rastreable (gatesnotes, cartas de
+  // Berkshire, la lista oficial de Naval, "A Year of Books" de Zuckerberg, tuits de
+  // Musk, el libro y las entrevistas de Nadella, biografías de Isaacson y Brad
+  // Stone). Se descartaron títulos muy citados pero sin fuente: Thinking Fast and
+  // Slow atribuido a Gates y Dalio, Atlas Shrugged a Jobs, y casi todo lo que se le
+  // cuelga a Musk fuera de sus tuits.
+  {
+    slug: "business-adventures",
+    title: "Aventuras empresariales",
+    author: "John Brooks",
+    year: 1969,
+    language: "es",
+    categories: ["Negocios y emprendimientos", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "aventuras+empresariales+john+brooks",
+    recomendadoPor: ["Bill Gates", "Warren Buffett"],
+    keyIdeas: [
+      "doce casos reales de éxitos y desastres corporativos",
+      "el fracaso del Ford Edsel como manual de lo que no hay que hacer",
+      "el factor humano pesa más que la estrategia en papel",
+      "los mercados se mueven por psicología, no solo por números",
+      "los fundamentos del negocio no cambian aunque cambie la tecnología",
+    ],
+  },
+  {
+    slug: "el-inversor-inteligente",
+    title: "El inversor inteligente",
+    author: "Benjamin Graham",
+    year: 1949,
+    language: "es",
+    categories: ["Negocios y emprendimientos", "Finanzas personales", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "el+inversor+inteligente+benjamin+graham",
+    recomendadoPor: ["Warren Buffett"],
+    keyIdeas: [
+      "el margen de seguridad como principio rector",
+      "Mr. Market: el mercado ofrece precios, no verdades",
+      "diferencia entre invertir y especular",
+      "invertir es comprar un negocio, no un ticker",
+      "el mayor enemigo del inversor es él mismo",
+    ],
+  },
+  {
+    slug: "el-dilema-del-innovador",
+    title: "El dilema del innovador",
+    author: "Clayton M. Christensen",
+    year: 1997,
+    language: "es",
+    categories: ["Negocios y emprendimientos", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "el+dilema+del+innovador+christensen",
+    recomendadoPor: ["Jeff Bezos", "Steve Jobs"],
+    keyIdeas: [
+      "las buenas empresas fracasan justamente por hacer todo bien",
+      "la innovación disruptiva entra por abajo del mercado",
+      "escuchar demasiado a tus mejores clientes te deja ciego",
+      "los márgenes altos son una trampa estructural",
+      "hay que crear unidades autónomas para canibalizarse a uno mismo",
+    ],
+  },
+  {
+    slug: "influencia-la-psicologia-de-la-persuasion",
+    title: "Influencia: La psicología de la persuasión",
+    author: "Robert B. Cialdini",
+    year: 1984,
+    language: "es",
+    categories: ["Negocios y emprendimientos", "Desarrollo personal", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "influencia+la+psicologia+de+la+persuasion+cialdini",
+    recomendadoPor: ["Charlie Munger"],
+    keyIdeas: [
+      "seis principios: reciprocidad, compromiso, prueba social, simpatía, autoridad y escasez",
+      "decidimos con piloto automático mental",
+      "la coherencia con lo ya dicho nos vuelve manipulables",
+      "la escasez percibida dispara el deseo",
+      "reconocer las tácticas es la única defensa",
+    ],
+  },
+  {
+    slug: "empresas-que-perduran",
+    title: "Empresas que perduran",
+    author: "Jim Collins y Jerry I. Porras",
+    year: 1994,
+    language: "es",
+    categories: ["Negocios y emprendimientos", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "empresas+que+perduran+jim+collins",
+    recomendadoPor: ["Jeff Bezos"],
+    keyIdeas: [
+      "construir un reloj en vez de dar la hora: la empresa por encima del líder",
+      "ideología central estable más progreso constante",
+      "el genio del Y en vez de la tiranía del O",
+      "metas grandes, audaces y arriesgadas",
+      "una cultura fuerte: o encajás o te vas",
+    ],
+  },
+  {
+    slug: "el-hombre-en-busca-de-sentido",
+    title: "El hombre en busca de sentido",
+    author: "Viktor E. Frankl",
+    year: 1946,
+    language: "es",
+    categories: ["Desarrollo personal", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "el+hombre+en+busca+de+sentido+frankl",
+    recomendadoPor: ["Charlie Munger", "Naval Ravikant"],
+    keyIdeas: [
+      "se puede quitar todo menos la elección de la propia actitud",
+      "el sentido, no el placer, es la motivación humana primaria",
+      "el sufrimiento deja de serlo cuando encuentra un significado",
+      "la logoterapia: curar mirando hacia adelante",
+      "quien tiene un porqué soporta casi cualquier cómo",
+    ],
+  },
+  {
+    slug: "mindset-la-actitud-del-exito",
+    title: "Mindset: La actitud del éxito",
+    author: "Carol S. Dweck",
+    year: 2006,
+    language: "es",
+    categories: ["Desarrollo personal", "Negocios y emprendimientos", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "mindset+la+actitud+del+exito+carol+dweck",
+    recomendadoPor: ["Satya Nadella"],
+    keyIdeas: [
+      "mentalidad fija contra mentalidad de crecimiento",
+      "el esfuerzo es el camino, no la señal de falta de talento",
+      "elogiar el proceso y no la inteligencia",
+      "el fracaso es información, no identidad",
+      "las organizaciones también tienen mentalidad",
+    ],
+  },
+  {
+    slug: "armas-germenes-y-acero",
+    title: "Armas, gérmenes y acero",
+    author: "Jared Diamond",
+    year: 1997,
+    language: "es",
+    categories: ["Historia", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "armas+germenes+y+acero+jared+diamond",
+    recomendadoPor: ["Bill Gates", "Charlie Munger"],
+    keyIdeas: [
+      "la geografía, no la raza, explica por qué unas sociedades dominaron a otras",
+      "el eje este-oeste de Eurasia aceleró la difusión de cultivos y tecnología",
+      "la domesticación de animales generó gérmenes que fueron armas involuntarias",
+      "el excedente agrícola hizo posibles la escritura, el Estado y los ejércitos",
+      "la historia se puede estudiar con método científico",
+    ],
+  },
+  {
+    slug: "superinteligencia",
+    title: "Superinteligencia: Caminos, peligros, estrategias",
+    author: "Nick Bostrom",
+    year: 2014,
+    language: "es",
+    categories: ["Tecnología", "Negocios y emprendimientos", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "superinteligencia+nick+bostrom",
+    recomendadoPor: ["Elon Musk", "Bill Gates"],
+    keyIdeas: [
+      "una inteligencia superior a la humana podría aparecer rápido y sin aviso",
+      "el problema del control: alinear objetivos antes, no después",
+      "una IA con un objetivo trivial puede ser catastrófica",
+      "la ventaja del primero en llegar podría ser decisiva",
+      "es un problema de ingeniería y de gobernanza a la vez",
+    ],
+  },
+  {
+    slug: "las-lecciones-de-la-historia",
+    title: "Las lecciones de la historia",
+    author: "Will y Ariel Durant",
+    year: 1968,
+    language: "es",
+    categories: ["Historia", "Negocios y emprendimientos", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "las+lecciones+de+la+historia+durant",
+    recomendadoPor: ["Ray Dalio", "Naval Ravikant"],
+    keyIdeas: [
+      "la historia se repite en patrones, no en hechos",
+      "la desigualdad se acumula y se corrige por reforma o por revolución",
+      "la libertad y la igualdad están en tensión permanente",
+      "las civilizaciones caen por causas internas antes que externas",
+      "la naturaleza humana cambia mucho más lento que la tecnología",
+    ],
+  },
+  {
+    slug: "comunicacion-no-violenta",
+    title: "Comunicación no violenta: Un lenguaje de vida",
+    author: "Marshall B. Rosenberg",
+    year: 1999,
+    language: "es",
+    categories: ["Desarrollo personal", "Negocios y emprendimientos", "Recomendados por los grandes"],
+    amazonAsin: "8415053665",
+    amazonSearch: "comunicacion+no+violenta+rosenberg",
+    recomendadoPor: ["Satya Nadella"],
+    keyIdeas: [
+      "cuatro pasos: observación, sentimiento, necesidad y pedido",
+      "separar la observación del juicio",
+      "detrás de todo reproche hay una necesidad no dicha",
+      "pedir en vez de exigir",
+      "la empatía como habilidad entrenable, no como rasgo de personalidad",
+    ],
+  },
+  {
+    slug: "el-almanaque-de-charlie-munger",
+    title: "El Almanaque de Poor Charlie",
+    author: "Charlie Munger",
+    year: 2005,
+    language: "es",
+    categories: ["Negocios y emprendimientos", "Finanzas personales", "Recomendados por los grandes"],
+    amazonAsin: "",
+    amazonSearch: "poor+charlies+almanack+munger",
+    recomendadoPor: ["Warren Buffett", "Naval Ravikant"],
+    keyIdeas: [
+      "usar modelos mentales de muchas disciplinas a la vez",
+      "invertir el problema: pensar al revés para encontrar la respuesta",
+      "las veinticinco causas estándar del error humano de juicio",
+      "los incentivos explican casi todo comportamiento",
+      "círculo de competencia: saber dónde uno no sabe",
+    ],
+  },
+  // ── FIN RECOMENDADOS POR LOS GRANDES ────────────────────────────────────────
+
   // 🇪🇸 Título en español (localizados para Argentina/LatAm)
   {
     slug: "el-club-de-las-5-am",
