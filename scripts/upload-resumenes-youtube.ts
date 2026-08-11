@@ -100,6 +100,16 @@ function buildMetadata(book: any, lang: Language) {
   return { title, description, tags, voiceLabel };
 }
 
+// Puntaje de demanda: define en qué se gastan las 6 subidas diarias.
+// Las visitas pesan mucho más que las descargas para que, cuando el sitio tenga
+// tráfico propio, esa señal se imponga sola sin tener que retocar nada acá.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function prioridad(b: any): number {
+  const visitas = (b.viewsCached ?? 0) * 10_000;
+  const nichoNegocios = b.contentLayer === 2 ? 5_000_000 : 0;
+  return visitas + nichoNegocios + (b.downloadCount ?? 0);
+}
+
 async function main() {
   if (!process.env.GOOGLE_REFRESH_TOKEN) throw new Error("Falta GOOGLE_REFRESH_TOKEN (correr scripts/youtube-auth.ts)");
   if (!process.env.R2_BUCKET) throw new Error("Falta R2 config.");
@@ -107,8 +117,17 @@ async function main() {
   // Traer todos los libros con audio de resumen (contentLayer 1 o 2), que no tengan videoId ya.
   const all = await prisma.book.findMany({
     where: { AND: [{ status: "published" }, { OR: [{ contentLayer: 1 }, { contentLayer: 2 }] }] },
-    orderBy: [{ contentLayer: "asc" }, { downloadCount: "desc" }],
   });
+  // La cuota de YouTube son 6 subidas por día: en qué se gastan importa más que
+  // cuántas son. Antes el orden era "capa 1 primero", que dejaba el nicho de
+  // negocios —el único con links de afiliado y el más buscado— detrás de 60 clásicos.
+  //
+  // Prioridad, de mayor a menor peso:
+  //   1. Visitas reales en el sitio. Es la única señal de demanda PROPIA; hoy casi
+  //      todos están en cero, pero a medida que llegue tráfico manda esta sola.
+  //   2. Modernos de negocios: se buscan mucho y son los que generan ingresos.
+  //   3. Descargas en Gutenberg: buen proxy de popularidad mientras no haya tráfico.
+  all.sort((a, b) => prioridad(b) - prioridad(a));
   const listos = all.filter((b) => !!pickAudioToUpload(b));
   const elegibles = SOLO_SLUGS.length ? listos.filter((b) => SOLO_SLUGS.includes(b.slug)) : listos;
   const pend = elegibles.slice(0, LIMIT);
