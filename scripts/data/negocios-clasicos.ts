@@ -2,7 +2,19 @@
 // Cada uno es un ID de Project Gutenberg. Se ingestan con la categoría
 // "Negocios y emprendimientos" forzada (aunque Gutenberg los tenga en otras).
 // Son la base "gratis con audio completo" del nicho, para el lanzamiento.
-export const CLASICOS_NEGOCIOS: { id: number; note: string }[] = [
+export type CuradoPublico = {
+  id: number; // ID en Project Gutenberg
+  note: string;
+  // Si se omite, cae en "Negocios y emprendimientos". Sirve para sumar títulos de
+  // otras categorías (la colección de recomendados por famosos es literatura,
+  // historia y ciencia, no solo negocios) sin necesitar otro ingestor.
+  categorias?: string[];
+  // Quién lo recomienda públicamente. Va en la descripción: es el gancho.
+  // Solo nombres con atribución rastreable — acá no se inventa nada.
+  recomendadoPor?: string[];
+};
+
+export const CLASICOS_NEGOCIOS: CuradoPublico[] = [
   // 🏆 Los grandes del "personal development" y riqueza
   { id: 25763, note: "Think and Grow Rich · Napoleon Hill (1937)" },
   { id: 25473, note: "The Science of Getting Rich · Wallace D. Wattles (1910)" },

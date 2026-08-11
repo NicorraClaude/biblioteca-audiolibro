@@ -31,6 +31,11 @@ function cleanTitle(raw: string | null): string {
   if (!raw) return "Sin título";
   return raw.split(/[;\n]/)[0].replace(/\s+/g, " ").trim();
 }
+// "Obama y Oprah" en vez de "Obama, Oprah".
+function listar(xs: string[]): string {
+  if (xs.length <= 1) return xs[0] ?? "";
+  return `${xs.slice(0, -1).join(", ")} y ${xs[xs.length - 1]}`;
+}
 
 const pendingAudio = () =>
   JSON.stringify([
@@ -49,7 +54,7 @@ async function main() {
   let ingest = 0, updated = 0, skipped = 0;
 
   const seen = new Set<number>();
-  for (const { id, note } of CLASICOS_NEGOCIOS) {
+  for (const { id, note, categorias, recomendadoPor } of CLASICOS_NEGOCIOS) {
     if (seen.has(id)) { skipped++; continue; }
     seen.add(id);
 
@@ -71,16 +76,25 @@ async function main() {
     const epubUrl = grab(/rdf:about="(https?:\/\/www\.gutenberg\.org\/[^"]*\.epub[^"]*)"/, rdf);
 
     const slug = await ensureUniqueSlug(slugify(title), id);
+    // El "lo recomienda X" va primero: es el gancho, más fuerte que el título solo.
+    const reco = recomendadoPor?.length
+      ? language === "es"
+        ? `Recomendado por ${listar(recomendadoPor)}. `
+        : `Recommended by ${recomendadoPor.join(", ")}. `
+      : "";
     const description = language === "es"
-      ? `${title}, de ${author}. Un clásico de negocios y desarrollo personal, en dominio público. Audiolibro y e-book gratis.`
-      : `${title}, by ${author}. A classic of business and personal development, in the public domain. Free audiobook and e-book.`;
+      ? `${reco}${title}, de ${author}. Dominio público: audiolibro completo y e-book, gratis.`
+      : `${reco}${title}, by ${author}. Public domain: full audiobook and e-book, free.`;
 
-    // Trae las categorías actuales si el libro ya existe (para NO borrarlas), y
-    // agrega "Negocios y emprendimientos" además.
+    // Trae las categorías actuales si el libro ya existe (para NO borrarlas) y suma
+    // las nuevas. Un mismo título puede entrar por varias listas (un clásico de
+    // negocios que además recomienda Obama) y no debe perder ninguna.
     const existing = await prisma.book.findUnique({ where: { gutenbergId: id } });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let cats: string[] = []; try { cats = JSON.parse(existing?.categories ?? "[]"); } catch { /* */ }
-    if (!cats.includes(CATEGORIA)) cats.push(CATEGORIA);
+    for (const c of categorias?.length ? categorias : [CATEGORIA]) {
+      if (!cats.includes(c)) cats.push(c);
+    }
 
     const common = {
       slug, title, author, language,
