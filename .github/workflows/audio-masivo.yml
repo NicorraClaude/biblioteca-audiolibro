@@ -1,12 +1,12 @@
-# AUDIO MASIVO ‚Äî completa texto + audio de TODO el cat√°logo, en paralelo.
-# Detalle del dise√±o en scripts/motor-shard.sh y scripts/apply-patches.ts.
+# AUDIO MASIVO — completa texto + audio de TODO el catálogo, en paralelo.
+# Detalle del diseño en scripts/motor-shard.sh y scripts/apply-patches.ts.
 #
-# La CANTIDAD de sesiones sale de scripts/shards.mjs, no de ac√°: as√≠ se puede subir
-# o bajar la paralelizaci√≥n con un push normal, sin volver a editar este archivo a
+# La CANTIDAD de sesiones sale de scripts/shards.mjs, no de acá: así se puede subir
+# o bajar la paralelización con un push normal, sin volver a editar este archivo a
 # mano por la web.
 #
-# Cada sesi√≥n toma su pedazo (reparto por resto: cubre todo sin repetir) y NO
-# commitea ‚Äîse pisar√≠an el snapshot y el summary es irrecuperable‚Äî: sube su parche y
+# Cada sesión toma su pedazo (reparto por resto: cubre todo sin repetir) y NO
+# commitea —se pisarían el snapshot y el summary es irrecuperable—: sube su parche y
 # el job final los junta. El guardado lo hace apply-patches.ts, que reintenta y
 # falla en rojo si no puede.
 #
@@ -19,7 +19,7 @@ on:
   workflow_dispatch:
     inputs:
       sesiones_min:
-        description: "Minutos de trabajo por sesi√≥n (el job muere a los 350)"
+        description: "Minutos de trabajo por sesión (el job muere a los 350)"
         default: "290"
 
 concurrency:
@@ -45,7 +45,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 350
     strategy:
-      # Que una sesi√≥n falle no debe cancelar a las dem√°s.
+      # Que una sesión falle no debe cancelar a las demás.
       fail-fast: false
       matrix:
         shard: ${{ fromJSON(needs.preparar.outputs.shards) }}
@@ -68,7 +68,7 @@ jobs:
           npx prisma migrate deploy
           npx tsx prisma/seed.ts
 
-      - name: Generar (sesi√≥n ${{ matrix.shard }})
+      - name: Generar (sesión ${{ matrix.shard }})
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -82,7 +82,7 @@ jobs:
           MOTOR_MIN: ${{ github.event.inputs.sesiones_min || '290' }}
         run: bash scripts/motor-shard.sh
 
-      - name: Guardar el parche de esta sesi√≥n
+      - name: Guardar el parche de esta sesión
         if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -93,7 +93,7 @@ jobs:
 
   consolidar:
     needs: generar
-    # Corre aunque alguna sesi√≥n se haya ca√≠do: lo generado se guarda igual.
+    # Corre aunque alguna sesión se haya caído: lo generado se guarda igual.
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -120,6 +120,6 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
-      - name: Cu√°nto falta
+      - name: Cuánto falta
         if: always()
         run: npx tsx scripts/faltan.ts >> "$GITHUB_STEP_SUMMARY"
