@@ -1,0 +1,118 @@
+# AUDIOLIBROS COMPLETOS — narra libros enteros de dominio público, en paralelo.
+# Detalle del diseño en scripts/motor-audiolibros.sh.
+#
+# Solo Capa 1: el libro completo únicamente se puede narrar cuando no hay derechos
+# vigentes. Los de Capa 2 llegan hasta el resumen y ahí paran.
+#
+# El mp3 va a R2 y queda escuchable en la ficha; la subida a YouTube va por su
+# propio carril (6/día de cuota) para no bloquear la producción.
+#
+# Corre a las 13:00 de Argentina, en el hueco entre Audio masivo (00:00-05:00) y
+# el motor diario (05:30): dos motores escribiendo el catálogo a la vez se pisan.
+#
+# Secrets: R2_*, VERCEL_*.
+name: Audiolibros completos
+
+on:
+  schedule:
+    - cron: "0 16 * * *"
+  workflow_dispatch:
+    inputs:
+      sesiones_min:
+        description: "Minutos de trabajo por sesión (el job muere a los 350)"
+        default: "290"
+
+concurrency:
+  group: audiolibros
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  preparar:
+    runs-on: ubuntu-latest
+    outputs:
+      shards: ${{ steps.calc.outputs.shards }}
+      total: ${{ steps.calc.outputs.total }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: calc
+        run: node scripts/shards.mjs >> "$GITHUB_OUTPUT"
+
+  narrar:
+    needs: preparar
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.preparar.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+
+      - name: Instalar deps
+        run: |
+          npm ci
+          python3 -m venv .venv-tts
+          .venv-tts/bin/pip install -q edge-tts
+
+      - name: Preparar base desde el snapshot
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx tsx prisma/seed.ts
+
+      - name: Narrar (sesión ${{ matrix.shard }})
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          SHARD: ${{ matrix.shard }}
+          SHARDS: ${{ needs.preparar.outputs.total }}
+          PATCH_OUT: "parche-audio-${{ matrix.shard }}.json"
+          MOTOR_MIN: ${{ github.event.inputs.sesiones_min || '290' }}
+        run: bash scripts/motor-audiolibros.sh
+
+      - name: Guardar el parche de esta sesión
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: parche-audio-${{ matrix.shard }}
+          path: parche-audio-${{ matrix.shard }}.json
+          retention-days: 3
+          if-no-files-found: warn
+
+  consolidar:
+    needs: narrar
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: npm ci
+
+      - name: Traer los parches
+        uses: actions/download-artifact@v4
+        with:
+          pattern: parche-audio-*
+          path: parches
+
+      - name: Aplicar, commitear y pushear
+        run: npx tsx scripts/apply-patches.ts parches
+
+      - name: Deploy a Vercel
+        run: npx vercel deploy --prod --yes --force --token="${{ secrets.VERCEL_TOKEN }}"
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
