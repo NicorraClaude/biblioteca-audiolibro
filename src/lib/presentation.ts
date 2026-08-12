@@ -87,6 +87,20 @@ export type PlayableTrack = {
   cover?: string | null;
 };
 
+// Saca del libro lo que las TARJETAS no usan, antes de mandarlo al navegador.
+//
+// POR QUÉ: la home es un componente de servidor que le pasa la lista completa a
+// componentes de cliente (Catalog, BookRow). Todo lo que va en esa lista viaja
+// serializado al navegador dentro del HTML. Los `summary` son análisis de 8.000
+// palabras: con 614 libros suman 15,6 MB de los 16 que pesaba la página, y las
+// tarjetas ni los miran. Vercel corta las páginas de más de 19 MB, así que el
+// catálogo dejó de deployarse justo cuando empezó a crecer en serio.
+//
+// El resumen se sigue sirviendo entero en la ficha de cada libro, que es donde se lee.
+export function paraTarjeta(book: Book): Book {
+  return { ...book, summary: null };
+}
+
 // Devuelve cómo reproducir el audio PROPIO de un libro (mp3 o YouTube público),
 // o null si todavía no tiene. Prioriza el mp3: es el único que sigue sonando con
 // el teléfono bloqueado (YouTube bloquea el segundo plano fuera de Premium).

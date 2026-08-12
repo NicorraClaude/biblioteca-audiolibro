@@ -3,7 +3,7 @@ import { Catalog } from "@/components/Catalog";
 import { SolicitarTitulo } from "@/components/SolicitarTitulo";
 import { BookRow } from "@/components/BookRow";
 import { COLECCIONES, pickForColeccion } from "@/lib/colecciones";
-import { hasPlayableAudio } from "@/lib/presentation";
+import { hasPlayableAudio, paraTarjeta } from "@/lib/presentation";
 
 export default async function HomePage() {
   const books = await getPublicBooks();
@@ -15,6 +15,12 @@ export default async function HomePage() {
     .slice(0, 16);
   const colecciones = COLECCIONES.map((c) => ({ c, list: pickForColeccion(books, c) }))
     .filter((x) => x.list.length >= 4);
+
+  // Todo lo que se le pasa a un componente de cliente viaja serializado al
+  // navegador. Sin aligerar, la home mandaba 15,6 MB de resúmenes que las tarjetas
+  // no usan y Vercel rechazaba el deploy por página sobredimensionada.
+  const librosLivianos = books.map(paraTarjeta);
+  const novedadesLivianas = novedades.map(paraTarjeta);
 
   return (
     <div>
@@ -52,16 +58,16 @@ export default async function HomePage() {
       </section>
 
       {/* Novedades: lo último que entró al catálogo */}
-      <BookRow title="Novedades" subtitle="Lo último que sumamos a la biblioteca" emoji="✨" books={novedades} />
+      <BookRow title="Novedades" subtitle="Lo último que sumamos a la biblioteca" emoji="✨" books={novedadesLivianas} />
 
       {/* Colecciones curadas */}
       {colecciones.map(({ c, list }) => (
-        <BookRow key={c.slug} title={c.title} subtitle={c.subtitle} emoji={c.emoji} books={list} />
+        <BookRow key={c.slug} title={c.title} subtitle={c.subtitle} emoji={c.emoji} books={list.map(paraTarjeta)} />
       ))}
 
       <section id="catalogo" className="mt-12 scroll-mt-24">
         <h2 className="mb-4 font-display text-xl font-semibold text-ink sm:text-2xl">Toda la biblioteca</h2>
-        <Catalog books={books} />
+        <Catalog books={librosLivianos} />
       </section>
 
       <section className="mt-12">
