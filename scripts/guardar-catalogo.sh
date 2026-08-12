@@ -67,6 +67,11 @@ for intento in $(seq 1 "$INTENTOS"); do
 
   if git push origin main --quiet 2>/dev/null; then
     echo "✅ Catálogo guardado y publicado."
+    # El chequeo va DESPUÉS de guardar, nunca antes: si la home se pasó de peso,
+    # queremos igual conservar el contenido generado y que la corrida quede en rojo
+    # con un mensaje claro, en vez de perder el trabajo o recibir un error críptico
+    # de Vercel dos minutos más tarde.
+    npx tsx scripts/chequear-peso-home.ts || exit 1
     exit 0
   fi
   echo "   ⚠️  Alguien commiteó en el medio. Reintento sobre la versión nueva."

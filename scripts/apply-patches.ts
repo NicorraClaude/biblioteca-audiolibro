@@ -153,14 +153,24 @@ async function main() {
     git("add", SEED);
     git("commit", "-m", `Audio masivo: ${aplicados} libros con texto + audio (auto)`);
 
+    let pusheado = false;
     try {
       git("push", "origin", "main");
-      console.log(`\n✅ Guardado y publicado: ${aplicados} libros.\n`);
-      return;
+      pusheado = true;
     } catch {
       // Alguien commiteó entre el fetch y el push. Como los parches son declarativos,
       // volver a aplicarlos sobre la nueva base da el mismo resultado.
       console.error(`   ⚠️  Push rechazado (otro commit entró en el medio). Reintento.`);
+    }
+
+    if (pusheado) {
+      console.log(`\n✅ Guardado y publicado: ${aplicados} libros.\n`);
+      // Fuera del try a propósito: si el chequeo falla no es un push rechazado y no
+      // hay que reintentar. Va DESPUÉS de guardar para no perder lo generado; si la
+      // home se pasó de peso, la corrida queda en rojo con un mensaje claro en vez
+      // del error críptico de Vercel dos minutos más tarde.
+      execFileSync("npx", ["tsx", "scripts/chequear-peso-home.ts"], { stdio: "inherit" });
+      return;
     }
   }
 
