@@ -1,5 +1,5 @@
 // Helpers de presentación: cómo se muestran las capas, idiomas y estados en la UI.
-import type { Book, ContentLayer, Language } from "@/lib/types";
+import type { Book, ContentLayer, Language, SummaryByLang } from "@/lib/types";
 
 export const LAYER_INFO: Record<
   ContentLayer,
@@ -98,7 +98,25 @@ export type PlayableTrack = {
 //
 // El resumen se sigue sirviendo entero en la ficha de cada libro, que es donde se lee.
 export function paraTarjeta(book: Book): Book {
-  return { ...book, summary: null };
+  // Conserva SOLO las URLs de audio del resumen y tira los textos, que son el 97%
+  // del peso. La tarjeta necesita saber si hay algo para escuchar: mandando
+  // summary: null, la web mostraba "sin audio" en 306 libros que SÍ tenían su
+  // resumen narrado, y el catálogo parecía menos de la mitad de lo que era.
+  const s = book.summary;
+  if (!s) return { ...book, summary: null };
+  const liviano: SummaryByLang = {};
+  for (const l of ["es", "en"] as const) {
+    const rAudio = s[l]?.resumen?.audio;
+    const sn = s[l]?.sinopsis;
+    const sAudio = sn?.audio;
+    const entrada: NonNullable<SummaryByLang["es"]> = {};
+    if (rAudio && Object.keys(rAudio).length) entrada.resumen = { text: "", audio: rAudio };
+    if ((sAudio && Object.keys(sAudio).length) || sn?.audioUrl) {
+      entrada.sinopsis = { text: "", audio: sAudio, audioUrl: sn?.audioUrl ?? null };
+    }
+    if (Object.keys(entrada).length) liviano[l] = entrada;
+  }
+  return { ...book, summary: Object.keys(liviano).length ? liviano : null };
 }
 
 // Devuelve cómo reproducir el audio PROPIO de un libro (mp3 o YouTube público),
@@ -112,6 +130,17 @@ export function getPlayableTrack(book: Book): PlayableTrack | null {
   const yt = book.audioVersions.find((v) => v.youtubeVideoId && v.youtubePublic);
   if (yt?.youtubeVideoId) {
     return { title: book.title, author: book.author, slug: book.slug, kind: "youtube", src: yt.youtubeVideoId, cover: book.coverImageUrl };
+  }
+
+  // Si el libro completo todavía no está narrado, ofrecer el RESUMEN, que sí lo
+  // está en la mayoría del catálogo. Sin esto la tarjeta se ve muda aunque haya
+  // 40 minutos de audio listos, y el filtro "solo con audio" esconde el material.
+  for (const l of ["es", "en"] as const) {
+    const audio = book.summary?.[l]?.resumen?.audio;
+    const src = audio?.onyx ?? audio?.nova;
+    if (src) {
+      return { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "audio", src, cover: book.coverImageUrl };
+    }
   }
   // Fallback: la SINOPSIS en audio (toda la biblioteca la tiene). Así cada libro
   // es reproducible desde la tarjeta y la biblioteca "suena" desde el día uno.
