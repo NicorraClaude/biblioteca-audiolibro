@@ -89,6 +89,24 @@ export function BookContent({ book }: { book: Book }) {
   if (tab === "libro") text = texts[libroLang] ?? null;
   else text = book.summary?.[activeLang]?.[tab]?.text ?? null;
 
+  // --- Qué voces existen DE VERDAD en esta pestaña ---
+  // El estado arrancaba siempre en "onyx" y la búsqueda exigía esa voz exacta. Un
+  // libro narrado solo en Nova (la mitad del catálogo) mostraba "Audio en
+  // preparación" con el audio ahí, listo. La voz elegida ahora es una preferencia,
+  // no un requisito: si no existe, se usa la que hay.
+  const vocesDisponibles: ("onyx" | "nova")[] = (() => {
+    if (tab === "libro") {
+      return (["onyx", "nova"] as const).filter((v) =>
+        book.audioVersions.some(
+          (x) => x.voiceId === v && ((x.audioUrl && x.status === "ready") || (x.youtubeVideoId && x.youtubePublic)),
+        ),
+      );
+    }
+    const e = book.summary?.[activeLang]?.[tab === "sinopsis" ? "sinopsis" : "resumen"];
+    return (["onyx", "nova"] as const).filter((v) => !!e?.audio?.[v]);
+  })();
+  const vozEfectiva = vocesDisponibles.includes(voice) ? voice : vocesDisponibles[0];
+
   // --- Track de audio ---
   // ytId = el video de este contenido, si existe y es público. No se usa para
   // reproducir (eso lo hace el mp3, que sí suena en segundo plano) sino para
@@ -96,7 +114,7 @@ export function BookContent({ book }: { book: Book }) {
   let track: PlayableTrack | null = null;
   let ytId: string | null = null;
   if (tab === "libro") {
-    const v = book.audioVersions.find((x) => x.voiceId === voice && ((x.youtubeVideoId && x.youtubePublic) || (x.audioUrl && x.status === "ready")));
+    const v = book.audioVersions.find((x) => x.voiceId === vozEfectiva && ((x.youtubeVideoId && x.youtubePublic) || (x.audioUrl && x.status === "ready")));
     // Preferimos el mp3 propio sobre el embed de YouTube: el <audio> sigue sonando
     // con el teléfono bloqueado (Media Session), el iframe de YouTube no.
     if (v)
@@ -106,12 +124,12 @@ export function BookContent({ book }: { book: Book }) {
     if (v?.youtubeVideoId && v.youtubePublic) ytId = v.youtubeVideoId;
   } else if (tab === "sinopsis") {
     const e = book.summary?.[activeLang]?.sinopsis;
-    const src = e?.audio?.[voice] ?? e?.audio?.nova ?? e?.audioUrl;
+    const src = (vozEfectiva && e?.audio?.[vozEfectiva]) ?? e?.audio?.nova ?? e?.audio?.onyx ?? e?.audioUrl;
     if (src) track = { title: `Sinopsis · ${book.title}`, author: book.author, slug: book.slug, kind: "audio", src, cover: book.coverImageUrl };
   } else {
     const e = book.summary?.[activeLang]?.resumen;
     // Igual que arriba: el mp3 gana porque permite escuchar en segundo plano.
-    const src = e?.audio?.[voice] ?? e?.audioUrl;
+    const src = (vozEfectiva && e?.audio?.[vozEfectiva]) ?? e?.audio?.nova ?? e?.audio?.onyx ?? e?.audioUrl;
     if (src) track = { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "audio", src, cover: book.coverImageUrl };
     else if (e?.youtubeVideoId && e.youtubePublic) track = { title: `Resumen · ${book.title}`, author: book.author, slug: book.slug, kind: "youtube", src: e.youtubeVideoId, cover: book.coverImageUrl };
     if (e?.youtubeVideoId && e.youtubePublic) ytId = e.youtubeVideoId;
@@ -122,6 +140,10 @@ export function BookContent({ book }: { book: Book }) {
     ? { libro: "Libro", sinopsis: "Sinopsis", resumen: "Resumen" }
     : { libro: "Libro", sinopsis: "Reseña", resumen: "Análisis" };
   const isOriginal = libroLang === orig;
+  // El audiolibro es la narración del texto ORIGINAL. Traducir el texto no traduce
+  // el audio: son dos cosas distintas y la web no lo decía. Alguien traducía a
+  // español, apretaba play y escuchaba inglés sin entender por qué.
+  const audioEnOtroIdioma = tab === "libro" && !isOriginal && !!track;
 
   if (nothingToShow) return null;
 
@@ -186,10 +208,12 @@ export function BookContent({ book }: { book: Book }) {
             ))}
           </div>
         )}
-        {(tab === "libro" || tab === "sinopsis") && (
+        {/* Solo se ofrecen las voces que existen: una pastilla que al tocarla no
+            reproduce nada es peor que no mostrarla. */}
+        {vocesDisponibles.length > 1 && (
           <div className="flex gap-1 rounded-full bg-paper p-1">
-            {(["onyx", "nova"] as const).map((vc) => (
-              <Pill key={vc} on={voice === vc} onClick={() => setVoice(vc)}>{vc === "onyx" ? "♂ Onyx" : "♀ Nova"}</Pill>
+            {vocesDisponibles.map((vc) => (
+              <Pill key={vc} on={vozEfectiva === vc} onClick={() => setVoice(vc)}>{vc === "onyx" ? "♂ Onyx" : "♀ Nova"}</Pill>
             ))}
           </div>
         )}
@@ -197,7 +221,7 @@ export function BookContent({ book }: { book: Book }) {
           <div className="ml-auto flex items-center gap-2">
             <PlayButton track={track} className="inline-flex items-center gap-1.5 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-dark active:scale-95">
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-              Escuchar
+              {audioEnOtroIdioma ? `Escuchar en ${nameFor(orig)}` : "Escuchar"}
             </PlayButton>
             {/* El reproductor usa el mp3 (único que suena con el teléfono bloqueado),
                 pero el video sigue accesible: le da views y suscriptores al canal. */}
@@ -221,6 +245,13 @@ export function BookContent({ book }: { book: Book }) {
           <span className="ml-auto rounded-full bg-paper px-3 py-1.5 text-xs font-medium text-ink-soft">🎧 Audio en preparación</span>
         )}
       </div>
+
+      {audioEnOtroIdioma && (
+        <p className="px-4 pt-2 text-xs text-ink-soft">
+          Estás leyendo la traducción, pero la narración existe solo en{" "}
+          {nameFor(orig)}. El <strong>resumen</strong> sí está narrado en español.
+        </p>
+      )}
 
       {/* Texto */}
       <div className="px-5 pt-4 pb-5">
