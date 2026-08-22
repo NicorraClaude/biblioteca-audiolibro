@@ -48,4 +48,26 @@ while [ "$SECONDS" -lt "$limite" ]; do
   echo "   ── $hechos libro(s) · $((SECONDS / 60))/$MOTOR_MIN min"
 done
 
-echo "✓ Sesión $((SHARD + 1)): $hechos libro(s)."
+# ── SEGUNDA FASE: traducir al español y narrar ──
+# Va acá y no solo en el motor de audiolibros porque ESTE workflow ya recibe
+# OPENAI_API_KEY: así arranca hoy, sin que haya que volver a subir un YAML a mano.
+# Solo corre si sobró tiempo después de los resúmenes, que son la prioridad.
+traducidos=0
+if [ "$SECONDS" -lt "$limite" ] && [ -n "${OPENAI_API_KEY:-}" ]; then
+  echo ""
+  echo "═══ Traducir y narrar en español ═══"
+  for slug in $(SHARD="$SHARD" SHARDS="$SHARDS" npx tsx scripts/list-traducibles.ts 100); do
+    [ "$SECONDS" -ge "$limite" ] && break
+    echo ""
+    echo "▶ $slug → español  ($((SECONDS / 60))/$MOTOR_MIN min)"
+    npx tsx scripts/traducir-y-narrar.ts "$slug" es nova
+    c=$?
+    if [ "$c" -eq 0 ]; then traducidos=$(( traducidos + 1 ))
+    elif [ "$c" -ne 2 ]; then
+      fallos=$(( fallos + 1 ))
+      [ "$fallos" -ge 3 ] && { echo "✗ Tres fallos seguidos: corto."; break; }
+    fi
+  done
+fi
+
+echo "✓ Sesión $((SHARD + 1)): $hechos libro(s) · $traducidos narrado(s) en español."

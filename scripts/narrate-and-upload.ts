@@ -15,7 +15,8 @@
 import { mkdtemp, readFile, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { prisma, fetchRetry, sleep } from "./db";
+import { prisma, sleep } from "./db";
+import { textoGutenberg } from "./lib/texto-gutenberg";
 import { EdgeTTSProvider } from "../src/lib/tts/edge";
 import {
   stripGutenbergBoilerplate,
@@ -46,9 +47,9 @@ async function main() {
 
   // 1) Texto completo desde Gutenberg, arrancando en el Cap. 1
   const id = book.gutenbergId;
-  const res = await fetchRetry(`https://www.gutenberg.org/cache/epub/${id}/pg${id}.txt`, { tries: 4, timeoutMs: 60000 });
-  if (!res || !res.ok) throw new Error("No pude bajar el texto.");
-  const { body } = splitFrontMatterAndBody(stripGutenbergBoilerplate(await res.text()));
+  const crudo = await textoGutenberg(id);
+  if (!crudo) throw new Error("No pude bajar el texto de Gutenberg ni de sus espejos.");
+  const { body } = splitFrontMatterAndBody(stripGutenbergBoilerplate(crudo));
   // Guard de tamaño: los clásicos gigantes (Quijote, Shakespeare) tardan horas
   // y dan archivos enormes. Por encima del tope, se saltean (salida limpia).
   const MAX_BOOK_CHARS = Number(process.env.TTS_MAX_BOOK_CHARS ?? 600000);

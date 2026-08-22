@@ -16,6 +16,10 @@ export type AudioVersion = {
   youtubePublic?: boolean; // true solo cuando el video ya es público (post-auditoría); hasta entonces se sirve el mp3
   archiveId?: string | null; // identificador de archive.org (grabación LibriVox, reproducible ya)
   audioUrl?: string | null; // mp3 propio (narrado TTS) servido por la app
+  // Idioma de ESTA grabación. Sin este campo, el audio de una traducción y el del
+  // original eran indistinguibles: alguien leía la traducción al español, apretaba
+  // play y escuchaba inglés. Si falta, se asume el idioma original del libro.
+  language?: string;
   durationSeconds: number | null;
   status: "ready" | "pending" | "processing";
 };
