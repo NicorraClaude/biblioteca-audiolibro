@@ -127,7 +127,7 @@ export function Cover({ book, variant = "card" }: { book: Book; variant?: "card"
           <div className="flex items-center gap-2" style={{ color: p.accent }}>
             <span className="h-px flex-1" style={{ background: p.accent, opacity: 0.6 }} />
             <span className={`${imprint} tracking-[0.25em] uppercase`}>
-              {book.contentLayer === 1 ? "Clásico" : "Análisis"}
+              {book.contentLayer === 1 ? "Clásico" : "Resumen"}
             </span>
             <span className="h-px flex-1" style={{ background: p.accent, opacity: 0.6 }} />
           </div>

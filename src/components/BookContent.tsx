@@ -140,10 +140,11 @@ export function BookContent({ book }: { book: Book }) {
     if (e?.youtubeVideoId && e.youtubePublic) ytId = e.youtubeVideoId;
   }
 
-  // En Capa 2 la "sinopsis" es nuestra reseña editorial y el "resumen" el análisis largo.
-  const tabLabel: Record<Tab, string> = hasLibro
-    ? { libro: "Libro", sinopsis: "Sinopsis", resumen: "Resumen" }
-    : { libro: "Libro", sinopsis: "Reseña", resumen: "Análisis" };
+  // Un solo nombre para cada cosa en todo el sitio. Antes los libros de dominio
+  // público decían "Sinopsis/Resumen" y los que tienen derechos "Reseña/Análisis",
+  // aunque el contenido sale del MISMO campo y se genera igual. Dos nombres para lo
+  // mismo solo confunden a quien navega entre un libro y otro.
+  const tabLabel: Record<Tab, string> = { libro: "Libro", sinopsis: "Sinopsis", resumen: "Resumen" };
   const isOriginal = libroLang === orig;
   // El audiolibro es la narración del texto ORIGINAL. Traducir el texto no traduce
   // el audio: son dos cosas distintas y la web no lo decía. Alguien traducía a

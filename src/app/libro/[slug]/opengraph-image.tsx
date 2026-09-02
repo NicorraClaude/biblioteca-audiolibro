@@ -67,7 +67,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ background: "#ec5a36", color: "#fff", padding: "10px 22px", borderRadius: 999, fontSize: 22, fontWeight: 700 }}>
-                {esResumen ? "Análisis gratis" : "Escuchar gratis"}
+                {esResumen ? "Resumen gratis" : "Escuchar gratis"}
               </div>
               {/* No prometer lo que no hay: los modernos son análisis original en
                   español, no el libro completo bilingüe. */}
