@@ -39,14 +39,35 @@ echo "▶ Motor: pedidos=$PEDIDOS · modernos=$MODERNOS · biblioteca=$BIBLIOTEC
 
 # Cada etapa es independiente: que una falle no debe tirar abajo las otras ni
 # impedir que el catálogo se snapshotee y deploye con lo que sí salió bien.
+# Además de no cortar la corrida, deja constancia ESCRITA de cada etapa en
+# estado-motor.md, que se commitea junto al catálogo.
+#
+# POR QUÉ: hasta ahora, si una etapa fallaba, el error quedaba enterrado en el log
+# de GitHub y la corrida figuraba en verde. Así estuvo semanas sin subir un solo
+# video a YouTube "exitosamente". Escribir el resultado en un archivo del repo
+# permite ver qué pasó sin entrar a la nube y sin que nadie tenga que copiar logs.
+BITACORA="/tmp/motor-bitacora.txt"
+: > "$BITACORA"
+
 run_step() {
   local nombre="$1"; shift
   echo ""
   echo "═══ $nombre ═══"
-  if "$@"; then
+  local salida
+  salida="$("$@" 2>&1)"
+  local code=$?
+  echo "$salida"
+  if [ "$code" -eq 0 ]; then
     echo "✓ $nombre ok"
+    echo "- ✅ **$nombre** — $(echo "$salida" | grep -vE '^\s*$' | tail -1 | cut -c1-160)" >> "$BITACORA"
   else
-    echo "✗ $nombre falló (código $?) — sigo con lo demás"
+    echo "✗ $nombre falló (código $code) — sigo con lo demás"
+    {
+      echo "- ❌ **$nombre** (código $code)"
+      echo "  \`\`\`"
+      echo "$salida" | grep -vE '^\s*$' | tail -8 | sed 's/^/  /'
+      echo "  \`\`\`"
+    } >> "$BITACORA"
   fi
 }
 
@@ -120,6 +141,15 @@ fi
 # después `vercel deploy` subía tal cual (sube el directorio, no el commit).
 # Haciéndolo bien acá, el paso del YAML no encuentra nada que commitear y el
 # directorio queda limpio para el deploy.
+# Deja la bitácora en el repo ANTES de guardar, para que viaje en el mismo commit.
+{
+  echo "# Última corrida del motor"
+  echo ""
+  echo "\`$(date -u '+%Y-%m-%d %H:%M UTC')\` · pedidos=$PEDIDOS modernos=$MODERNOS biblioteca=$BIBLIOTECA youtube=$YOUTUBE"
+  echo ""
+  cat "$BITACORA" 2>/dev/null
+} > estado-motor.md
+
 bash scripts/guardar-catalogo.sh "Motor biblioteca (auto)"
 
 echo ""

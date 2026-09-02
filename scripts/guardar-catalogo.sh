@@ -57,12 +57,12 @@ for intento in $(seq 1 "$INTENTOS"); do
     exit 1
   fi
 
-  if git diff --quiet -- "$SEED"; then
+  if git diff --quiet -- "$SEED" estado-motor.md; then
     echo "✓ El catálogo publicado ya tiene todo esto. Nada para guardar."
     exit 0
   fi
 
-  git add "$SEED"
+  git add "$SEED" estado-motor.md 2>/dev/null || git add "$SEED"
   git commit -m "$MENSAJE" --quiet
 
   if git push origin main --quiet 2>/dev/null; then
