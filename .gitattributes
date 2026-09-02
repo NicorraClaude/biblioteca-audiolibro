@@ -1,0 +1,13 @@
+# El catálogo NUNCA se fusiona por texto.
+#
+# git, al mezclar dos versiones de este JSON, escribe marcadores de conflicto
+# (<<<<<<<) DENTRO del archivo. Como `vercel deploy` sube el directorio de trabajo y
+# no el commit, esos marcadores llegaban a producción y el build moría con
+# "SyntaxError: Unexpected token '<'". El commit en GitHub quedaba sano, así que el
+# síntoma no señalaba la causa.
+#
+# Con `-merge`, git lo trata como binario: ante un conflicto deja UNA de las dos
+# versiones entera y marca el archivo como no resuelto, sin inyectar nada. El
+# archivo siempre es JSON válido. La fusión de verdad la hace scripts/merge-seed.mjs,
+# que une por slug quedándose con el contenido más rico de cada lado.
+prisma/seed-data.json -merge
