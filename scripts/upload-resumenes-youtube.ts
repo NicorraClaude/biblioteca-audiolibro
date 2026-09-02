@@ -139,6 +139,7 @@ async function main() {
   }
 
   let done = 0;
+  const errores: string[] = [];
   for (const book of pend) {
     const pick = pickAudioToUpload(book);
     if (!pick) continue;
@@ -169,11 +170,23 @@ async function main() {
       done++;
       await sleep(300);
     } catch (e) {
+      errores.push(`${book.slug}: ${(e as Error).message}`);
       console.error(`  ✗ ${(e as Error).message}`);
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
     console.log(`  (${done}/${pend.length})`);
+  }
+  if (errores.length) {
+    console.error(`\n⚠️  ${errores.length} fallaron:`);
+    for (const e of errores) console.error(`   · ${e}`);
+  }
+  // Si había candidatos y no subió NINGUNO, es un fallo, no un éxito de cero. Sin
+  // esto la corrida quedaba en verde informando "Subidos 0 videos" y el canal
+  // estuvo semanas sin recibir nada mientras todo parecía funcionar.
+  if (pend.length > 0 && done === 0) {
+    console.error(`\n✗ Había ${pend.length} para subir y no entró ninguno.`);
+    process.exit(1);
   }
   console.log(`\n✅ Subidos ${done} videos a YouTube.\n`);
 }

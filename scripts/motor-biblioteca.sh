@@ -59,7 +59,12 @@ run_step() {
   echo "$salida"
   if [ "$code" -eq 0 ]; then
     echo "✓ $nombre ok"
-    echo "- ✅ **$nombre** — $(echo "$salida" | grep -vE '^\s*$' | tail -1 | cut -c1-160)" >> "$BITACORA"
+    {
+      echo "- ✅ **$nombre**"
+      echo "  \`\`\`"
+      echo "$salida" | grep -vE '^\s*$' | tail -4 | sed 's/^/  /'
+      echo "  \`\`\`"
+    } >> "$BITACORA"
   else
     echo "✗ $nombre falló (código $code) — sigo con lo demás"
     {
