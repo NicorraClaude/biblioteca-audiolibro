@@ -18,6 +18,10 @@ import { Readable } from "node:stream";
 import type { Language } from "../src/lib/types";
 
 const LIMIT = Number(process.env.REQ_LIMIT ?? 3);
+// Tope de reloj opcional (minutos). El motor diario lo usa para que las subidas no se
+// coman todo su turno: cada video tarda 2-3 min entre bajar audio, armar y subir.
+const MAX_MS = Number(process.env.YT_MAX_MIN ?? 0) * 60_000;
+const INICIO = Date.now();
 const SITE = "https://biblioteca-audiolibros.vercel.app";
 // Para subidas puntuales que tienen que saltear la cola: re-subir un video que salió
 // mal, o empujar un título concreto. Sin esto hay que esperar el turno por orden de
@@ -100,7 +104,7 @@ function buildMetadata(book: any, lang: Language) {
   return { title, description, tags, voiceLabel };
 }
 
-// Puntaje de demanda: define en qué se gastan las 6 subidas diarias.
+// Puntaje de demanda: define en qué se gastan las subidas diarias (la cuota manda).
 // Las visitas pesan mucho más que las descargas para que, cuando el sitio tenga
 // tráfico propio, esa señal se imponga sola sin tener que retocar nada acá.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -108,6 +112,11 @@ function prioridad(b: any): number {
   const visitas = (b.viewsCached ?? 0) * 10_000;
   const nichoNegocios = b.contentLayer === 2 ? 5_000_000 : 0;
   return visitas + nichoNegocios + (b.downloadCount ?? 0);
+}
+
+// ¿El error es de cuota? YouTube lo informa con distintos "reasons" según el caso.
+function esCuota(msg: string): boolean {
+  return /quota|uploadLimitExceeded|rateLimitExceeded|dailyLimitExceeded/i.test(msg);
 }
 
 async function main() {
@@ -118,7 +127,7 @@ async function main() {
   const all = await prisma.book.findMany({
     where: { AND: [{ status: "published" }, { OR: [{ contentLayer: 1 }, { contentLayer: 2 }] }] },
   });
-  // La cuota de YouTube son 6 subidas por día: en qué se gastan importa más que
+  // La cuota de YouTube es limitada: en qué se gastan las subidas importa más que
   // cuántas son. Antes el orden era "capa 1 primero", que dejaba el nicho de
   // negocios —el único con links de afiliado y el más buscado— detrás de 60 clásicos.
   //
@@ -140,7 +149,15 @@ async function main() {
 
   let done = 0;
   const errores: string[] = [];
+  // Con la cuota ampliada, el motor pide muchos videos por corrida y el techo real
+  // lo pone YouTube. Cuando la cuota se agota hay que CORTAR: cada intento baja el
+  // audio de R2 y arma el mp4 (2-3 min) antes de enterarse de que no puede subir.
+  let cuotaAgotada = false;
   for (const book of pend) {
+    if (MAX_MS && Date.now() - INICIO > MAX_MS) {
+      console.log(`\n⏱  Tope de ${MAX_MS / 60_000} min alcanzado. El resto sube en la próxima corrida.`);
+      break;
+    }
     const pick = pickAudioToUpload(book);
     if (!pick) continue;
     console.log(`\n→ ${book.slug} [${pick.lang}/${pick.voice}]`);
@@ -170,12 +187,19 @@ async function main() {
       done++;
       await sleep(300);
     } catch (e) {
-      errores.push(`${book.slug}: ${(e as Error).message}`);
-      console.error(`  ✗ ${(e as Error).message}`);
+      const msg = (e as Error).message;
+      if (esCuota(msg)) {
+        cuotaAgotada = true;
+        console.log(`  ⏸  YouTube: cuota diaria agotada. Corto acá; el resto sube mañana.`);
+      } else {
+        errores.push(`${book.slug}: ${msg}`);
+        console.error(`  ✗ ${msg}`);
+      }
     } finally {
       await rm(dir, { recursive: true, force: true });
     }
     console.log(`  (${done}/${pend.length})`);
+    if (cuotaAgotada) break;
   }
   if (errores.length) {
     console.error(`\n⚠️  ${errores.length} fallaron:`);
@@ -184,11 +208,15 @@ async function main() {
   // Si había candidatos y no subió NINGUNO, es un fallo, no un éxito de cero. Sin
   // esto la corrida quedaba en verde informando "Subidos 0 videos" y el canal
   // estuvo semanas sin recibir nada mientras todo parecía funcionar.
-  if (pend.length > 0 && done === 0) {
+  // Quedarse sin cuota NO es un fallo: es el techo del día. Se informa y listo.
+  // Sí es fallo que no entre nada por cualquier OTRA razón (credenciales, R2...):
+  // esa fue la causa de semanas sin subidas mientras todo figuraba en verde.
+  if (pend.length > 0 && done === 0 && !cuotaAgotada) {
     console.error(`\n✗ Había ${pend.length} para subir y no entró ninguno.`);
     process.exit(1);
   }
-  console.log(`\n✅ Subidos ${done} videos a YouTube.\n`);
+  const techo = cuotaAgotada ? " · techo de cuota alcanzado" : "";
+  console.log(`\n✅ Subidos ${done} videos a YouTube${techo}.\n`);
 }
 
 main().catch((e) => { console.error(e); process.exit(1); }).finally(() => prisma.$disconnect());

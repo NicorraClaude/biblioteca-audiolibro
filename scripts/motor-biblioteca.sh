@@ -12,7 +12,7 @@
 #   3. Subida a YouTube de lo que tenga audio y no video  → upload-resumenes-youtube.ts
 #
 # El audio SIEMPRE queda en R2 y escuchable en la ficha, tenga o no video: la
-# cuota de YouTube (6/día) no puede dejar el catálogo mudo.
+# cuota de YouTube no puede dejar el catálogo mudo.
 set -uo pipefail
 
 PEDIDOS="${PEDIDOS:-10}"
@@ -33,6 +33,15 @@ MOTOR_MIN="${MOTOR_MIN:-290}"
 # perdiendo todo lo generado porque nunca llegaba al paso de guardar.
 if [ "${GITHUB_EVENT_NAME:-}" = "schedule" ] && [ "$BIBLIOTECA" != "0" ]; then
   BIBLIOTECA="auto"
+fi
+
+# Cuota de YouTube ampliada (aprobada sep-2026: video.insert de 100 a 1.100 unidades
+# diarias, por 6 meses). El YAML sigue mandando 6 por defecto en las corridas
+# automáticas; acá se sube el tope y el techo real lo marca YouTube: el uploader
+# corta solo apenas avisa "cuota agotada", y la bitácora registra cuántos entraron.
+# Mismo criterio que arriba: el 0 se respeta, y a mano manda el formulario.
+if [ "${GITHUB_EVENT_NAME:-}" = "schedule" ] && [ "$YOUTUBE" != "0" ]; then
+  YOUTUBE="${YOUTUBE_AUTO:-60}"
 fi
 
 echo "▶ Motor: pedidos=$PEDIDOS · modernos=$MODERNOS · biblioteca=$BIBLIOTECA · youtube=$YOUTUBE · reloj=${MOTOR_MIN}min"
@@ -88,10 +97,11 @@ if [ "$MODERNOS" != "0" ]; then
   REQ_LIMIT="$MODERNOS" run_step "Fichas modernas" npx tsx scripts/build-modernos.ts
 fi
 
-# YouTube va ANTES del catálogo: son solo 6 subidas y no pueden quedar sin hacerse
-# porque la generación de audio se comió todo el tiempo del job.
+# YouTube va ANTES del catálogo, pero con TOPE DE TIEMPO: con la cuota ampliada
+# pueden ser ~60 videos de 2-3 min cada uno. Sin tope, un día lento se come el turno
+# entero y el catálogo no avanza. A los YT_MAX_MIN minutos corta y el resto va mañana.
 if [ "$YOUTUBE" != "0" ]; then
-  REQ_LIMIT="$YOUTUBE" run_step "Subida a YouTube" npx tsx scripts/upload-resumenes-youtube.ts
+  YT_MAX_MIN="${YT_MAX_MIN:-180}" REQ_LIMIT="$YOUTUBE" run_step "Subida a YouTube" npx tsx scripts/upload-resumenes-youtube.ts
 fi
 
 # El catálogo se lleva TODO el tiempo que sobre, de a un libro por vez.
