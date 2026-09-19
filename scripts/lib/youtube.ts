@@ -104,3 +104,80 @@ export async function uploadVideo(opts: {
   if (!videoId) throw new Error("YouTube no devolvió un videoId.");
   return videoId;
 }
+
+// ---------- Gestión del canal (requiere el permiso completo `youtube`) ----------
+export const UPLOADS_PLAYLIST = "UUJBAm41Rsc3doYqCcujenTA"; // "subidas" del canal BibliotecaAbierta
+
+export function youtubeClient() {
+  const auth = oauthClient();
+  auth.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
+  return google.youtube({ version: "v3", auth });
+}
+
+export const normalizarTitulo = (t: string) =>
+  t.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+
+// Títulos PÚBLICOS del canal → videoId. Segunda barrera contra duplicados: aunque se
+// pierda el registro y el catálogo, no se sube algo que el canal ya muestra.
+export async function titulosPublicados(): Promise<Map<string, string>> {
+  const yt = youtubeClient();
+  const ids: string[] = [];
+  let pageToken: string | undefined;
+  do {
+    const r = await yt.playlistItems.list({ part: ["contentDetails"], playlistId: UPLOADS_PLAYLIST, maxResults: 50, pageToken });
+    for (const it of r.data.items ?? []) ids.push(it.contentDetails!.videoId!);
+    pageToken = r.data.nextPageToken ?? undefined;
+  } while (pageToken);
+  const out = new Map<string, string>();
+  for (let i = 0; i < ids.length; i += 50) {
+    const r = await yt.videos.list({ part: ["snippet", "status"], id: ids.slice(i, i + 50) });
+    for (const v of r.data.items ?? []) {
+      if (v.status?.privacyStatus === "public" && v.snippet?.title) out.set(normalizarTitulo(v.snippet.title), v.id!);
+    }
+  }
+  return out;
+}
+
+// Devuelve el id de la lista con ese nombre; la crea (pública) si no existe.
+const cachePlaylists = new Map<string, string>();
+export async function asegurarPlaylist(titulo: string, descripcion: string): Promise<string> {
+  if (cachePlaylists.has(titulo)) return cachePlaylists.get(titulo)!;
+  const yt = youtubeClient();
+  let pageToken: string | undefined;
+  do {
+    const r = await yt.playlists.list({ part: ["snippet"], mine: true, maxResults: 50, pageToken });
+    for (const p of r.data.items ?? []) if (p.snippet?.title === titulo) { cachePlaylists.set(titulo, p.id!); return p.id!; }
+    pageToken = r.data.nextPageToken ?? undefined;
+  } while (pageToken);
+  const r = await yt.playlists.insert({
+    part: ["snippet", "status"],
+    requestBody: { snippet: { title: titulo, description: descripcion, defaultLanguage: "es" }, status: { privacyStatus: "public" } },
+  });
+  cachePlaylists.set(titulo, r.data.id!);
+  return r.data.id!;
+}
+
+// Con reintentos: una lista recién creada tarda unos segundos en "existir" para la API.
+export async function agregarAPlaylist(playlistId: string, videoId: string): Promise<void> {
+  for (let i = 0; ; i++) {
+    try {
+      await youtubeClient().playlistItems.insert({
+        part: ["snippet"],
+        requestBody: { snippet: { playlistId, resourceId: { kind: "youtube#video", videoId } } },
+      });
+      return;
+    } catch (e) {
+      if (i >= 3 || /quota/i.test((e as Error).message)) throw e;
+      await new Promise((r) => setTimeout(r, 5000));
+    }
+  }
+}
+
+// Lista a la que va cada libro según su tipo.
+export function playlistPara(contentLayer: number): { titulo: string; descripcion: string } {
+  return contentLayer === 2
+    ? { titulo: "Resúmenes de libros de negocios y desarrollo personal",
+        descripcion: "Las ideas centrales de los libros más recomendados de negocios, finanzas y desarrollo personal, en español. Más en https://biblioteca-audiolibros.vercel.app" }
+    : { titulo: "Clásicos de la literatura: resúmenes en español",
+        descripcion: "Resúmenes narrados de los grandes clásicos. El libro completo, gratis en audio y texto: https://biblioteca-audiolibros.vercel.app" };
+}

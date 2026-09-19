@@ -8,7 +8,7 @@
 import "dotenv/config";
 import { prisma, sleep } from "./db";
 import { makeVideo } from "./lib/video";
-import { uploadVideo } from "./lib/youtube";
+import { uploadVideo, titulosPublicados, normalizarTitulo, asegurarPlaylist, agregarAPlaylist, playlistPara } from "./lib/youtube";
 import { r2GetText, r2Put } from "../src/lib/r2";
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -280,6 +280,10 @@ async function main() {
   // lo pone YouTube. Cuando la cuota se agota hay que CORTAR: cada intento baja el
   // audio de R2 y arma el mp4 (2-3 min) antes de enterarse de que no puede subir.
   let cuotaAgotada = false;
+  // Segunda barrera: lo que el canal YA muestra no se sube, aunque registro y
+  // catálogo digan otra cosa. Si no se puede leer el canal, no se sube a ciegas.
+  const enCanal = SIMULAR ? new Map<string, string>() : await titulosPublicados();
+  if (!SIMULAR) console.log(`🔎 Canal: ${enCanal.size} videos públicos leídos para evitar repetidos.`);
   for (const book of pend) {
     if (MAX_MS && Date.now() - INICIO > MAX_MS) {
       console.log(`\n⏱  Tope de ${MAX_MS / 60_000} min alcanzado. El resto sube en la próxima corrida.`);
@@ -294,6 +298,20 @@ async function main() {
       done++;
       continue;
     }
+    const meta = book.contentLayer === 1
+      ? buildMetadataClasico(book, await tituloEspanol(book))
+      : buildMetadata(book, pick.lang);
+    const yaEsta = enCanal.get(normalizarTitulo(meta.title));
+    if (yaEsta) {
+      console.log(`  ⏭️  ya está en el canal (${yaEsta}): lo anoto y no lo subo de nuevo.`);
+      await anotar(registro, `${book.slug}:${pick.lang}`, yaEsta);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const s: any = JSON.parse(book.summary ?? "{}");
+      s[pick.lang].resumen.youtubeVideoId = yaEsta;
+      s[pick.lang].resumen.youtubePublic = true;
+      await prisma.book.update({ where: { id: book.id }, data: { summary: JSON.stringify(s) } });
+      continue;
+    }
     const dir = await mkdtemp(path.join(tmpdir(), "ytup-"));
     const audioPath = path.join(dir, "audio.mp3");
     const videoPath = path.join(dir, "video.mp4");
@@ -303,9 +321,6 @@ async function main() {
       await downloadFromR2(key, audioPath);
       console.log("  · armando mp4 (tapa + audio)...");
       await makeVideo({ coverUrl: book.coverImageUrl, slug: book.slug, audioPath, outPath: videoPath });
-      const meta = book.contentLayer === 1
-        ? buildMetadataClasico(book, await tituloEspanol(book))
-        : buildMetadata(book, pick.lang);
       console.log(`  · subiendo a YouTube ("${meta.title.slice(0, 50)}")...`);
       const videoId = await uploadVideo({
         videoPath, title: meta.title, description: meta.description, tags: meta.tags,
@@ -329,6 +344,15 @@ async function main() {
       s[pick.lang].resumen.youtubePublic = true;
       await prisma.book.update({ where: { id: book.id }, data: { summary: JSON.stringify(s) } });
       done++;
+      enCanal.set(normalizarTitulo(meta.title), videoId);
+      // Lista de reproducción por tipo. Si falla no pasa nada grave: el video ya está.
+      try {
+        const pl = playlistPara(book.contentLayer);
+        await agregarAPlaylist(await asegurarPlaylist(pl.titulo, pl.descripcion), videoId);
+        console.log(`  ✓ agregado a la lista "${pl.titulo}"`);
+      } catch (e) {
+        console.error(`  ⚠️  no pude agregarlo a la lista: ${(e as Error).message}`);
+      }
       await sleep(300);
     } catch (e) {
       const msg = (e as Error).message;
