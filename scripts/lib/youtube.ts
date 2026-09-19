@@ -5,6 +5,10 @@ import { createReadStream } from "node:fs";
 import { google } from "googleapis";
 
 export const YOUTUBE_UPLOAD_SCOPE = "https://www.googleapis.com/auth/youtube.upload";
+// Permiso completo del canal (editar, pasar a privado, listas, estadísticas).
+// Autorizado por Nico el 19/09/2026. Borrar videos NO se hace por código: se pasan a
+// privado y el borrado definitivo lo decide y lo hace él desde YouTube Studio.
+export const YOUTUBE_FULL_SCOPE = "https://www.googleapis.com/auth/youtube";
 
 export function oauthClient(redirectUri?: string) {
   const id = process.env.GOOGLE_CLIENT_ID;

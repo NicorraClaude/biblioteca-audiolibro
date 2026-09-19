@@ -10,7 +10,10 @@ import "dotenv/config";
 import http from "node:http";
 import { appendFile, readFile } from "node:fs/promises";
 import path from "node:path";
-import { oauthClient, YOUTUBE_UPLOAD_SCOPE } from "./lib/youtube";
+import { google } from "googleapis";
+
+const CANAL_ESPERADO = process.env.YT_CANAL_ID ?? "UCJBAm41Rsc3doYqCcujenTA"; // BibliotecaAbierta
+import { oauthClient, YOUTUBE_FULL_SCOPE, YOUTUBE_UPLOAD_SCOPE } from "./lib/youtube";
 
 const PORT = 4455;
 const REDIRECT = `http://localhost:${PORT}`;
@@ -38,8 +41,8 @@ async function main() {
   const auth = oauthClient(REDIRECT);
   const url = auth.generateAuthUrl({
     access_type: "offline",
-    prompt: "consent",
-    scope: [YOUTUBE_UPLOAD_SCOPE],
+    prompt: "consent select_account",
+    scope: [YOUTUBE_UPLOAD_SCOPE, YOUTUBE_FULL_SCOPE],
   });
 
   console.log(
@@ -58,8 +61,22 @@ async function main() {
           return;
         }
         const { tokens } = await auth.getToken(code);
+        // Control de canal: una cuenta de Google puede manejar varios canales y es
+        // fácil elegir el que no es (pasó: quedó autorizado "Clout Cafe"). Si no es
+        // el canal de la biblioteca, NO se guarda nada.
+        auth.setCredentials(tokens);
+        const ch = await google.youtube({ version: "v3", auth }).channels.list({ part: ["snippet"], mine: true });
+        const canal = ch.data.items?.[0];
+        if (canal?.id !== CANAL_ESPERADO) {
+          const nombre = canal?.snippet?.title ?? "(ninguno)";
+          res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }).end(
+            `<h2>✗ Elegiste el canal "${nombre}". Tiene que ser BibliotecaAbierta.</h2><p>No guardé nada. Volvé a abrir el link y en "Elegí una cuenta o un canal" elegí BibliotecaAbierta.</p>`,
+          );
+          console.log(`\n✗ Canal equivocado: "${nombre}" (${canal?.id}). No guardé nada. Sigo esperando otro intento...`);
+          return;
+        }
         res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" }).end(
-          "<h2>✅ Listo. Ya podés cerrar esta pestaña y volver a la terminal.</h2>",
+          `<h2>✅ Listo: canal ${canal.snippet?.title}. Ya podés cerrar esta pestaña.</h2>`,
         );
         server.close();
         if (tokens.refresh_token) {
