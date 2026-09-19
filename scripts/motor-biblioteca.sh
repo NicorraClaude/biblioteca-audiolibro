@@ -157,13 +157,29 @@ fi
 # Haciéndolo bien acá, el paso del YAML no encuentra nada que commitear y el
 # directorio queda limpio para el deploy.
 # Deja la bitácora en el repo ANTES de guardar, para que viaje en el mismo commit.
+#
+# Dos archivos, y con HISTORIAL: pedidos.yml llama a este mismo script cada 2 horas
+# solo con pedidos, y antes pisaba estado-motor.md → a la mañana ya no quedaba rastro
+# de lo que había hecho el motor grande (subidas a YouTube incluidas). Ahora cada
+# corrida se agrega arriba y se conservan las últimas ~40.
+if [ "$MODERNOS" = "0" ] && [ "$BIBLIOTECA" = "0" ] && [ "$YOUTUBE" = "0" ]; then
+  export ESTADO_ARCHIVO="estado-pedidos.md"
+else
+  export ESTADO_ARCHIVO="estado-motor.md"
+fi
 {
-  echo "# Última corrida del motor"
+  echo "# Bitácora (${ESTADO_ARCHIVO%.md}) — la corrida más nueva arriba"
   echo ""
-  echo "\`$(date -u '+%Y-%m-%d %H:%M UTC')\` · pedidos=$PEDIDOS modernos=$MODERNOS biblioteca=$BIBLIOTECA youtube=$YOUTUBE"
+  echo "## \`$(date -u '+%Y-%m-%d %H:%M UTC')\` · pedidos=$PEDIDOS modernos=$MODERNOS biblioteca=$BIBLIOTECA youtube=$YOUTUBE"
   echo ""
   cat "$BITACORA" 2>/dev/null
-} > estado-motor.md
+  echo ""
+  # corridas anteriores (sin el título), recortadas a las últimas 40
+  if [ -f "$ESTADO_ARCHIVO" ]; then
+    awk 'NR>2' "$ESTADO_ARCHIVO" | awk '/^## `/{n++} n<=39' 
+  fi
+} > /tmp/estado-nuevo.md
+mv /tmp/estado-nuevo.md "$ESTADO_ARCHIVO"
 
 bash scripts/guardar-catalogo.sh "Motor biblioteca (auto)"
 

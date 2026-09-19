@@ -21,6 +21,7 @@ set -uo pipefail
 SEED="prisma/seed-data.json"
 INTENTOS="${INTENTOS:-4}"
 MENSAJE="${1:-Catálogo actualizado (auto)}"
+ESTADO="${ESTADO_ARCHIVO:-estado-motor.md}"
 
 if [ -z "${GITHUB_ACTIONS:-}" ]; then
   echo "(local: solo snapshot, no commiteo)"
@@ -46,9 +47,22 @@ for intento in $(seq 1 "$INTENTOS"); do
   fi
 
   # 2) Traer lo último publicado y fusionar por contenido, nunca por texto.
-  git fetch origin main --quiet
-  git checkout -B main origin/main --quiet
+  #
+  # ANTES esto era `git checkout -B main origin/main` sin chequear el resultado. Si
+  # otro workflow había pusheado mientras este trabajaba, el checkout se NEGABA
+  # ("your local changes would be overwritten") porque seed-data.json y la bitácora
+  # estaban modificados; el script seguía igual, fusionaba el archivo consigo mismo
+  # y el push fallaba. Resultado: los videoIds subidos a YouTube y las fichas nuevas
+  # se perdían, y al día siguiente el motor rehacía y RE-SUBÍA los mismos libros
+  # (hubo títulos con 7 copias en el canal).
+  # Ahora: lo nuestro ya está a salvo en /tmp, así que se descarta el directorio sin
+  # miedo (reset --hard), y si algo de git falla, se corta en rojo.
+  rm -f /tmp/estado-mio.md; cp "$ESTADO" /tmp/estado-mio.md 2>/dev/null || true
+  git fetch origin main --quiet || { echo "✗ git fetch falló"; exit 1; }
+  git checkout -f -B main origin/main --quiet || { echo "✗ No pude posicionarme sobre origin/main"; exit 1; }
+  git reset --hard origin/main --quiet || { echo "✗ git reset falló"; exit 1; }
   cp "$SEED" /tmp/seed-origin.json
+  [ -f /tmp/estado-mio.md ] && cp /tmp/estado-mio.md "$ESTADO"
   node scripts/merge-seed.mjs /tmp/seed-origin.json /tmp/seed-mio.json "$SEED" || { echo "✗ merge falló"; exit 1; }
 
   if ! valido "$SEED"; then
@@ -57,13 +71,13 @@ for intento in $(seq 1 "$INTENTOS"); do
     exit 1
   fi
 
-  if git diff --quiet -- "$SEED" estado-motor.md; then
+  if git diff --quiet -- "$SEED" "$ESTADO" && [ -z "$(git ls-files --others --exclude-standard -- "$ESTADO")" ]; then
     echo "✓ El catálogo publicado ya tiene todo esto. Nada para guardar."
     exit 0
   fi
 
-  git add "$SEED" estado-motor.md 2>/dev/null || git add "$SEED"
-  git commit -m "$MENSAJE" --quiet
+  git add "$SEED" "$ESTADO" 2>/dev/null || git add "$SEED"
+  git commit -m "$MENSAJE" --quiet || { echo "✗ git commit falló"; exit 1; }
 
   if git push origin main --quiet 2>/dev/null; then
     echo "✅ Catálogo guardado y publicado."

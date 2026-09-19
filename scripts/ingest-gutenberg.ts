@@ -117,6 +117,13 @@ function parseRdf(rdf: string): Parsed | null {
 }
 
 const MODE = process.env.INGEST_SOURCE ?? "top"; // "top" | "es"
+// INGEST_NUEVOS=N → modo crecimiento: busca hasta sumar N libros NUEVOS.
+// Antes las fuentes eran dos páginas fijas (los 100 más descargados y la primera
+// página de español) con un tope de "total a asegurar" (200/80). Ese total ya se
+// había alcanzado: cada día se re-procesaban los mismos ~200 y entraban 0 libros en
+// español y ~6 en inglés. Ahora se recorre la búsqueda de Gutenberg ordenada por
+// descargas, página por página, salteando lo que ya está, hasta juntar N nuevos.
+const NUEVOS = Number(process.env.INGEST_NUEVOS ?? 0);
 
 async function idsFromPage(url: string): Promise<number[]> {
   const res = await fetchRetry(url, { tries: 4 });
@@ -132,6 +139,25 @@ async function idsFromPage(url: string): Promise<number[]> {
 }
 
 async function fetchIdList(): Promise<number[]> {
+  if (NUEVOS > 0) {
+    const ya = new Set(
+      (await prisma.book.findMany({ where: { gutenbergId: { not: null } }, select: { gutenbergId: true } }))
+        .map((b) => b.gutenbergId),
+    );
+    const lang = MODE === "es" ? "es" : "en";
+    const out: number[] = MODE === "es" ? SPANISH_IDS.filter((i) => !ya.has(i)) : [];
+    // 25 por página; se juntan ~3 candidatos por libro buscado porque parte se
+    // descarta (copyright en EE.UU., duplicados, tomos).
+    for (let start = 1; start <= 2000 && out.length < NUEVOS * 3; start += 25) {
+      const ids = await idsFromPage(
+        `https://www.gutenberg.org/ebooks/search/?query=l.${lang}&sort_order=downloads&start_index=${start}`,
+      );
+      if (!ids.length) break;
+      for (const i of ids) if (!ya.has(i) && !out.includes(i)) out.push(i);
+      await sleep(300);
+    }
+    return out;
+  }
   if (MODE === "es") {
     // Modo español: catálogo de Gutenberg en español + curados conocidos.
     const browse = await idsFromPage(
@@ -163,7 +189,7 @@ async function main() {
   let discarded = 0;
 
   for (const id of ids) {
-    if (kept >= TARGET) break;
+    if (NUEVOS > 0 ? created >= NUEVOS : kept >= TARGET) break;
     const res = await fetchRetry(`https://www.gutenberg.org/ebooks/${id}.rdf`, {
       tries: 3,
       timeoutMs: 25000,
