@@ -1,5 +1,27 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-09-22 15:09 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+     ✓ audio es/onyx (17.2 MB, 246s)
+     ✓ audio es/nova (18.4 MB, 334s)
+     (5/5 ficha lista)
+  ✅ Tanda lista: 5 fichas generadas · 38 ya estaban · ~21 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: tG8V1Zb2-wE → https://youtu.be/tG8V1Zb2-wE
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (59/60)
+  ✅ Subidos 59 videos a YouTube.
+  ```
+
 ## `2026-09-20 14:31 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
