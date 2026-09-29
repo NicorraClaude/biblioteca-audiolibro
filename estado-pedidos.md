@@ -1,5 +1,13 @@
 # Bitácora (estado-pedidos) — la corrida más nueva arriba
 
+## `2026-09-29 08:17 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+
 ## `2026-09-29 01:44 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
 
 - ✅ **Pedidos de títulos**
@@ -305,14 +313,6 @@
   ```
 
 ## `2026-09-20 13:00 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-
-## `2026-09-20 07:40 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
 
 - ✅ **Pedidos de títulos**
   ```
