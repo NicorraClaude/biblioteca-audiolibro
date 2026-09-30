@@ -1,5 +1,25 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-09-30 15:25 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=5
+  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: OLpJudQWKts → https://youtu.be/OLpJudQWKts
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (22/22)
+  ✅ Subidos 22 videos a YouTube.
+  ```
+
 ## `2026-09-29 15:37 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
