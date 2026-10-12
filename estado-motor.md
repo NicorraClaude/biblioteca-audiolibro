@@ -1,5 +1,24 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-12 22:58 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=5
+  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+  📺 A subir a YouTube: 0 (de 0 pendientes)
+  🔎 Canal: 719 videos públicos leídos para evitar repetidos.
+  ✅ Subidos 0 videos a YouTube.
+  ```
+
 ## `2026-10-11 15:06 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
