@@ -111,6 +111,16 @@ if [ "$YOUTUBE" != "0" ]; then
   YT_MAX_MIN="${YT_MAX_MIN:-180}" REQ_LIMIT="$YOUTUBE" run_step "Subida a YouTube" npx tsx scripts/upload-resumenes-youtube.ts
 fi
 
+# AUDIOLIBROS COMPLETOS a YouTube. Son videos de 2 a 15 horas: el contenido con
+# más tiempo de reproducción del canal, y el que YouTube más recomienda. Van
+# DESPUÉS de los resúmenes (que son rápidos) y antes del catálogo, con su propio
+# tope de reloj. Armar el video es barato (un tramo de 60 s que se repite sin
+# recodificar), así que el tiempo se va casi todo en subir.
+if [ "${YT_LIBROS:-10}" != "0" ]; then
+  YT_LIBROS_MIN="${YT_LIBROS_MIN:-150}" REQ_LIMIT="${YT_LIBROS:-10}" \
+    run_step "Audiolibros completos a YouTube" npx tsx scripts/upload-audiolibros-youtube.ts
+fi
+
 # El catálogo se lleva TODO el tiempo que sobre, de a un libro por vez.
 #
 # Antes esto era una sola llamada con REQ_LIMIT fijo (3 libros) y el job se quedaba

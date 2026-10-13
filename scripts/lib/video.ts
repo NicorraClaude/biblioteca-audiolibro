@@ -34,6 +34,10 @@ export async function makeVideo(opts: {
   outPath: string;
   /** Slug del libro: si no hay archivo de tapa, se usa la imagen diseñada del sitio. */
   slug?: string;
+  /** Audiolibro completo (horas): codifica más liviano para no comerse la corrida. */
+  largo?: boolean;
+  /** Duración del audio en segundos. Necesaria para el modo largo. */
+  duracionSegundos?: number | null;
 }): Promise<string> {
   const dir = path.dirname(opts.outPath);
   await mkdir(dir, { recursive: true });
@@ -56,24 +60,55 @@ export async function makeVideo(opts: {
     "scale=1280:720:force_original_aspect_ratio=decrease," +
     "pad=1280:720:(ow-iw)/2:(oh-ih)/2:color=0x181310,setsar=1,format=yuv420p";
 
+  // MODO LARGO (audiolibros completos, de 2 a 15 horas).
+  // Codificar hora tras hora la misma imagen fija es absurdo: 2 h 20 de audio
+  // tardaban 5 minutos y daban 70 MB. Acá se codifica UN tramo de 60 segundos con
+  // la tapa y después se repite ese tramo copiándolo (sin recodificar), con el
+  // audio tal cual viene. El mismo libro: 4 segundos y 55 MB.
+  if (opts.largo && coverOk && opts.duracionSegundos && opts.duracionSegundos > 120) {
+    const loop = path.join(dir, `_loop_${Date.now()}.mp4`);
+    await run([
+      "-y", "-loop", "1", "-framerate", "1", "-t", "60", "-i", tmpCover,
+      "-c:v", "libx264", "-tune", "stillimage", "-preset", "veryfast", "-crf", "28",
+      // Un solo cuadro clave cada 60: los demás son idénticos y pesan nada.
+      "-g", "60", "-vf", vf, loop,
+    ]);
+    await run([
+      "-y", "-stream_loop", "-1", "-i", loop, "-i", opts.audioPath,
+      "-t", String(Math.ceil(opts.duracionSegundos)),
+      "-map", "0:v:0", "-map", "1:a:0", "-c:v", "copy", "-c:a", "copy",
+      "-movflags", "+faststart", opts.outPath,
+    ]);
+    await rm(loop, { force: true });
+    await rm(tmpCover, { force: true });
+    return opts.outPath;
+  }
+
+  // Un audiolibro de 5 h con los ajustes de un resumen de 40 min tarda demasiado y
+  // pesa de más: 1 cuadro por segundo alcanza para una imagen fija, y el audio
+  // hablado no necesita 192 kbps.
+  const fps = opts.largo ? "1" : "2";
+  const abr = opts.largo ? "64k" : "192k";
+  const preset = opts.largo ? "ultrafast" : "veryfast";
+
   const args = coverOk
     ? [
         "-y",
-        "-loop", "1", "-framerate", "2", "-i", tmpCover,
+        "-loop", "1", "-framerate", fps, "-i", tmpCover,
         "-i", opts.audioPath,
-        "-c:v", "libx264", "-tune", "stillimage", "-preset", "veryfast",
+        "-c:v", "libx264", "-tune", "stillimage", "-preset", preset,
         "-vf", vf,
-        "-c:a", "aac", "-b:a", "192k",
+        "-c:a", "aac", "-b:a", abr,
         "-shortest", "-movflags", "+faststart",
         opts.outPath,
       ]
     : [
         // Sin tapa: lienzo negro.
         "-y",
-        "-f", "lavfi", "-i", "color=c=black:s=1280x720:r=2",
+        "-f", "lavfi", "-i", "color=c=black:s=1280x720:r=" + fps,
         "-i", opts.audioPath,
-        "-c:v", "libx264", "-tune", "stillimage", "-preset", "veryfast",
-        "-c:a", "aac", "-b:a", "192k",
+        "-c:v", "libx264", "-tune", "stillimage", "-preset", preset,
+        "-c:a", "aac", "-b:a", abr,
         "-shortest", "-movflags", "+faststart",
         opts.outPath,
       ];
