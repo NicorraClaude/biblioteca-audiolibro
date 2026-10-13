@@ -40,6 +40,13 @@ fi
 # automáticas; acá se sube el tope y el techo real lo marca YouTube: el uploader
 # corta solo apenas avisa "cuota agotada", y la bitácora registra cuántos entraron.
 # Mismo criterio que arriba: el 0 se respeta, y a mano manda el formulario.
+# Fichas modernas: el YAML manda 5 por defecto. Con la lista ampliada (49 títulos
+# actuales pendientes al 13/10/2026) y el catálogo de clásicos al día, el motor
+# tiene tiempo de sobra: se suben a 8 por corrida en las automáticas.
+if [ "${GITHUB_EVENT_NAME:-}" = "schedule" ] && [ "$MODERNOS" != "0" ]; then
+  MODERNOS="${MODERNOS_AUTO:-8}"
+fi
+
 if [ "${GITHUB_EVENT_NAME:-}" = "schedule" ] && [ "$YOUTUBE" != "0" ]; then
   YOUTUBE="${YOUTUBE_AUTO:-60}"
 fi
