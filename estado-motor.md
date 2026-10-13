@@ -1,5 +1,27 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-13 13:26 UTC` · pedidos=10 modernos=1 biblioteca=0 youtube=0
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+     · bajando voz es_AR-daniela-high...
+     ✓ audio es/nova (19.5 MB, 738s)
+     (1/1 ficha lista)
+  ✅ Tanda lista: 1 fichas generadas · 64 ya estaban · ~48 pendientes.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (195 MB)...
+    ✓ videoId: An7-mKcnEgw → https://youtu.be/An7-mKcnEgw
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 10 audiolibros completos.
+  ```
+
 ## `2026-10-13 12:57 UTC` · pedidos=10 modernos=2 biblioteca=0 youtube=0
 
 - ✅ **Pedidos de títulos**
