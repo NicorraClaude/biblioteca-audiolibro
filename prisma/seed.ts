@@ -8,6 +8,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import { conTextos } from "../scripts/lib/textos";
 
 const adapter = new PrismaBetterSqlite3({
   url: process.env.DATABASE_URL ?? "file:./dev.db",
@@ -18,7 +19,8 @@ type SeedRow = Record<string, unknown> & { publishedAt: string | null };
 
 async function main() {
   const file = path.join(process.cwd(), "prisma", "seed-data.json");
-  const rows: SeedRow[] = JSON.parse(readFileSync(file, "utf8"));
+  // El snapshot trae el índice; los textos viven en prisma/textos/<slug>.json.
+  const rows: SeedRow[] = conTextos(JSON.parse(readFileSync(file, "utf8")) as Array<SeedRow & { slug: string }>);
   console.log(`Sembrando ${rows.length} libros desde seed-data.json...`);
 
   await prisma.book.deleteMany();

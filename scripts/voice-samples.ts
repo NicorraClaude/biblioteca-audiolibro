@@ -5,7 +5,8 @@ import { r2Put } from "../src/lib/r2";
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const seed: any[] = require("../prisma/seed-data.json");
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const seed: any[] = require("./lib/textos").leerCatalogo();
 
 function sinopsis(slug: string): string {
   const b = seed.find((x) => x.slug === slug);

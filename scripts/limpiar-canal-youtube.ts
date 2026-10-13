@@ -10,6 +10,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { google } from "googleapis";
 import { oauthClient } from "./lib/youtube";
 import { r2GetText } from "../src/lib/r2";
+import { leerTexto, slugsConTexto } from "./lib/textos";
 
 const UPLOADS = "UUJBAm41Rsc3doYqCcujenTA"; // lista "subidas" del canal BibliotecaAbierta
 const APLICAR = process.env.APLICAR === "1";
@@ -27,7 +28,11 @@ async function main() {
     pageToken = r.data.nextPageToken ?? undefined;
   } while (pageToken);
 
-  const seed = readFileSync("prisma/seed-data.json", "utf8");
+  // Se leen el índice Y los textos (donde viven los videoId de los resúmenes).
+  // Si esto quedara mirando solo el índice, "en uso" daría casi cero y el script
+  // pasaría a privado el canal entero.
+  const seed = readFileSync("prisma/seed-data.json", "utf8") +
+    slugsConTexto().map((s) => leerTexto(s) ?? "").join("");
   const enUso = new Set([...seed.matchAll(/youtubeVideoId\\?"\s*:\s*\\?"([\w-]{11})/g)].map((m) => m[1]));
   const reg = JSON.parse((await r2GetText("youtube/subidos.json")) ?? "{}") as Record<string, string>;
   for (const [k, v] of Object.entries(reg)) if (k.endsWith(":es")) enUso.add(v);

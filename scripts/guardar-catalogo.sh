@@ -19,6 +19,7 @@
 set -uo pipefail
 
 SEED="prisma/seed-data.json"
+TEXTOS="prisma/textos"
 INTENTOS="${INTENTOS:-4}"
 MENSAJE="${1:-Catálogo actualizado (auto)}"
 ESTADO="${ESTADO_ARCHIVO:-estado-motor.md}"
@@ -41,6 +42,10 @@ for intento in $(seq 1 "$INTENTOS"); do
   # 1) Volcar la base de este job a un archivo aparte.
   npx tsx scripts/export-seed.ts >/dev/null || { echo "✗ export-seed falló"; exit 1; }
   cp "$SEED" /tmp/seed-mio.json
+  # Los textos (uno por libro) viajan aparte desde que el snapshot chocaba con el
+  # límite de 100 MB de GitHub.
+  rm -rf /tmp/textos-mios && mkdir -p /tmp/textos-mios
+  cp -R "$TEXTOS"/. /tmp/textos-mios/ 2>/dev/null || true
   if ! valido /tmp/seed-mio.json; then
     echo "✗ El snapshot generado no es JSON válido. No commiteo nada."
     exit 1
@@ -64,6 +69,7 @@ for intento in $(seq 1 "$INTENTOS"); do
   cp "$SEED" /tmp/seed-origin.json
   [ -f /tmp/estado-mio.md ] && cp /tmp/estado-mio.md "$ESTADO"
   node scripts/merge-seed.mjs /tmp/seed-origin.json /tmp/seed-mio.json "$SEED" || { echo "✗ merge falló"; exit 1; }
+  node scripts/merge-textos.mjs /tmp/textos-mios "$TEXTOS" || { echo "✗ merge de textos falló"; exit 1; }
 
   if ! valido "$SEED"; then
     echo "✗ El resultado del merge no es JSON válido. Abandono sin tocar el repo."
@@ -71,12 +77,13 @@ for intento in $(seq 1 "$INTENTOS"); do
     exit 1
   fi
 
-  if git diff --quiet -- "$SEED" "$ESTADO" && [ -z "$(git ls-files --others --exclude-standard -- "$ESTADO")" ]; then
+  if git diff --quiet -- "$SEED" "$TEXTOS" "$ESTADO" \
+     && [ -z "$(git ls-files --others --exclude-standard -- "$ESTADO" "$TEXTOS")" ]; then
     echo "✓ El catálogo publicado ya tiene todo esto. Nada para guardar."
     exit 0
   fi
 
-  git add "$SEED" "$ESTADO" 2>/dev/null || git add "$SEED"
+  git add "$SEED" "$TEXTOS" "$ESTADO" 2>/dev/null || git add "$SEED" "$TEXTOS"
   git commit -m "$MENSAJE" --quiet || { echo "✗ git commit falló"; exit 1; }
 
   if git push origin main --quiet 2>/dev/null; then

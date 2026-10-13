@@ -1,6 +1,7 @@
 // Cuánto falta para tener el catálogo completo (texto + audio en las 4 combinaciones
 // idioma × voz). Se usa en el resumen de las corridas para ver el avance de un vistazo.
 import { readFileSync } from "node:fs";
+import { conTextos } from "./lib/textos";
 
 type Book = { contentLayer: number; summary?: string | null };
 
@@ -22,7 +23,7 @@ function falta(raw: string | null | undefined): boolean {
   }
 }
 
-const libros: Book[] = JSON.parse(readFileSync("prisma/seed-data.json", "utf8"));
+const libros: Book[] = conTextos(JSON.parse(readFileSync("prisma/seed-data.json", "utf8")) as Book[]);
 const capa1 = libros.filter((b) => b.contentLayer === 1);
 const pendientes = capa1.filter((b) => falta(b.summary)).length;
 const listos = capa1.length - pendientes;

@@ -11,3 +11,6 @@
 # archivo siempre es JSON válido. La fusión de verdad la hace scripts/merge-seed.mjs,
 # que une por slug quedándose con el contenido más rico de cada lado.
 prisma/seed-data.json -merge
+
+# Mismo motivo que arriba, para cada archivo de textos.
+prisma/textos/*.json -merge

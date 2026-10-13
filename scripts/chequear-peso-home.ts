@@ -24,6 +24,7 @@ type Book = Record<string, unknown>;
 // (Si algún día una tarjeta necesita uno de estos, sacalo de la lista.)
 const NO_VIAJA = new Set(["summary", "description", "ebookEpubUrl", "ebookPdfUrl", "textPath", "licenseRecord", "sourceUrl"]);
 
+// Sin cargar los textos a propósito: "summary" está en NO_VIAJA, no viaja a la home.
 const libros: Book[] = JSON.parse(readFileSync("prisma/seed-data.json", "utf8"));
 const publicos = libros.filter((b) => b.status === "published");
 

@@ -17,6 +17,7 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
+import { guardarTexto, leerTexto } from "./lib/textos";
 
 // Un parche puede traer el resumen (Audio masivo) o el audiolibro completo
 // (motor de audiolibros), o los dos. Cada campo se evalúa por separado.
@@ -24,6 +25,7 @@ type Patch = { slug: string; summary?: string | null; audioVersions?: string | n
 type Book = { slug: string; summary?: string | null; audioVersions?: string | null; [k: string]: unknown };
 
 const SEED = "prisma/seed-data.json";
+const TEXTOS = "prisma/textos";
 const INTENTOS = 4;
 
 function git(...args: string[]): string {
@@ -100,8 +102,10 @@ async function aplicar(parches: Patch[]): Promise<number> {
     let toco = false;
     // Cada campo se compara contra el suyo: un parche que solo trae el audiolibro
     // no debe pisar un resumen que el otro motor generó mientras tanto.
-    if (p.summary !== undefined && riqueza(p.summary) > riqueza(b.summary)) {
-      b.summary = p.summary;
+    // El texto ya no vive en el snapshot sino en prisma/textos/<slug>.json.
+    if (p.summary !== undefined && riqueza(p.summary) > riqueza(b.summary ?? leerTexto(p.slug))) {
+      guardarTexto(p.slug, p.summary);
+      b.summary = null;
       toco = true;
     }
     if (p.audioVersions !== undefined && riquezaAudio(p.audioVersions) > riquezaAudio(b.audioVersions)) {
@@ -142,7 +146,12 @@ async function main() {
     console.log(`\n── Intento ${intento}/${INTENTOS}`);
     // Partir SIEMPRE de lo último publicado, no de la foto con la que arrancó la corrida.
     git("fetch", "origin", "main");
-    git("checkout", "-B", "main", "origin/main");
+    // Forzado: los parches son declarativos, así que volver a la versión publicada y
+    // reaplicarlos da el mismo resultado. Sin el -f, un intento anterior que ya
+    // escribió textos deja el directorio sucio y el checkout se niega (fue
+    // exactamente el error que hizo re-subir libros a YouTube durante días).
+    git("checkout", "-f", "-B", "main", "origin/main");
+    git("reset", "--hard", "origin/main");
 
     const aplicados = await aplicar(parches);
     if (aplicados === 0) {
@@ -150,7 +159,7 @@ async function main() {
       return;
     }
 
-    git("add", SEED);
+    git("add", SEED, TEXTOS);
     git("commit", "-m", `Audio masivo: ${aplicados} libros con texto + audio (auto)`);
 
     let pusheado = false;
