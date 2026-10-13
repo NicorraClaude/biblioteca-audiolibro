@@ -91,7 +91,12 @@ export class PiperTTSProvider implements TTSProvider {
       // género (voice-style.ts) se ignora mientras esté de respaldo.
       await writeFile(txt, input, "utf8");
       await correr(this.python, ["-m", "piper", "-m", voz, "--data-dir", CACHE, "--input-file", txt, "-f", wav]);
-      await correr(ffmpegPath as string, ["-y", "-i", wav, "-c:a", "libmp3lame", "-b:a", "64k", "-ac", "1", mp3]);
+      // Un limitador suave: Piper entrega picos a 0 dB y al pasar a mp3 eso satura.
+      await correr(ffmpegPath as string, [
+        "-y", "-i", wav,
+        "-af", "alimiter=limit=0.89:level=disabled",
+        "-c:a", "libmp3lame", "-b:a", "64k", "-ac", "1", mp3,
+      ]);
       return await readFile(mp3);
     } finally {
       await rm(dir, { recursive: true, force: true });
