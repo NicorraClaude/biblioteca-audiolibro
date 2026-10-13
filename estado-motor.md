@@ -1,5 +1,34 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-13 18:07 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+     ✓ audio es/onyx (16.9 MB, 147s)
+     ✓ audio es/nova (17.2 MB, 141s)
+     (8/8 ficha lista)
+  ✅ Tanda lista: 8 fichas generadas · 65 ya estaban · ~40 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: qnjUvRKnaEE → https://youtu.be/qnjUvRKnaEE
+    ✓ agregado a la lista "Resúmenes de libros de negocios y desarrollo personal"
+    (9/9)
+  ✅ Subidos 9 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (192 MB)...
+    ✓ videoId: QZhn4wdzpbY → https://youtu.be/QZhn4wdzpbY
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 10 audiolibros completos.
+  ```
+
 ## `2026-10-13 13:26 UTC` · pedidos=10 modernos=1 biblioteca=0 youtube=0
 
 - ✅ **Pedidos de títulos**
