@@ -8,6 +8,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import type { TTSProvider, TTSOptions } from "./types";
 import type { Language } from "../types";
+import { PiperTTSProvider } from "./piper";
 
 // Mapeo de nuestras voces (onyx=masculina, nova=femenina) a voces de edge-tts
 // por idioma. Español = argentino.
@@ -16,16 +17,24 @@ const EDGE_VOICES: Record<Language, Record<"onyx" | "nova", string>> = {
   en: { onyx: "en-US-GuyNeural", nova: "en-US-AriaNeural" },
 };
 
+// Cuando Microsoft corta (13/10/2026: 403 en todas las voces, desde cualquier IP),
+// se pasa a Piper para TODO lo que falte en esta corrida. Es por proceso: no tiene
+// sentido reintentar contra un servicio caído cien veces seguidas, cada intento
+// cuesta segundos y el job tiene el reloj contado.
+let microsoftCaido = false;
+
 export class EdgeTTSProvider implements TTSProvider {
   readonly id = "edge";
   private python: string;
   private language: Language;
+  private respaldo: PiperTTSProvider;
 
   constructor(opts: { language: Language; pythonPath?: string }) {
     this.language = opts.language;
     this.python =
       opts.pythonPath ??
       path.join(process.cwd(), ".venv-tts", "bin", "python");
+    this.respaldo = new PiperTTSProvider(opts);
   }
 
   // speed 1.07 → "+7%" ; 0.9 → "-10%"
@@ -36,6 +45,17 @@ export class EdgeTTSProvider implements TTSProvider {
   }
 
   async generate(input: string, opts: TTSOptions): Promise<Buffer> {
+    if (microsoftCaido) return this.respaldo.generate(input, opts);
+    try {
+      return await this.generarConEdge(input, opts);
+    } catch (e) {
+      microsoftCaido = true;
+      console.warn(`   ⚠️  edge-tts no responde (${(e as Error).message.slice(0, 80)}). Sigo con Piper.`);
+      return this.respaldo.generate(input, opts);
+    }
+  }
+
+  private async generarConEdge(input: string, opts: TTSOptions): Promise<Buffer> {
     const voice = EDGE_VOICES[this.language][opts.voice];
     const dir = await mkdtemp(path.join(tmpdir(), "edge-"));
     const txt = path.join(dir, "in.txt");
