@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPublicSlugs, getBookBySlug, isPublishable } from "@/lib/books";
+import { getPublicSlugs, getBookBySlug, getPublicBooks, isPublishable } from "@/lib/books";
 import { Cover } from "@/components/Cover";
 import { AudioSection } from "@/components/AudioSection";
 import { BookContent } from "@/components/BookContent";
@@ -11,6 +11,7 @@ import { ResumenMedida } from "@/components/ResumenMedida";
 import { Reviews } from "@/components/Reviews";
 import { LANGUAGE_FLAG, LAYER_INFO } from "@/lib/presentation";
 import { withAffiliateTag } from "@/lib/affiliates";
+import { SITE, MARCA, autores, breadcrumb, faqFicha, slugificar, tituloFicha, videoJsonLd } from "@/lib/seo";
 
 // Solo se generan las fichas públicas (dominio público). Cualquier otro slug
 // —incluidos los libros con copyright ocultos— da 404 limpio, sin intentar
@@ -30,21 +31,29 @@ export async function generateMetadata({
   const { slug } = await params;
   const book = await getBookBySlug(slug);
   if (!book) return { title: "Libro no encontrado" };
-  const desc = (book.summary?.[book.language]?.sinopsis?.text ?? book.description).replace(/\s+/g, " ").slice(0, 200);
-  const url = `https://biblioteca-audiolibros.vercel.app/libro/${book.slug}`;
+  // La descripción arranca con la promesa (gratis, en audio, sin registro) y sigue
+  // con la sinopsis: es lo que se lee en el resultado de Google y define el clic.
+  const sinopsis = (book.summary?.es?.sinopsis?.text ?? book.summary?.[book.language]?.sinopsis?.text ?? book.description)
+    .replace(/\s+/g, " ");
+  const gancho = book.contentLayer === 1
+    ? `Escuchá ${book.title}, de ${book.author}, completo y gratis en español. Audio y texto, sin registro. `
+    : `Resumen y análisis en audio de ${book.title}, de ${book.author}, gratis y en español. `;
+  const desc = (gancho + sinopsis).slice(0, 300);
+  const url = `${SITE}/libro/${book.slug}`;
+  const titulo = tituloFicha(book);
   return {
-    title: `${book.title} — ${book.author}`,
+    title: titulo,
     description: desc,
     alternates: { canonical: url },
     openGraph: {
-      title: `${book.title} — ${book.author}`,
+      title: titulo,
       description: desc,
       url,
-      siteName: "Biblioteca Abierta",
+      siteName: MARCA,
       type: "book",
       locale: book.language === "es" ? "es_AR" : "en_US",
     },
-    twitter: { card: "summary_large_image", title: `${book.title} — ${book.author}`, description: desc },
+    twitter: { card: "summary_large_image", title: titulo, description: desc },
   };
 }
 
@@ -104,12 +113,47 @@ export default async function BookPage({
     jsonLd.associatedMedia = { "@type": "AudioObject", contentUrl: sinAudio, encodingFormat: "audio/mpeg", name: "Sinopsis" };
   }
 
+  // ¿Tiene página propia el autor? (solo los que tienen dos o más obras).
+  const tieneAutor = (await autores(await getPublicBooks())).some((a) => a.slug === slugificar(book.author));
+
+  // Migas, preguntas frecuentes y, si hay video, su ficha de VideoObject: los tres
+  // pueden salir desplegados en Google y son tráfico que la página sola no trae.
+  const primeraCat = (book.categories ?? [])[0];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const jsonLdExtra: Record<string, any>[] = [
+    breadcrumb([
+      { nombre: "Inicio", url: SITE },
+      ...(primeraCat ? [{ nombre: primeraCat, url: `${SITE}/categoria/${slugificar(primeraCat)}` }] : []),
+      { nombre: book.title, url: `${SITE}/libro/${book.slug}` },
+    ]),
+    faqFicha(book),
+  ];
+  const videoCompleto = book.audioVersions.find((v) => v.youtubeVideoId && v.youtubePublic);
+  const videoResumen = book.summary?.es?.resumen?.youtubeVideoId;
+  if (videoCompleto?.youtubeVideoId) {
+    jsonLdExtra.push(videoJsonLd({
+      videoId: videoCompleto.youtubeVideoId,
+      nombre: `${book.title} — Audiolibro completo en español`,
+      descripcion: sin?.text ?? book.description,
+      fecha: book.publishedAt,
+      duracionSegundos: videoCompleto.durationSeconds,
+    }));
+  }
+  if (videoResumen) {
+    jsonLdExtra.push(videoJsonLd({
+      videoId: videoResumen,
+      nombre: `${book.title} — Resumen en español`,
+      descripcion: sin?.text ?? book.description,
+      fecha: book.publishedAt,
+    }));
+  }
+
   return (
     <article>
       <script
         type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+         
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, ...jsonLdExtra]) }}
       />
 
       <Link
@@ -166,13 +210,27 @@ export default async function BookPage({
           <h1 className="font-display text-3xl leading-tight font-semibold text-balance text-ink sm:text-5xl">
             {book.title}
           </h1>
-          <p className="mt-2 text-lg text-ink-soft">{book.author}</p>
+          {/* Autor y categorías son ENLACES: así se navega entre obras parecidas y
+              así descubre Google las fichas, siguiendo esos enlaces. */}
+          <p className="mt-2 text-lg text-ink-soft">
+            {tieneAutor ? (
+              <Link href={`/autor/${slugificar(book.author)}`} className="transition hover:text-ink hover:underline">
+                {book.author}
+              </Link>
+            ) : (
+              book.author
+            )}
+          </p>
 
           <div className="mt-4 flex flex-wrap gap-2">
             {book.categories.map((c) => (
-              <span key={c} className="rounded-full bg-surface px-3 py-1 text-xs text-ink-soft ring-1 ring-line">
+              <Link
+                key={c}
+                href={`/categoria/${slugificar(c)}`}
+                className="rounded-full bg-surface px-3 py-1 text-xs text-ink-soft ring-1 ring-line transition hover:bg-black/5 hover:text-ink"
+              >
                 {c}
-              </span>
+              </Link>
             ))}
           </div>
 

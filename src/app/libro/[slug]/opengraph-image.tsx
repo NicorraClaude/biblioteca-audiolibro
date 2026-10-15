@@ -48,7 +48,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
           }}
         >
           {book.coverImageUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
+             
             <img src={book.coverImageUrl} alt="" style={{ maxWidth: "80%", maxHeight: "80%", objectFit: "contain", boxShadow: "0 20px 60px rgba(0,0,0,0.5)" }} />
           ) : (
             <div style={{ fontSize: 260, fontWeight: 800, color: "rgba(255,255,255,0.2)" }}>

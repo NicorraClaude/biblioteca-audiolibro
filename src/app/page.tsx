@@ -4,6 +4,8 @@ import { SolicitarTitulo } from "@/components/SolicitarTitulo";
 import { BookRow } from "@/components/BookRow";
 import { COLECCIONES, pickForColeccion } from "@/lib/colecciones";
 import { hasPlayableAudio, paraTarjeta } from "@/lib/presentation";
+import Link from "next/link";
+import { autores, categorias } from "@/lib/seo";
 
 export default async function HomePage() {
   const books = await getPublicBooks();
@@ -19,6 +21,11 @@ export default async function HomePage() {
   // Todo lo que se le pasa a un componente de cliente viaja serializado al
   // navegador. Sin aligerar, la home mandaba 15,6 MB de resúmenes que las tarjetas
   // no usan y Vercel rechazaba el deploy por página sobredimensionada.
+  // Enlaces a las páginas de categoría y autor. Además de ayudar a navegar, son
+  // el camino por el que Google llega a esas páginas (y desde ellas, a las fichas).
+  const cats = categorias(books).filter((c) => c.libros.length >= 3);
+  const autoresTop = autores(books, 3).slice(0, 24);
+
   const librosLivianos = books.map(paraTarjeta);
   const novedadesLivianas = novedades.map(paraTarjeta);
 
@@ -64,6 +71,35 @@ export default async function HomePage() {
       {colecciones.map(({ c, list }) => (
         <BookRow key={c.slug} title={c.title} subtitle={c.subtitle} emoji={c.emoji} books={list.map(paraTarjeta)} />
       ))}
+
+      {/* Explorar por tema y por autor */}
+      <section className="mt-12">
+        <h2 className="mb-4 font-display text-xl font-semibold text-ink sm:text-2xl">Explorar por tema</h2>
+        <div className="flex flex-wrap gap-2">
+          {cats.map((c) => (
+            <Link
+              key={c.slug}
+              href={`/categoria/${c.slug}`}
+              className="rounded-full bg-surface px-3.5 py-2 text-sm text-ink-soft ring-1 ring-line transition hover:bg-black/5 hover:text-ink"
+            >
+              {c.nombre} <span className="opacity-60">{c.libros.length}</span>
+            </Link>
+          ))}
+        </div>
+
+        <h2 className="mt-10 mb-4 font-display text-xl font-semibold text-ink sm:text-2xl">Autores con más obras</h2>
+        <div className="flex flex-wrap gap-2">
+          {autoresTop.map((a) => (
+            <Link
+              key={a.slug}
+              href={`/autor/${a.slug}`}
+              className="rounded-full bg-surface px-3.5 py-2 text-sm text-ink-soft ring-1 ring-line transition hover:bg-black/5 hover:text-ink"
+            >
+              {a.nombre} <span className="opacity-60">{a.libros.length}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       <section id="catalogo" className="mt-12 scroll-mt-24">
         <h2 className="mb-4 font-display text-xl font-semibold text-ink sm:text-2xl">Toda la biblioteca</h2>

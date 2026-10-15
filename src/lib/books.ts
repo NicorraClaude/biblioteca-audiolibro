@@ -123,9 +123,19 @@ export function isPublishable(book: Book): boolean {
 // Catálogo PÚBLICO: solo títulos que hoy podemos entregar de verdad.
 // Lo que depende de licencias/acuerdos (Capa 3 sin licencia, o blocked) NO se
 // muestra públicamente; queda en el backlog privado (ver getBacklogBooks).
+// Se memoriza el resultado: el sitio es 100% estático, así que el catálogo no
+// cambia durante el build, y cada página de categoría, autor o ficha lo pedía de
+// nuevo (leer 850 libros, parsear sus JSON y filtrarlos). Con ~600 páginas de
+// autor eso hacía que el build se pasara del minuto por página y Next lo abortara.
+let cacheCatalogo: Promise<Book[]> | null = null;
+
 export async function getPublicBooks(): Promise<Book[]> {
-  const rows = await prisma.book.findMany({ orderBy: { title: "asc" } });
-  return rows.map(hydrate).filter(isPublishable);
+  if (!cacheCatalogo) {
+    cacheCatalogo = prisma.book
+      .findMany({ orderBy: { title: "asc" } })
+      .then((rows) => rows.map(hydrate).filter(isPublishable));
+  }
+  return cacheCatalogo;
 }
 
 // Backlog PRIVADO: títulos "nice to have" que dependen de licencias o acuerdos
