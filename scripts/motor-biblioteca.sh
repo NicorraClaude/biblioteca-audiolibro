@@ -51,7 +51,26 @@ if [ "${GITHUB_EVENT_NAME:-}" = "schedule" ] && [ "$YOUTUBE" != "0" ]; then
   YOUTUBE="${YOUTUBE_AUTO:-60}"
 fi
 
-echo "▶ Motor: pedidos=$PEDIDOS · modernos=$MODERNOS · biblioteca=$BIBLIOTECA · youtube=$YOUTUBE · reloj=${MOTOR_MIN}min"
+# PRESUPUESTO GLOBAL de la corrida. Cada etapa tenía su propio tope y la suma
+# (90 de fichas + 180 de resúmenes + 150 de libros + catálogo) podía pasarse del
+# límite de 350 minutos de GitHub. Si GitHub mata el job, NO se guarda nada: el
+# snapshot es el último paso. Ahora cada etapa recibe lo que queda, menos una
+# reserva para guardar y deployar.
+TOTAL_MIN="${MOTOR_TOTAL_MIN:-300}"
+RESERVA_MIN=20
+restante() {
+  local r=$(( TOTAL_MIN - RESERVA_MIN - SECONDS / 60 ))
+  [ "$r" -lt 0 ] && r=0
+  echo "$r"
+}
+# Devuelve el menor entre el tope de la etapa y lo que queda de presupuesto.
+tope() {
+  local pedido="$1" queda
+  queda="$(restante)"
+  [ "$queda" -lt "$pedido" ] && echo "$queda" || echo "$pedido"
+}
+
+echo "▶ Motor: pedidos=$PEDIDOS · modernos=$MODERNOS · biblioteca=$BIBLIOTECA · youtube=$YOUTUBE · libros=${YT_LIBROS:-30} · presupuesto=${TOTAL_MIN}min"
 
 # Cada etapa es independiente: que una falle no debe tirar abajo las otras ni
 # impedir que el catálogo se snapshotee y deploye con lo que sí salió bien.
@@ -107,8 +126,8 @@ fi
 # YouTube va ANTES del catálogo, pero con TOPE DE TIEMPO: con la cuota ampliada
 # pueden ser ~60 videos de 2-3 min cada uno. Sin tope, un día lento se come el turno
 # entero y el catálogo no avanza. A los YT_MAX_MIN minutos corta y el resto va mañana.
-if [ "$YOUTUBE" != "0" ]; then
-  YT_MAX_MIN="${YT_MAX_MIN:-180}" REQ_LIMIT="$YOUTUBE" run_step "Subida a YouTube" npx tsx scripts/upload-resumenes-youtube.ts
+if [ "$YOUTUBE" != "0" ] && [ "$(restante)" -gt 5 ]; then
+  YT_MAX_MIN="$(tope "${YT_MAX_MIN:-120}")" REQ_LIMIT="$YOUTUBE" run_step "Subida a YouTube" npx tsx scripts/upload-resumenes-youtube.ts
 fi
 
 # AUDIOLIBROS COMPLETOS a YouTube. Son videos de 2 a 15 horas: el contenido con
@@ -116,8 +135,14 @@ fi
 # DESPUÉS de los resúmenes (que son rápidos) y antes del catálogo, con su propio
 # tope de reloj. Armar el video es barato (un tramo de 60 s que se repite sin
 # recodificar), así que el tiempo se va casi todo en subir.
-if [ "${YT_LIBROS:-10}" != "0" ]; then
-  YT_LIBROS_MIN="${YT_LIBROS_MIN:-150}" REQ_LIMIT="${YT_LIBROS:-10}" \
+# Son el contenido que más horas de reproducción genera, que es lo que mide YouTube
+# para monetizar: un resumen son 30 minutos, un libro entero de 2 a 12 horas. La cola
+# de resúmenes ya está al día (757 de 758 subidos), así que el turno es para acá:
+# 336 libros narrados esperando. 10 por corrida tardaban 35 min, o sea que entran
+# muchos más; el techo real lo pone la cuota de YouTube y el uploader corta solo
+# cuando se agota.
+if [ "${YT_LIBROS:-30}" != "0" ] && [ "$(restante)" -gt 10 ]; then
+  YT_LIBROS_MIN="$(tope "${YT_LIBROS_MIN:-200}")" REQ_LIMIT="${YT_LIBROS:-30}" \
     run_step "Audiolibros completos a YouTube" npx tsx scripts/upload-audiolibros-youtube.ts
 fi
 
@@ -134,7 +159,9 @@ fi
 if [ "$BIBLIOTECA" != "0" ]; then
   echo ""
   echo "═══ Catálogo: texto + audio (hasta $MOTOR_MIN min de reloj) ═══"
-  limite=$(( MOTOR_MIN * 60 ))
+  # El tope del catálogo nunca puede pasarse del presupuesto global.
+  limite_min="$(tope "$MOTOR_MIN")"
+  limite=$(( SECONDS + limite_min * 60 ))
   hechos=0
   fallos=0
   while [ "$SECONDS" -lt "$limite" ]; do
