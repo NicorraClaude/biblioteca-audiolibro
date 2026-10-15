@@ -1,5 +1,27 @@
 # Bitácora (estado-pedidos) — la corrida más nueva arriba
 
+## `2026-10-15 20:13 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (142 MB)...
+    ✓ videoId: v4iSpG5ERJM → https://youtu.be/v4iSpG5ERJM
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 30 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ common-sense: The request cannot be completed because you have exceeded your <a href="/youtube/v3/getting-started#quota">quota</a>.
+    ⏸  Cuota agotada, corto acá.
+  ⚠️  25 fallaron.
+  ✅ 96 miniaturas puestas · quedan 770.
+  ```
+
 ## `2026-10-15 19:16 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
 
 - ✅ **Pedidos de títulos**
@@ -422,14 +444,6 @@
   ```
 
 ## `2026-10-05 14:20 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-
-## `2026-10-05 05:16 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
 
 - ✅ **Pedidos de títulos**
   ```
