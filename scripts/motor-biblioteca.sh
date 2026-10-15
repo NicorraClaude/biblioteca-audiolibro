@@ -146,6 +146,15 @@ if [ "${YT_LIBROS:-30}" != "0" ] && [ "$(restante)" -gt 10 ]; then
     run_step "Audiolibros completos a YouTube" npx tsx scripts/upload-audiolibros-youtube.ts
 fi
 
+# MINIATURAS. Va después de las subidas, así los videos de hoy ya salen con la
+# suya. Cuesta 50 unidades de cuota por video (una subida cuesta 1600), así que
+# entran muchas: con 150 por corrida, los 800 videos viejos quedan cubiertos en
+# menos de una semana.
+if [ "${YT_MINIATURAS:-150}" != "0" ] && [ "$(restante)" -gt 5 ]; then
+  YT_MINIATURAS_MIN="$(tope "${YT_MINIATURAS_MIN:-30}")" REQ_LIMIT="${YT_MINIATURAS:-150}" \
+    run_step "Miniaturas de YouTube" npx tsx scripts/miniaturas-youtube.ts
+fi
+
 # El catálogo se lleva TODO el tiempo que sobre, de a un libro por vez.
 #
 # Antes esto era una sola llamada con REQ_LIMIT fijo (3 libros) y el job se quedaba

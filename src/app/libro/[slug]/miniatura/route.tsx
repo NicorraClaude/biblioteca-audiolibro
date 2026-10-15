@@ -11,10 +11,10 @@ import { notFound } from "next/navigation";
 // Se lee el snapshot directo, sin Prisma: esto corre en runtime y en Vercel la
 // función no tiene la base. El índice ya no trae los textos, pero sí todo lo que
 // hace falta acá (título, autor, tapa, duración).
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const seed: Array<{
   slug: string; title: string; author: string; coverImageUrl: string | null;
   contentLayer: number; language: string; audioVersions: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
 }> = require("../../../../../prisma/seed-data.json");
 
 export const size = { width: 1280, height: 720 };
