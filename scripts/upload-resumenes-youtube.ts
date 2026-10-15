@@ -11,11 +11,13 @@ import { makeVideo } from "./lib/video";
 import { uploadVideo, titulosPublicados, normalizarTitulo, asegurarPlaylist, agregarAPlaylist, playlistPara } from "./lib/youtube";
 import { r2GetText, r2Put } from "../src/lib/r2";
 import { tituloEspanol } from "./lib/titulo-es";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { createWriteStream } from "node:fs";
 import type { Language } from "../src/lib/types";
 
 const LIMIT = Number(process.env.REQ_LIMIT ?? 3);
@@ -38,12 +40,13 @@ const s3 = new S3Client({
 });
 
 // Baja un mp3 de R2 al disco local (para pasárselo a ffmpeg).
+// Baja un mp3 de R2 al disco EN FLUJO (sin cargarlo entero en memoria).
+// Un audiolibro de 12 horas son cientos de MB: juntarlo en un Buffer hacía que el
+// runner de GitHub se quedara sin memoria y muriera ("the hosted runner lost
+// communication with the server", 15/10/2026).
 async function downloadFromR2(key: string, dest: string): Promise<void> {
   const res = await s3.send(new GetObjectCommand({ Bucket: process.env.R2_BUCKET!, Key: key }));
-  const chunks: Buffer[] = [];
-  const stream = res.Body as Readable;
-  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
-  await writeFile(dest, Buffer.concat(chunks));
+  await pipeline(res.Body as Readable, createWriteStream(dest));
 }
 
 // Extrae la key de R2 de una URL pública.
@@ -110,9 +113,9 @@ function buildMetadata(book: any, lang: Language) {
   const isEs = lang === "es";
   const voiceLabel = "voz Onyx";
   const title = `${book.title} — Resumen · ${book.author}`.slice(0, 100);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let cats: string[] = []; try { cats = JSON.parse(book.categories ?? "[]"); } catch { /* */ }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   let affs: {store:string,url:string}[] = []; try { affs = JSON.parse(book.affiliateLinks ?? "[]"); } catch { /* */ }
   // La descripción NO lleva link directo a la tienda: manda a la ficha, y la ficha
   // arma el link de afiliado al renderizar (withAffiliateTag). Así el día que el tag

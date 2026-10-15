@@ -18,11 +18,13 @@ import { makeVideo } from "./lib/video";
 import { uploadVideo, titulosPublicados, normalizarTitulo, asegurarPlaylist, agregarAPlaylist } from "./lib/youtube";
 import { tituloEspanol } from "./lib/titulo-es";
 import { r2GetText, r2Put } from "../src/lib/r2";
-import { mkdtemp, rm, writeFile, stat } from "node:fs/promises";
+import { mkdtemp, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { Readable } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { createWriteStream } from "node:fs";
 
 const LIMIT = Number(process.env.REQ_LIMIT ?? 2);
 const MAX_MS = Number(process.env.YT_LIBROS_MIN ?? 0) * 60_000;
@@ -42,11 +44,13 @@ const s3 = new S3Client({
   credentials: { accessKeyId: process.env.R2_ACCESS_KEY_ID!, secretAccessKey: process.env.R2_SECRET_ACCESS_KEY! },
 });
 
+// Baja un mp3 de R2 al disco EN FLUJO (sin cargarlo entero en memoria).
+// Un audiolibro de 12 horas son cientos de MB: juntarlo en un Buffer hacía que el
+// runner de GitHub se quedara sin memoria y muriera ("the hosted runner lost
+// communication with the server", 15/10/2026).
 async function downloadFromR2(key: string, dest: string): Promise<void> {
   const res = await s3.send(new GetObjectCommand({ Bucket: process.env.R2_BUCKET!, Key: key }));
-  const chunks: Buffer[] = [];
-  for await (const chunk of res.Body as Readable) chunks.push(Buffer.from(chunk));
-  await writeFile(dest, Buffer.concat(chunks));
+  await pipeline(res.Body as Readable, createWriteStream(dest));
 }
 
 function keyFromUrl(url: string): string {
