@@ -1,5 +1,41 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-16 15:32 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+     ✓ audio es/onyx (17.2 MB, 199s)
+     ✓ audio es/nova (18.3 MB, 392s)
+     (8/8 ficha lista)
+  ✅ Tanda lista: 8 fichas generadas · 85 ya estaban · ~42 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: b0VJApRQkVc → https://youtu.be/b0VJApRQkVc
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (16/16)
+  ✅ Subidos 16 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+     · beyond-good-and-evil: The user has exceeded the number of videos they may upload.
+     · second-treatise-of-government: The user has exceeded the number of videos they may upload.
+     · a-doll-s-house-a-play: The user has exceeded the number of videos they may upload.
+  ✅ Subidos 12 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ meditations: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ✗ meditations: The user has uploaded too many thumbnails recently. Please try the request again later.
+  ⚠️  145 fallaron.
+  ✅ 5 miniaturas puestas · quedan 792.
+  ```
+
 ## `2026-10-15 18:40 UTC` · pedidos=10 modernos=4 biblioteca=0 youtube=20
 
 - ✅ **Pedidos de títulos**
