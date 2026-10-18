@@ -1,5 +1,41 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-18 14:33 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+     ✓ audio es/onyx (16.7 MB, 239s)
+     ✓ audio es/nova (17.8 MB, 336s)
+     (8/8 ficha lista)
+  ✅ Tanda lista: 8 fichas generadas · 101 ya estaban · ~26 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: 3IM0N0X338A → https://youtu.be/3IM0N0X338A
+    ✓ agregado a la lista "Resúmenes de libros de negocios y desarrollo personal"
+    (8/8)
+  ✅ Subidos 8 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (233 MB)...
+    ✓ videoId: lHxVRTejsfM → https://youtu.be/lHxVRTejsfM
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 30 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ color-images-from-mars-rovers-spirit-and-opportunity: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ✗ color-images-from-mars-rovers-spirit-and-opportunity: The user has uploaded too many thumbnails recently. Please try the request again later.
+  ⚠️  50 fallaron.
+  ✅ 100 miniaturas puestas · quedan 662.
+  ```
+
 ## `2026-10-17 13:59 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
