@@ -1,5 +1,41 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-21 16:49 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+     ✓ audio es/onyx (17.1 MB, 488s)
+     ✓ audio es/nova (18.2 MB, 293s)
+     (8/8 ficha lista)
+  ✅ Tanda lista: 8 fichas generadas · 125 ya estaban · ~2 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: bVH_2X6BK1E → https://youtu.be/bVH_2X6BK1E
+    ✓ agregado a la lista "Resúmenes de libros de negocios y desarrollo personal"
+    (8/8)
+  ✅ Subidos 8 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (241 MB)...
+    ✓ videoId: -EnuybVulSk → https://youtu.be/-EnuybVulSk
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 29 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ socialism-a-summary-and-interpretation-of-socialist-principles: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ✗ from-edinburgh-to-india-burmah: The user has uploaded too many thumbnails recently. Please try the request again later.
+  ⚠️  48 fallaron.
+  ✅ 102 miniaturas puestas · quedan 566.
+  ```
+
 ## `2026-10-20 16:23 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
