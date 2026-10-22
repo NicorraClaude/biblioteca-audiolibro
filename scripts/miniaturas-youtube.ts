@@ -17,6 +17,10 @@ import { r2GetText, r2Put } from "../src/lib/r2";
 import { Readable } from "node:stream";
 
 const LIMIT = Number(process.env.REQ_LIMIT ?? 40);
+// YouTube corta las miniaturas mucho antes que la cuota: a las ~60 seguidas
+// responde "too many thumbnails recently" y rechaza todo por un rato. Una pausa
+// corta entre envíos estira bastante esa cantidad.
+const PAUSA_MS = Number(process.env.YT_MINIATURAS_PAUSA_MS ?? 1500);
 const MAX_MS = Number(process.env.YT_MINIATURAS_MIN ?? 0) * 60_000;
 const INICIO = Date.now();
 const SITE = process.env.SITE_URL ?? "https://biblioteca-audiolibros.vercel.app";
@@ -65,12 +69,16 @@ async function main() {
       console.log(`  ✓ ${p.slug} → ${p.videoId}`);
       // El registro se guarda cada diez: si el job muere, no se repite todo.
       if (listas % 10 === 0) await r2Put(REGISTRO, JSON.stringify(hechos, null, 1), "application/json");
+      await new Promise((r) => setTimeout(r, PAUSA_MS));
     } catch (e) {
       const msg = (e as Error).message;
       errores.push(`${p.slug}: ${msg}`);
       console.error(`  ✗ ${p.slug}: ${msg.slice(0, 160)}`);
-      // Sin cuota no tiene sentido seguir: cada intento gasta y falla igual.
+      // Dos techos distintos, los dos significan "basta por hoy": la cuota diaria
+      // y el límite de miniaturas seguidas. Sin esto, el 22/10 se gastaron 148
+      // intentos fallidos en fila contra un servicio que ya había dicho que no.
       if (/quota|rateLimitExceeded|dailyLimitExceeded/i.test(msg)) { console.log("  ⏸  Cuota agotada, corto acá."); break; }
+      if (/too many thumbnails/i.test(msg)) { console.log("  ⏸  YouTube no acepta más miniaturas por ahora. Sigo mañana."); break; }
     }
   }
 
@@ -78,7 +86,10 @@ async function main() {
   if (errores.length) console.error(`\n⚠️  ${errores.length} fallaron.`);
   // Si había trabajo y no entró ninguna, es un fallo de verdad (credenciales, el
   // sitio caído, el canal sin permiso de miniaturas): que la corrida quede en rojo.
-  if (pendientes.length > 0 && listas === 0) { console.error("\n✗ Había miniaturas para poner y no entró ninguna."); process.exit(1); }
+  // Que no entre ninguna es un fallo real (credenciales, sitio caído), salvo que
+  // YouTube nos haya frenado: eso es un techo, no un error.
+  const freno = errores.some((e) => /too many thumbnails|quota/i.test(e));
+  if (pendientes.length > 0 && listas === 0 && !freno) { console.error("\n✗ Había miniaturas para poner y no entró ninguna."); process.exit(1); }
   console.log(`\n✅ ${listas} miniaturas puestas · quedan ${pendientes.length - listas}.\n`);
 }
 
