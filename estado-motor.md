@@ -1,5 +1,38 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-23 14:00 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+  📺 A subir a YouTube: 0 (de 0 pendientes)
+  🔎 Canal: 1080 videos públicos leídos para evitar repetidos.
+  ✅ Subidos 0 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (214 MB)...
+    ✓ videoId: Hr_gFZzGLKg → https://youtu.be/Hr_gFZzGLKg
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 29 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ the-choctaw-freedmen-and-the-story-of-oak-hill-industrial-academy: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ⏸  YouTube no acepta más miniaturas por ahora. Sigo mañana.
+  ⚠️  1 fallaron.
+  ✅ 102 miniaturas puestas · quedan 521.
+  ```
+
 ## `2026-10-22 14:50 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
