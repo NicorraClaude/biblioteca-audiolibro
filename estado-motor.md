@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-24 13:04 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: 5RSIW2jNOi0 → https://youtu.be/5RSIW2jNOi0
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (8/8)
+  ✅ Subidos 8 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (231 MB)...
+    ✓ videoId: 3b_9Y2hZVL4 → https://youtu.be/3b_9Y2hZVL4
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 28 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ through-the-looking-glass: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ⏸  YouTube no acepta más miniaturas por ahora. Sigo mañana.
+  ⚠️  1 fallaron.
+  ✅ 0 miniaturas puestas · quedan 558.
+  ```
+
 ## `2026-10-23 14:00 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
