@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-25 13:38 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: tRmoQSiMezQ → https://youtu.be/tRmoQSiMezQ
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (8/8)
+  ✅ Subidos 8 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (32 MB)...
+    ✓ videoId: BWpGyG3CUq0 → https://youtu.be/BWpGyG3CUq0
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 29 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ murphy-a-message-to-dog-lovers: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ⏸  YouTube no acepta más miniaturas por ahora. Sigo mañana.
+  ⚠️  1 fallaron.
+  ✅ 101 miniaturas puestas · quedan 496.
+  ```
+
 ## `2026-10-24 13:04 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
