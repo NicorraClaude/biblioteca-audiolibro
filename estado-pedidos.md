@@ -1,5 +1,35 @@
 # Bitácora (estado-pedidos) — la corrida más nueva arriba
 
+## `2026-10-26 04:24 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ❌ **Audiolibros completos a YouTube** (código 1)
+  ```
+      at Object.<anonymous> (/home/runner/work/biblioteca-audiolibro/biblioteca-audiolibro/scripts/upload-audiolibros-youtube.ts:197:95)
+      at Module._compile (node:internal/modules/cjs/loader:1929:14)
+      at Object.transformer (/home/runner/work/biblioteca-audiolibro/biblioteca-audiolibro/node_modules/tsx/dist/register-BOkp8V6j.cjs:9:3176)
+      at Module.load (node:internal/modules/cjs/loader:1651:32)
+      at Module._load (node:internal/modules/cjs/loader:1443:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)
+      at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)
+  ```
+- ❌ **Miniaturas de YouTube** (código 1)
+  ```
+      at Object.<anonymous> (/home/runner/work/biblioteca-audiolibro/biblioteca-audiolibro/scripts/miniaturas-youtube.ts:96:95)
+      at Module._compile (node:internal/modules/cjs/loader:1929:14)
+      at Object.transformer (/home/runner/work/biblioteca-audiolibro/biblioteca-audiolibro/node_modules/tsx/dist/register-BOkp8V6j.cjs:9:3176)
+      at Module.load (node:internal/modules/cjs/loader:1651:32)
+      at Module._load (node:internal/modules/cjs/loader:1443:12)
+      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
+      at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)
+      at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)
+  ```
+
 ## `2026-10-25 22:25 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
 
 - ✅ **Pedidos de títulos**
@@ -1141,36 +1171,6 @@
   ```
 
 ## `2026-10-17 20:26 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ❌ **Audiolibros completos a YouTube** (código 1)
-  ```
-      at Object.<anonymous> (/home/runner/work/biblioteca-audiolibro/biblioteca-audiolibro/scripts/upload-audiolibros-youtube.ts:197:95)
-      at Module._compile (node:internal/modules/cjs/loader:1929:14)
-      at Object.transformer (/home/runner/work/biblioteca-audiolibro/biblioteca-audiolibro/node_modules/tsx/dist/register-BOkp8V6j.cjs:9:3176)
-      at Module.load (node:internal/modules/cjs/loader:1651:32)
-      at Module._load (node:internal/modules/cjs/loader:1443:12)
-      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
-      at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)
-      at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)
-  ```
-- ❌ **Miniaturas de YouTube** (código 1)
-  ```
-      at Object.<anonymous> (/home/runner/work/biblioteca-audiolibro/biblioteca-audiolibro/scripts/miniaturas-youtube.ts:85:95)
-      at Module._compile (node:internal/modules/cjs/loader:1929:14)
-      at Object.transformer (/home/runner/work/biblioteca-audiolibro/biblioteca-audiolibro/node_modules/tsx/dist/register-BOkp8V6j.cjs:9:3176)
-      at Module.load (node:internal/modules/cjs/loader:1651:32)
-      at Module._load (node:internal/modules/cjs/loader:1443:12)
-      at wrapModuleLoad (node:internal/modules/cjs/loader:261:19)
-      at loadCJSModuleWithModuleLoad (node:internal/modules/esm/translators:372:15)
-      at ModuleWrap.<anonymous> (node:internal/modules/esm/translators:244:9)
-  ```
-
-## `2026-10-17 16:58 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
 
 - ✅ **Pedidos de títulos**
   ```
