@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-26 15:39 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: RH9oqu3xUWk → https://youtu.be/RH9oqu3xUWk
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (7/7)
+  ✅ Subidos 7 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (10 MB)...
+    ✓ videoId: hCowJblD59Y → https://youtu.be/hCowJblD59Y
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 9 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ manures-and-the-principles-of-manuring: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ⏸  YouTube no acepta más miniaturas por ahora. Sigo mañana.
+  ⚠️  1 fallaron.
+  ✅ 97 miniaturas puestas · quedan 415.
+  ```
+
 ## `2026-10-25 13:38 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
