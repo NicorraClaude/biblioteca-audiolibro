@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-28 15:36 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: 9KVTLylFqA0 → https://youtu.be/9KVTLylFqA0
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (7/7)
+  ✅ Subidos 7 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (84 MB)...
+    ✓ videoId: l01rjJaT1KE → https://youtu.be/l01rjJaT1KE
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 4 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ amor-y-pedagogia: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ⏸  YouTube no acepta más miniaturas por ahora. Sigo mañana.
+  ⚠️  1 fallaron.
+  ✅ 101 miniaturas puestas · quedan 242.
+  ```
+
 ## `2026-10-27 15:05 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1005,32 +1039,3 @@
   ✅ Subidos 59 videos a YouTube.
   ```
 
-## `2026-09-19 14:00 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (17.0 MB, 183s)
-     ✓ audio es/nova (18.2 MB, 242s)
-     (5/5 ficha lista)
-  ✅ Tanda lista: 5 fichas generadas · 28 ya estaban · ~31 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: K8K29wKjYis → https://youtu.be/K8K29wKjYis
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (60/60)
-  ✅ Subidos 60 videos a YouTube.
-  ```
-
-`2026-09-19 00:07 UTC` · pedidos=10 modernos=0 biblioteca=0 youtube=0
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
