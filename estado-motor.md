@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-29 15:43 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: -g41Gv3oT-U → https://youtu.be/-g41Gv3oT-U
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (7/7)
+  ✅ Subidos 7 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (203 MB)...
+    ✓ videoId: q0VuqW8Aq0k → https://youtu.be/q0VuqW8Aq0k
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 2 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ poirot-investigates: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ⏸  YouTube no acepta más miniaturas por ahora. Sigo mañana.
+  ⚠️  1 fallaron.
+  ✅ 101 miniaturas puestas · quedan 150.
+  ```
+
 ## `2026-10-28 15:36 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1012,28 +1046,6 @@
 - ✅ **Subida a YouTube**
   ```
     ✓ videoId: tG8V1Zb2-wE → https://youtu.be/tG8V1Zb2-wE
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (59/60)
-  ✅ Subidos 59 videos a YouTube.
-  ```
-
-## `2026-09-20 14:31 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.7 MB, 235s)
-     ✓ audio es/nova (17.8 MB, 215s)
-     (5/5 ficha lista)
-  ✅ Tanda lista: 5 fichas generadas · 33 ya estaban · ~26 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: GK_ML_t_Pnc → https://youtu.be/GK_ML_t_Pnc
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (59/60)
   ✅ Subidos 59 videos a YouTube.
