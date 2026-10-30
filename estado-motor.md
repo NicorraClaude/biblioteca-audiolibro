@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-30 15:27 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: Exa4O4yED60 → https://youtu.be/Exa4O4yED60
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (6/6)
+  ✅ Subidos 6 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (128 MB)...
+    ✓ videoId: -drxS2WdcjY → https://youtu.be/-drxS2WdcjY
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 5 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✗ social-organization-b-a-study-of-the-larger-mind: The user has uploaded too many thumbnails recently. Please try the request again later.
+    ⏸  YouTube no acepta más miniaturas por ahora. Sigo mañana.
+  ⚠️  4 fallaron.
+  ✅ 100 miniaturas puestas · quedan 61.
+  ```
+
 ## `2026-10-29 15:43 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1027,27 +1061,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (60/60)
   ✅ Subidos 60 videos a YouTube.
-  ```
-
-## `2026-09-22 15:09 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (17.2 MB, 246s)
-     ✓ audio es/nova (18.4 MB, 334s)
-     (5/5 ficha lista)
-  ✅ Tanda lista: 5 fichas generadas · 38 ya estaban · ~21 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: tG8V1Zb2-wE → https://youtu.be/tG8V1Zb2-wE
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (59/60)
-  ✅ Subidos 59 videos a YouTube.
   ```
 
