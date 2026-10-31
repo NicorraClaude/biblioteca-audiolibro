@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-10-31 14:52 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: KU6-1uiYp6A → https://youtu.be/KU6-1uiYp6A
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (7/7)
+  ✅ Subidos 7 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (235 MB)...
+    ✓ videoId: Q0ZjzyFsYcg → https://youtu.be/Q0ZjzyFsYcg
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 5 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ diario-de-su-residencia-en-chile-1822-y-de-su-viaje-al-brasil-1823 → MA6kLuxxAbA
+    ✓ tierra-virgen → uHG0Twy5ZcI
+    ✓ tierra-virgen → ogdT7vmqIOQ
+  ✅ 74 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-10-30 15:27 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1039,27 +1073,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (58/60)
   ✅ Subidos 58 videos a YouTube.
-  ```
-
-## `2026-09-23 15:15 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.6 MB, 220s)
-     ✓ audio es/nova (17.6 MB, 184s)
-     (5/5 ficha lista)
-  ✅ Tanda lista: 5 fichas generadas · 43 ya estaban · ~16 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: l1GJNw6IXbU → https://youtu.be/l1GJNw6IXbU
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (60/60)
-  ✅ Subidos 60 videos a YouTube.
   ```
 
