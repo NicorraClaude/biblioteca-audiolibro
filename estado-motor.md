@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-01 15:30 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: sbe0xGTOwaQ → https://youtu.be/sbe0xGTOwaQ
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (7/7)
+  ✅ Subidos 7 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (6 MB)...
+    ✓ videoId: HwOeTZlMSHc → https://youtu.be/HwOeTZlMSHc
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 2 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ 20-poemas-para-ser-leidos-en-el-tranvia → ZhUNPtz_-TU
+    ✓ novelas-ejemplares-y-amorosas → mHnld6nBwaw
+    ✓ vidas-ejemplares-beethoven-miguel-angel-tolstoi → sbe0xGTOwaQ
+  ✅ 9 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-10-31 14:52 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1051,27 +1085,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (60/60)
   ✅ Subidos 60 videos a YouTube.
-  ```
-
-## `2026-09-24 15:22 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.1 MB, 215s)
-     ✓ audio es/nova (17.2 MB, 336s)
-     (5/5 ficha lista)
-  ✅ Tanda lista: 5 fichas generadas · 48 ya estaban · ~11 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: 1V9utSlNXPM → https://youtu.be/1V9utSlNXPM
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (58/60)
-  ✅ Subidos 58 videos a YouTube.
   ```
 
