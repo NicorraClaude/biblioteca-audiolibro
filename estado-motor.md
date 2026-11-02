@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-02 18:51 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: Bb2EKvQmXkI → https://youtu.be/Bb2EKvQmXkI
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (6/6)
+  ✅ Subidos 6 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (96 MB)...
+    ✓ videoId: Pg9Md4VOthw → https://youtu.be/Pg9Md4VOthw
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 6 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ la-madre-naturaleza-2-parte-de-los-pazos-de-ulloa → mgaNW1SbU8k
+    ✓ en-las-orillas-del-sar → 9Y19oiOg8dU
+    ✓ en-las-orillas-del-sar → IJ9Y8qrb4HI
+  ✅ 12 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-01 15:30 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1060,28 +1094,6 @@
 - ✅ **Subida a YouTube**
   ```
     ✓ videoId: kLzMXAGP2n4 → https://youtu.be/kLzMXAGP2n4
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (60/60)
-  ✅ Subidos 60 videos a YouTube.
-  ```
-
-## `2026-09-25 15:35 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.3 MB, 272s)
-     ✓ audio es/nova (17.3 MB, 330s)
-     (5/5 ficha lista)
-  ✅ Tanda lista: 5 fichas generadas · 53 ya estaban · ~6 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: Q9VJxqQr4I4 → https://youtu.be/Q9VJxqQr4I4
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (60/60)
   ✅ Subidos 60 videos a YouTube.
