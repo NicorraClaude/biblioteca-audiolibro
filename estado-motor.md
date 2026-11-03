@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-03 16:33 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: xjxy92002CY → https://youtu.be/xjxy92002CY
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (6/6)
+  ✅ Subidos 6 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (221 MB)...
+    ✓ videoId: 50PbRrOTRu4 → https://youtu.be/50PbRrOTRu4
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 2 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ sotileza → xjxy92002CY
+    ✓ obras → DwBuYkz7mZc
+    ✓ cuentos-escogidos → MuzWt2cggYs
+  ✅ 8 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-02 18:51 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1072,28 +1106,6 @@
 - ✅ **Subida a YouTube**
   ```
     ✓ videoId: H7t98w4vqmI → https://youtu.be/H7t98w4vqmI
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (60/60)
-  ✅ Subidos 60 videos a YouTube.
-  ```
-
-## `2026-09-26 14:39 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.8 MB, 209s)
-     ✓ audio es/nova (18.0 MB, 301s)
-     (5/5 ficha lista)
-  ✅ Tanda lista: 5 fichas generadas · 58 ya estaban · ~1 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: kLzMXAGP2n4 → https://youtu.be/kLzMXAGP2n4
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (60/60)
   ✅ Subidos 60 videos a YouTube.
