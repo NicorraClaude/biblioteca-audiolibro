@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-04 16:36 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: 9Kdk8FrGPXo → https://youtu.be/9Kdk8FrGPXo
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (6/6)
+  ✅ Subidos 6 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (96 MB)...
+    ✓ videoId: Jgj86dLBsQ0 → https://youtu.be/Jgj86dLBsQ0
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 4 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ spanish-composition → S9a16wEQEO0
+    ✓ el-quijote-apocrifo → 9Kdk8FrGPXo
+    ✓ obras-dramaticas-de-euripides-1-de-3 → 5EZmIiKytQ8
+  ✅ 10 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-03 16:33 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1084,28 +1118,6 @@
 - ✅ **Subida a YouTube**
   ```
     ✓ videoId: nfv6Uo-quJ0 → https://youtu.be/nfv6Uo-quJ0
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (60/60)
-  ✅ Subidos 60 videos a YouTube.
-  ```
-
-## `2026-09-27 15:00 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.8 MB, 303s)
-     ✓ audio es/nova (17.9 MB, 268s)
-     (1/5 ficha lista)
-  ✅ Tanda lista: 1 fichas generadas · 63 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: H7t98w4vqmI → https://youtu.be/H7t98w4vqmI
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (60/60)
   ✅ Subidos 60 videos a YouTube.
