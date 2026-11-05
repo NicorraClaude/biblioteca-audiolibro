@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-05 16:48 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: CIfDEhHi8bc → https://youtu.be/CIfDEhHi8bc
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (7/7)
+  ✅ Subidos 7 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (184 MB)...
+    ✓ videoId: QX8mdhkpd7I → https://youtu.be/QX8mdhkpd7I
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 5 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ lo-prohibido-novela-completa → CIfDEhHi8bc
+    ✓ los-apostoles → Z60mjonrLJc
+    ✓ los-apostoles → 2zNKipuSlsY
+  ✅ 12 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-04 16:36 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1101,25 +1135,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (58/60)
   ✅ Subidos 58 videos a YouTube.
-  ```
-
-## `2026-09-28 17:29 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-  💼 Negocios modernos · MODE=all · LIMIT=5
-  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: nfv6Uo-quJ0 → https://youtu.be/nfv6Uo-quJ0
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (60/60)
-  ✅ Subidos 60 videos a YouTube.
   ```
 
