@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-06 16:15 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: M7P4X9xr8Gs → https://youtu.be/M7P4X9xr8Gs
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (7/7)
+  ✅ Subidos 7 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (183 MB)...
+    ✓ videoId: v6R6mgTlQYs → https://youtu.be/v6R6mgTlQYs
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 3 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ nacha-regules-novela → v6R6mgTlQYs
+    ✓ historia-de-la-instruccion-publica-en-puerto-rico-hasta-el-ano-de-1898 → gCwjC9WdCJM
+    ✓ historia-de-la-instruccion-publica-en-puerto-rico-hasta-el-ano-de-1898 → Q4zoAk3YCQ4
+  ✅ 10 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-05 16:48 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1115,25 +1149,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (22/22)
   ✅ Subidos 22 videos a YouTube.
-  ```
-
-## `2026-09-29 15:37 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-  💼 Negocios modernos · MODE=all · LIMIT=5
-  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: Yz7ZaIqaWFE → https://youtu.be/Yz7ZaIqaWFE
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (58/60)
-  ✅ Subidos 58 videos a YouTube.
   ```
 
