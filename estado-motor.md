@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-07 15:08 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: o-heN8iIp8o → https://youtu.be/o-heN8iIp8o
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (6/6)
+  ✅ Subidos 6 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (106 MB)...
+    ✓ videoId: lCPqTSCs3wY → https://youtu.be/lCPqTSCs3wY
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 3 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ a-vuela-pluma-coleccion-de-articulos-literarios-y-politicos → luuD8g0d2WA
+    ✓ la-politica-de-los-estados-unidos-en-el-continente-americano → o-heN8iIp8o
+    ✓ gloria-novela-completa → j8Vijzew_vc
+  ✅ 9 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-06 16:15 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1129,25 +1163,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (10/10)
   ✅ Subidos 10 videos a YouTube.
-  ```
-
-## `2026-09-30 15:25 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-  💼 Negocios modernos · MODE=all · LIMIT=5
-  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: OLpJudQWKts → https://youtu.be/OLpJudQWKts
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (22/22)
-  ✅ Subidos 22 videos a YouTube.
   ```
 
