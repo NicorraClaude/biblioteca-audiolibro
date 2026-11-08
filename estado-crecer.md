@@ -1,5 +1,14 @@
 # Bitácora de crecimiento — la corrida más nueva arriba
 
+## `2026-11-08 16:06 UTC` · objetivo: 8 en español + 4 en inglés
+
+- Ingeridos: 8 (nuevos 8, actualizados 0)
+- Descartados (copyright/idioma/no-rdf): 5
+- Total libros Capa 1 en la base: 890
+- Ingeridos: 4 (nuevos 4, actualizados 0)
+- Descartados (copyright/idioma/no-rdf): 1
+- Total libros Capa 1 en la base: 894
+
 ## `2026-11-07 15:41 UTC` · objetivo: 8 en español + 4 en inglés
 
 - Ingeridos: 8 (nuevos 8, actualizados 0)
@@ -260,13 +269,4 @@
 - Ingeridos: 4 (nuevos 4, actualizados 0)
 - Descartados (copyright/idioma/no-rdf): 1
 - Total libros Capa 1 en la base: 756
-
-## `2026-10-09 15:57 UTC` · objetivo: 8 en español + 4 en inglés
-
-- Ingeridos: 8 (nuevos 8, actualizados 0)
-- Descartados (copyright/idioma/no-rdf): 4
-- Total libros Capa 1 en la base: 744
-- Ingeridos: 4 (nuevos 4, actualizados 0)
-- Descartados (copyright/idioma/no-rdf): 1
-- Total libros Capa 1 en la base: 748
 
