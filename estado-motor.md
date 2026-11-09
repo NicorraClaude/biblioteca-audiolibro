@@ -1,5 +1,37 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-09 19:07 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: HrUvST2uQ4c → https://youtu.be/HrUvST2uQ4c
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (6/6)
+  ✅ Subidos 6 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+  📚 Audiolibros completos a subir: 0 (de 0 pendientes)
+  ✅ Subidos 0 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ la-gran-aldea → Mr3BDID8bNc
+    ✓ la-lucha-por-la-vida-la-busca → -H46Nhcscmc
+    ✓ claros-varones-de-castilla-y-letras → HrUvST2uQ4c
+  ✅ 6 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-08 17:28 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1153,26 +1185,6 @@
 - ✅ **Subida a YouTube**
   ```
     ✓ videoId: PXQ_yFLCIUg → https://youtu.be/PXQ_yFLCIUg
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (10/10)
-  ✅ Subidos 10 videos a YouTube.
-  ```
-
-## `2026-10-02 15:02 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-  💼 Negocios modernos · MODE=all · LIMIT=5
-  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: vgREwcLk6dE → https://youtu.be/vgREwcLk6dE
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (10/10)
   ✅ Subidos 10 videos a YouTube.
