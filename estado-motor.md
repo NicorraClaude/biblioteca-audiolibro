@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-10 16:38 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: EYHWknejr30 → https://youtu.be/EYHWknejr30
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (5/5)
+  ✅ Subidos 5 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (173 MB)...
+    ✓ videoId: h4uXiVUHMyg → https://youtu.be/h4uXiVUHMyg
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 3 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ el-abuelo-novela-en-cinco-jornadas → EYHWknejr30
+    ✓ el-abuelo-novela-en-cinco-jornadas → h4uXiVUHMyg
+    ✓ luces-de-bohemia-esperpento → ZHQwIuLAFEc
+  ✅ 8 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-09 19:07 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1168,25 +1202,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (6/6)
   ✅ Subidos 6 videos a YouTube.
-  ```
-
-## `2026-10-03 13:44 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-  💼 Negocios modernos · MODE=all · LIMIT=5
-  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: PXQ_yFLCIUg → https://youtu.be/PXQ_yFLCIUg
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (10/10)
-  ✅ Subidos 10 videos a YouTube.
   ```
 
