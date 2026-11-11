@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-11 16:36 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: B1q3KhctRzQ → https://youtu.be/B1q3KhctRzQ
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (5/5)
+  ✅ Subidos 5 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (53 MB)...
+    ✓ videoId: EUajDmWOp7o → https://youtu.be/EUajDmWOp7o
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 5 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ espana-invertebrada-bosquejo-de-algunos-pensamientos-historicos → EUajDmWOp7o
+    ✓ el-19-de-marzo-y-el-2-de-mayo → 6OQeVnjbtnI
+    ✓ el-19-de-marzo-y-el-2-de-mayo → eMh91jdANc0
+  ✅ 10 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-10 16:38 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1182,25 +1216,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (7/7)
   ✅ Subidos 7 videos a YouTube.
-  ```
-
-## `2026-10-04 14:22 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-  💼 Negocios modernos · MODE=all · LIMIT=5
-  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: VeNQJWefKnI → https://youtu.be/VeNQJWefKnI
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (6/6)
-  ✅ Subidos 6 videos a YouTube.
   ```
 
