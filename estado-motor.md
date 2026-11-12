@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-12 17:07 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: kpc-djatwhI → https://youtu.be/kpc-djatwhI
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (6/6)
+  ✅ Subidos 6 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (224 MB)...
+    ✓ videoId: Uh5926K6huI → https://youtu.be/Uh5926K6huI
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 3 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ historia-de-la-guerra-del-peloponeso-2-de-2 → kpc-djatwhI
+    ✓ el-caballero-encantado-cuento-real-inverosi-mil → X5msuaoViSA
+    ✓ el-caballero-encantado-cuento-real-inverosi-mil → Uh5926K6huI
+  ✅ 9 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-11 16:36 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1196,25 +1230,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (4/4)
   ✅ Subidos 4 videos a YouTube.
-  ```
-
-## `2026-10-05 17:24 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-  💼 Negocios modernos · MODE=all · LIMIT=5
-  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: lUBb0Cb5R3U → https://youtu.be/lUBb0Cb5R3U
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (7/7)
-  ✅ Subidos 7 videos a YouTube.
   ```
 
