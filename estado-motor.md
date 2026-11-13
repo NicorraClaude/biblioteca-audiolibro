@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-13 16:47 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: 7GkHM2me-Vc → https://youtu.be/7GkHM2me-Vc
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (5/5)
+  ✅ Subidos 5 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (55 MB)...
+    ✓ videoId: BBG58LyLw_k → https://youtu.be/BBG58LyLw_k
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 4 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ la-venganza-de-don-mendo → BBG58LyLw_k
+    ✓ cuentos-y-cronicas-obras-completas-vol-xiv → Qu68e7cSlHg
+    ✓ cuentos-y-cronicas-obras-completas-vol-xiv → Gg-L64q4giY
+  ✅ 9 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-12 17:07 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1210,25 +1244,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (5/5)
   ✅ Subidos 5 videos a YouTube.
-  ```
-
-## `2026-10-06 15:26 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-  💼 Negocios modernos · MODE=all · LIMIT=5
-  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: GWHZB9ciJlA → https://youtu.be/GWHZB9ciJlA
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (4/4)
-  ✅ Subidos 4 videos a YouTube.
   ```
 
