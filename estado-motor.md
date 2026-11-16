@@ -1,5 +1,39 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-16 18:55 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+    ✓ videoId: d1Ij6sbhs88 → https://youtu.be/d1Ij6sbhs88
+    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
+    (6/6)
+  ✅ Subidos 6 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+    · subiendo (145 MB)...
+    ✓ videoId: SIu_SI8Kqeo → https://youtu.be/SIu_SI8Kqeo
+    ✓ agregado a la lista de audiolibros completos
+  ✅ Subidos 3 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+    ✓ los-exploradores-espanoles-del-siglo-xvi → ULeksDzQW7Y
+    ✓ en-tranvia-b-cuentos-dramaticos → _loDfrOHCV8
+    ✓ en-tranvia-b-cuentos-dramaticos → SIu_SI8Kqeo
+  ✅ 9 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-15 15:53 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1252,25 +1286,5 @@
     ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
     (6/6)
   ✅ Subidos 6 videos a YouTube.
-  ```
-
-## `2026-10-09 15:35 UTC` · pedidos=10 modernos=5 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-  💼 Negocios modernos · MODE=all · LIMIT=5
-  ✅ Tanda lista: 0 fichas generadas · 64 ya estaban · ~0 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: Q9MuwPYisEY → https://youtu.be/Q9MuwPYisEY
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (7/7)
-  ✅ Subidos 7 videos a YouTube.
   ```
 
