@@ -1,5 +1,34 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-20 17:11 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+  📺 A subir a YouTube: 0 (de 0 pendientes)
+  🔎 Canal: 1394 videos públicos leídos para evitar repetidos.
+  ✅ Subidos 0 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+  📚 Audiolibros completos a subir: 0 (de 0 pendientes)
+  ✅ Subidos 0 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+  🖼  Miniaturas pendientes: 0 · esta tanda: 0
+  ✅ 0 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-19 17:35 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1290,28 +1319,6 @@
   ```
     · subiendo (195 MB)...
     ✓ videoId: An7-mKcnEgw → https://youtu.be/An7-mKcnEgw
-    ✓ agregado a la lista de audiolibros completos
-  ✅ Subidos 10 audiolibros completos.
-  ```
-
-## `2026-10-13 12:57 UTC` · pedidos=10 modernos=2 biblioteca=0 youtube=0
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✗ audio es/onyx: edge-tts 1: status', url='wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=ad4eefc6f675400a800b6d97bc97d2f5&Sec-MS-GEC=22B125ED6919F075CF8D07F0B020BA5FB890F1894045BC18B11887F7BE2A5B71&Sec-MS-GEC-Version=1-143.0.3650.75'
-     ✗ audio es/nova: edge-tts 1: status', url='wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4&ConnectionId=c2868ea6ccf84abe86b632acd8b1d984&Sec-MS-GEC=22B125ED6919F075CF8D07F0B020BA5FB890F1894045BC18B11887F7BE2A5B71&Sec-MS-GEC-Version=1-143.0.3650.75'
-     (2/2 ficha lista)
-  ✅ Tanda lista: 2 fichas generadas · 64 ya estaban · ~47 pendientes.
-  ```
-- ✅ **Audiolibros completos a YouTube**
-  ```
-    · subiendo (163 MB)...
-    ✓ videoId: F56v1j5CD2s → https://youtu.be/F56v1j5CD2s
     ✓ agregado a la lista de audiolibros completos
   ✅ Subidos 10 audiolibros completos.
   ```
