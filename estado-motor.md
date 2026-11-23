@@ -1,5 +1,34 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-23 20:30 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+  📺 A subir a YouTube: 0 (de 0 pendientes)
+  🔎 Canal: 1394 videos públicos leídos para evitar repetidos.
+  ✅ Subidos 0 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+  📚 Audiolibros completos a subir: 0 (de 0 pendientes)
+  ✅ Subidos 0 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+  🖼  Miniaturas pendientes: 0 · esta tanda: 0
+  ✅ 0 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-22 16:34 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1297,35 +1326,6 @@
   ```
     · subiendo (225 MB)...
     ✓ videoId: UcggyhWL87E → https://youtu.be/UcggyhWL87E
-    ✓ agregado a la lista de audiolibros completos
-  ✅ Subidos 10 audiolibros completos.
-  ```
-
-## `2026-10-14 15:10 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.8 MB, 157s)
-     ✓ audio es/nova (17.9 MB, 173s)
-     (8/8 ficha lista)
-  ✅ Tanda lista: 8 fichas generadas · 73 ya estaban · ~32 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: 5dBvpxQRhG8 → https://youtu.be/5dBvpxQRhG8
-    ✓ agregado a la lista "Clásicos de la literatura: resúmenes en español"
-    (13/14)
-  ✅ Subidos 13 videos a YouTube.
-  ```
-- ✅ **Audiolibros completos a YouTube**
-  ```
-    · subiendo (60 MB)...
-    ✓ videoId: WZMr-xFb98M → https://youtu.be/WZMr-xFb98M
     ✓ agregado a la lista de audiolibros completos
   ✅ Subidos 10 audiolibros completos.
   ```
