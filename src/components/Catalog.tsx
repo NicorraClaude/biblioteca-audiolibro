@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Book, Language } from "@/lib/types";
 import { BookCard } from "@/components/BookCard";
 import { normalize } from "@/lib/text";
@@ -36,7 +36,39 @@ const CATEGORY_EMOJI: Record<string, string> = {
   Biografía: "👤",
 };
 
-export function Catalog({ books }: { books: Book[] }) {
+// La portada trae solo los primeros libros (`books`) y los números del catálogo
+// entero (`resumen`). El resto se pide a /api/catalogo cuando la persona llega a
+// esta sección o toca un filtro: así la portada pesa poco para quien no lo usa.
+export function Catalog({
+  books: primeros,
+  resumen,
+}: {
+  books: Book[];
+  resumen: { total: number; conAudio: number; categorias: [string, number][] };
+}) {
+  const [todos, setTodos] = useState<Book[] | null>(null);
+  const [fallo, setFallo] = useState(false);
+  const pedido = useRef(false);
+  const caja = useRef<HTMLDivElement>(null);
+  const cargar = () => {
+    if (pedido.current) return;
+    pedido.current = true;
+    setFallo(false);
+    fetch("/api/catalogo")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((lista: Book[]) => setTodos(lista))
+      .catch(() => { pedido.current = false; setFallo(true); });
+  };
+  useEffect(() => {
+    const el = caja.current;
+    if (!el || !("IntersectionObserver" in window)) { cargar(); return; }
+    const ojo = new IntersectionObserver((e) => { if (e.some((x) => x.isIntersecting)) { cargar(); ojo.disconnect(); } }, { rootMargin: "600px" });
+    ojo.observe(el);
+    return () => ojo.disconnect();
+  }, []);
+  const books = todos ?? primeros;
+  const completo = todos !== null || primeros.length >= resumen.total;
+
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("todas");
   const [language, setLanguage] = useState<"todos" | Language>("todos");
@@ -44,13 +76,8 @@ export function Catalog({ books }: { books: Book[] }) {
   const [onlyAudio, setOnlyAudio] = useState(false);
 
   // Categorías con conteo, ordenadas por cantidad (las más pobladas primero).
-  const categories = useMemo(() => {
-    const count = new Map<string, number>();
-    books.forEach((b) => b.categories.forEach((c) => count.set(c, (count.get(c) ?? 0) + 1)));
-    return Array.from(count.entries()).sort((a, b) => b[1] - a[1]);
-  }, [books]);
-
-  const audioCount = useMemo(() => books.filter(hasPlayableAudio).length, [books]);
+  const categories = resumen.categorias;
+  const audioCount = resumen.conAudio;
 
   const filtered = useMemo(() => {
     const q = normalize(query);
@@ -69,7 +96,7 @@ export function Catalog({ books }: { books: Book[] }) {
   }, [books, query, category, language, sort, onlyAudio]);
 
   return (
-    <div>
+    <div ref={caja} onFocusCapture={cargar} onPointerDownCapture={cargar}>
       {/* Búsqueda */}
       <div className="relative mb-5">
         <svg viewBox="0 0 24 24" className="pointer-events-none absolute top-1/2 left-5 h-5 w-5 -translate-y-1/2 text-ink-soft" fill="none" stroke="currentColor" strokeWidth="2">
@@ -127,6 +154,27 @@ export function Catalog({ books }: { books: Book[] }) {
           {filtered.map((b) => (
             <BookCard key={b.id} book={b} />
           ))}
+        </div>
+      ) : null}
+      {filtered.length > 0 ? (
+        completo ? null : (
+        <p className="mt-6 text-center text-sm text-ink-soft">
+          {fallo ? (
+            <button onClick={cargar} className="font-semibold text-accent hover:text-accent-dark">No se cargó el resto. Reintentar</button>
+          ) : (
+            `Cargando los ${resumen.total} títulos…`
+          )}
+        </p>
+        )
+      ) : !completo ? (
+        <div className="rounded-2xl border border-dashed border-line py-20 text-center text-ink-soft">
+          {fallo ? "No pudimos cargar el catálogo." : "Buscando en toda la biblioteca…"}
+          {fallo && (
+            <>
+              <br />
+              <button onClick={cargar} className="mt-2 font-semibold text-accent hover:text-accent-dark">Reintentar</button>
+            </>
+          )}
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-line py-20 text-center text-ink-soft">

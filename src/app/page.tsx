@@ -26,7 +26,13 @@ export default async function HomePage() {
   const cats = categorias(books).filter((c) => c.libros.length >= 3);
   const autoresTop = autores(books, 3).slice(0, 24);
 
-  const librosLivianos = books.map(paraTarjeta);
+  // La portada lleva solo los primeros del catálogo (A-Z) y sus números; el
+  // resto lo pide el navegador a /api/catalogo cuando hace falta. Con los 1.100
+  // libros adentro pesaba 5,3 MB y los robots que la piden se comían la cuota de Vercel.
+  const librosLivianos = [...books].sort((a, b) => a.title.localeCompare(b.title, "es")).slice(0, 40).map(paraTarjeta);
+  const cuenta = new Map<string, number>();
+  books.forEach((b) => b.categories.forEach((c) => cuenta.set(c, (cuenta.get(c) ?? 0) + 1)));
+  const resumenCatalogo = { total, conAudio, categorias: Array.from(cuenta.entries()).sort((a, b) => b[1] - a[1]) };
   const novedadesLivianas = novedades.map(paraTarjeta);
 
   return (
@@ -103,7 +109,7 @@ export default async function HomePage() {
 
       <section id="catalogo" className="mt-12 scroll-mt-24">
         <h2 className="mb-4 font-display text-xl font-semibold text-ink sm:text-2xl">Toda la biblioteca</h2>
-        <Catalog books={librosLivianos} />
+        <Catalog books={librosLivianos} resumen={resumenCatalogo} />
       </section>
 
       <section className="mt-12">
