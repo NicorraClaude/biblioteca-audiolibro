@@ -1,5 +1,34 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-24 19:40 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+  📺 A subir a YouTube: 0 (de 0 pendientes)
+  🔎 Canal: 1394 videos públicos leídos para evitar repetidos.
+  ✅ Subidos 0 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+  📚 Audiolibros completos a subir: 0 (de 0 pendientes)
+  ✅ Subidos 0 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+  🖼  Miniaturas pendientes: 0 · esta tanda: 0
+  ✅ 0 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-23 20:30 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1299,34 +1328,5 @@
     ✗ meditations: The user has uploaded too many thumbnails recently. Please try the request again later.
   ⚠️  145 fallaron.
   ✅ 5 miniaturas puestas · quedan 792.
-  ```
-
-## `2026-10-15 18:40 UTC` · pedidos=10 modernos=4 biblioteca=0 youtube=20
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.8 MB, 288s)
-     ✓ audio es/nova (17.9 MB, 406s)
-     (4/4 ficha lista)
-  ✅ Tanda lista: 4 fichas generadas · 81 ya estaban · ~50 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: ymoYo9F6EsM → https://youtu.be/ymoYo9F6EsM
-    ✓ agregado a la lista "Resúmenes de libros de negocios y desarrollo personal"
-    (4/4)
-  ✅ Subidos 4 videos a YouTube.
-  ```
-- ✅ **Audiolibros completos a YouTube**
-  ```
-    · subiendo (225 MB)...
-    ✓ videoId: UcggyhWL87E → https://youtu.be/UcggyhWL87E
-    ✓ agregado a la lista de audiolibros completos
-  ✅ Subidos 10 audiolibros completos.
   ```
 
