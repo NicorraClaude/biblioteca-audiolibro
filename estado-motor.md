@@ -1,5 +1,34 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-26 18:36 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+  📺 A subir a YouTube: 0 (de 0 pendientes)
+  🔎 Canal: 1394 videos públicos leídos para evitar repetidos.
+  ✅ Subidos 0 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+  📚 Audiolibros completos a subir: 0 (de 0 pendientes)
+  ✅ Subidos 0 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+  🖼  Miniaturas pendientes: 0 · esta tanda: 0
+  ✅ 0 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-25 18:48 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1285,41 +1314,5 @@
     ✗ color-images-from-mars-rovers-spirit-and-opportunity: The user has uploaded too many thumbnails recently. Please try the request again later.
   ⚠️  50 fallaron.
   ✅ 100 miniaturas puestas · quedan 662.
-  ```
-
-## `2026-10-17 13:59 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (17.1 MB, 195s)
-     ✓ audio es/nova (18.2 MB, 273s)
-     (8/8 ficha lista)
-  ✅ Tanda lista: 8 fichas generadas · 93 ya estaban · ~34 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: I3esIrgB6Ss → https://youtu.be/I3esIrgB6Ss
-    ✓ agregado a la lista "Resúmenes de libros de negocios y desarrollo personal"
-    (8/8)
-  ✅ Subidos 8 videos a YouTube.
-  ```
-- ✅ **Audiolibros completos a YouTube**
-  ```
-    · subiendo (220 MB)...
-    ✓ videoId: gGcdQJ2vTso → https://youtu.be/gGcdQJ2vTso
-    ✓ agregado a la lista de audiolibros completos
-  ✅ Subidos 30 audiolibros completos.
-  ```
-- ✅ **Miniaturas de YouTube**
-  ```
-    ✗ carmen: The user has uploaded too many thumbnails recently. Please try the request again later.
-    ✗ carmen: The user has uploaded too many thumbnails recently. Please try the request again later.
-  ⚠️  47 fallaron.
-  ✅ 103 miniaturas puestas · quedan 728.
   ```
 
