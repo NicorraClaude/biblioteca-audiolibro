@@ -1,5 +1,34 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-27 18:24 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+  📺 A subir a YouTube: 0 (de 0 pendientes)
+  🔎 Canal: 1394 videos públicos leídos para evitar repetidos.
+  ✅ Subidos 0 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+  📚 Audiolibros completos a subir: 0 (de 0 pendientes)
+  ✅ Subidos 0 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+  🖼  Miniaturas pendientes: 0 · esta tanda: 0
+  ✅ 0 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-26 18:36 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1278,41 +1307,5 @@
     ✗ surgical-experiences-in-south-africa-1899-1900-being-mainly-a-clinical-study-of-: The user has uploaded too many thumbnails recently. Please try the request again later.
   ⚠️  47 fallaron.
   ✅ 103 miniaturas puestas · quedan 593.
-  ```
-
-## `2026-10-18 14:33 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.7 MB, 239s)
-     ✓ audio es/nova (17.8 MB, 336s)
-     (8/8 ficha lista)
-  ✅ Tanda lista: 8 fichas generadas · 101 ya estaban · ~26 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    ✓ videoId: 3IM0N0X338A → https://youtu.be/3IM0N0X338A
-    ✓ agregado a la lista "Resúmenes de libros de negocios y desarrollo personal"
-    (8/8)
-  ✅ Subidos 8 videos a YouTube.
-  ```
-- ✅ **Audiolibros completos a YouTube**
-  ```
-    · subiendo (233 MB)...
-    ✓ videoId: lHxVRTejsfM → https://youtu.be/lHxVRTejsfM
-    ✓ agregado a la lista de audiolibros completos
-  ✅ Subidos 30 audiolibros completos.
-  ```
-- ✅ **Miniaturas de YouTube**
-  ```
-    ✗ color-images-from-mars-rovers-spirit-and-opportunity: The user has uploaded too many thumbnails recently. Please try the request again later.
-    ✗ color-images-from-mars-rovers-spirit-and-opportunity: The user has uploaded too many thumbnails recently. Please try the request again later.
-  ⚠️  50 fallaron.
-  ✅ 100 miniaturas puestas · quedan 662.
   ```
 
