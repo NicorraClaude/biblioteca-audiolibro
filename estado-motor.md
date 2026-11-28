@@ -1,5 +1,34 @@
 # Bitácora (estado-motor) — la corrida más nueva arriba
 
+## `2026-11-28 17:08 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
+
+- ✅ **Pedidos de títulos**
+  ```
+  📥 Cola de pedidos: 1 total · 0 a procesar.
+  Nada pendiente. ✅
+  ```
+- ✅ **Fichas modernas**
+  ```
+  💼 Negocios modernos · MODE=all · LIMIT=8
+  ✅ Tanda lista: 0 fichas generadas · 135 ya estaban · ~0 pendientes.
+  ```
+- ✅ **Subida a YouTube**
+  ```
+  📺 A subir a YouTube: 0 (de 0 pendientes)
+  🔎 Canal: 1394 videos públicos leídos para evitar repetidos.
+  ✅ Subidos 0 videos a YouTube.
+  ```
+- ✅ **Audiolibros completos a YouTube**
+  ```
+  📚 Audiolibros completos a subir: 0 (de 0 pendientes)
+  ✅ Subidos 0 audiolibros completos.
+  ```
+- ✅ **Miniaturas de YouTube**
+  ```
+  🖼  Miniaturas pendientes: 0 · esta tanda: 0
+  ✅ 0 miniaturas puestas · quedan 0.
+  ```
+
 ## `2026-11-27 18:24 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
 
 - ✅ **Pedidos de títulos**
@@ -1271,41 +1300,5 @@
     ✗ the-handbook-to-english-heraldry: The user has uploaded too many thumbnails recently. Please try the request again later.
   ⚠️  149 fallaron.
   ✅ 1 miniaturas puestas · quedan 630.
-  ```
-
-## `2026-10-19 18:34 UTC` · pedidos=10 modernos=8 biblioteca=auto youtube=60
-
-- ✅ **Pedidos de títulos**
-  ```
-  📥 Cola de pedidos: 1 total · 0 a procesar.
-  Nada pendiente. ✅
-  ```
-- ✅ **Fichas modernas**
-  ```
-     ✓ audio es/onyx (16.2 MB, 333s)
-     ✓ audio es/nova (17.9 MB, 522s)
-     (8/8 ficha lista)
-  ✅ Tanda lista: 8 fichas generadas · 109 ya estaban · ~18 pendientes.
-  ```
-- ✅ **Subida a YouTube**
-  ```
-    (7/8)
-  ⚠️  1 fallaron:
-     · team-topologies: Requested entity already exists
-  ✅ Subidos 7 videos a YouTube.
-  ```
-- ✅ **Audiolibros completos a YouTube**
-  ```
-    · subiendo (93 MB)...
-    ✓ videoId: 2HWP7na2CMQ → https://youtu.be/2HWP7na2CMQ
-    ✓ agregado a la lista de audiolibros completos
-  ✅ Subidos 30 audiolibros completos.
-  ```
-- ✅ **Miniaturas de YouTube**
-  ```
-    ✗ expositions-of-holy-scripture-second-corinthians-galatians-and-philippians-chapt: The user has uploaded too many thumbnails recently. Please try the request again later.
-    ✗ surgical-experiences-in-south-africa-1899-1900-being-mainly-a-clinical-study-of-: The user has uploaded too many thumbnails recently. Please try the request again later.
-  ⚠️  47 fallaron.
-  ✅ 103 miniaturas puestas · quedan 593.
   ```
 
